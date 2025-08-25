@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-08-23
+## [0.0.1] - 2025-08-25
+
+### Added
+-Create the skeleton dice test.py
+
+## [0.0.0] - 2025-08-23
 
 ### Added
 - Initial commit with full folder structure.
 - Requeriments started with coverage==7.10.5 and pygame==2.6.1
-- GitHub repository initialized for Backgammon project.
+- GitHub repository initialized for Backgammon project.  
