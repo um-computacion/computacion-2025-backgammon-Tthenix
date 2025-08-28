@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.2] - 2025-09 -25
+
+## [0.0.4] - 2025-09 -28
+
+### Added
+-Create the skeleton checker test.py
+
+## [0.0.3] - 2025-09 -27
+
+### Added
+-Create the skeleton player test.py
+
+## [0.0.2] - 2025-09 -26
 
 ### Added
 -Create the skeleton board test.py
-
 
 ## [0.0.1] - 2025-08-25
 
