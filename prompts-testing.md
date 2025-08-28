@@ -675,3 +675,330 @@ I use all the answer for the player test
 ### reference:
 
 test/test_player.py
+
+## Promt 4
+### Claude-4-sonnet:
+### Prompt:
+I am implementing the game Backgammon using Test-Driven Development (TDD). Please create an initial test suite for a Checker class in a file named test_checker.py. 
+use python unittest 
+
+Initially fail because the Player class not exist
+Cover key responsibilities of a Backgammon checker, like:
+Belongs to a specific player (color: black or white).
+Can be placed on a point.
+Can be moved from one point to another.
+Can be sent to the bar when captured.
+Can be borne off when conditions are met.
+
+Aim for high coverage (around 90%) once the class is implemente@test_checker.py 
+
+### Answer:
+Voy a crear una suite de pruebas completa para la clase Checker siguiendo el enfoque TDD. Primero voy a revisar la estructura actual del proyecto y luego implementar las pruebas.
+Crear pruebas completas para la clase Checker con cobertura del 90%
+Perfecto! Veo que ya tienes una estructura sólida de tests en el proyecto. Ahora voy a crear una suite de pruebas completa para la clase Checker siguiendo el mismo patrón que usaste en test_player.py. Voy a corregir el error de sintaxis y crear pruebas comprehensivas que cubran todas las responsabilidades de un checker en Backgammon.
+Perfecto! He creado una suite de pruebas completa para la clase Checker siguiendo el enfoque TDD. Ahora voy a verificar que las pruebas fallan correctamente (como es esperado en TDD) ejecutándolas:
+
+```
+def setUp(self):
+		self.white_checker = Checker("white")
+		self.black_checker = Checker("black")
+	
+	def test_checker_initialization_with_white_color(self):
+		checker = Checker("white")
+		
+		self.assertEqual(checker.color, "white")
+		self.assertIsNone(checker.position)
+		self.assertFalse(checker.is_on_bar)
+		self.assertFalse(checker.is_borne_off)
+	
+	def test_checker_initialization_with_black_color(self):
+		checker = Checker("black")
+		
+		self.assertEqual(checker.color, "black")
+		self.assertIsNone(checker.position)
+		self.assertFalse(checker.is_on_bar)
+		self.assertFalse(checker.is_borne_off)
+	
+	def test_invalid_color_raises_exception(self):
+		with self.assertRaises(ValueError) as context:
+			Checker("red")
+		
+		self.assertIn("Color must be 'white' or 'black'", str(context.exception))
+	
+	def test_none_color_raises_exception(self):
+		with self.assertRaises(ValueError) as context:
+			Checker(None)
+		
+		self.assertIn("Color must be 'white' or 'black'", str(context.exception))
+	
+	def test_place_checker_on_valid_point(self):
+		self.white_checker.place_on_point(5)
+		
+		self.assertEqual(self.white_checker.position, 5)
+		self.assertFalse(self.white_checker.is_on_bar)
+		self.assertFalse(self.white_checker.is_borne_off)
+	
+	def test_place_checker_on_point_1(self):
+		self.black_checker.place_on_point(1)
+		
+		self.assertEqual(self.black_checker.position, 1)
+	
+	def test_place_checker_on_point_24(self):
+		self.white_checker.place_on_point(24)
+		
+		self.assertEqual(self.white_checker.position, 24)
+	
+	def test_place_checker_on_invalid_point_below_range(self):
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.place_on_point(0)
+		
+		self.assertIn("Position must be between 1 and 24", str(context.exception))
+	
+	def test_place_checker_on_invalid_point_above_range(self):
+		with self.assertRaises(ValueError) as context:
+			self.black_checker.place_on_point(25)
+		
+		self.assertIn("Position must be between 1 and 24", str(context.exception))
+	
+	def test_move_checker_from_point_to_point(self):
+		self.white_checker.place_on_point(8)
+		self.white_checker.move_to_point(12)
+		
+		self.assertEqual(self.white_checker.position, 12)
+		self.assertFalse(self.white_checker.is_on_bar)
+		self.assertFalse(self.white_checker.is_borne_off)
+	
+	def test_move_checker_when_not_placed_raises_exception(self):
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.move_to_point(5)
+		
+		self.assertIn("Checker must be placed before moving", str(context.exception))
+	
+	def test_move_checker_when_on_bar_raises_exception(self):
+		self.white_checker.send_to_bar()
+		
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.move_to_point(5)
+		
+		self.assertIn("Checker on bar cannot move directly", str(context.exception))
+	
+	def test_move_checker_when_borne_off_raises_exception(self):
+		self.white_checker.place_on_point(1)
+		self.white_checker.bear_off()
+		
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.move_to_point(5)
+		
+		self.assertIn("Checker has already been removed from board", str(context.exception))
+	
+	def test_send_checker_to_bar(self):
+		self.white_checker.place_on_point(10)
+		self.white_checker.send_to_bar()
+		
+		self.assertIsNone(self.white_checker.position)
+		self.assertTrue(self.white_checker.is_on_bar)
+		self.assertFalse(self.white_checker.is_borne_off)
+	
+	def test_send_unplaced_checker_to_bar_raises_exception(self):
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.send_to_bar()
+		
+		self.assertIn("Checker must be placed before sending to bar", str(context.exception))
+	
+	def test_send_already_barred_checker_to_bar_raises_exception(self):
+		self.white_checker.place_on_point(5)
+		self.white_checker.send_to_bar()
+		
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.send_to_bar()
+		
+		self.assertIn("Checker is already on bar", str(context.exception))
+	
+	def test_return_checker_from_bar(self):
+		self.black_checker.place_on_point(15)
+		self.black_checker.send_to_bar()
+		self.black_checker.return_from_bar(20)
+		
+		self.assertEqual(self.black_checker.position, 20)
+		self.assertFalse(self.black_checker.is_on_bar)
+		self.assertFalse(self.black_checker.is_borne_off)
+	
+	def test_return_checker_not_on_bar_raises_exception(self):
+		self.black_checker.place_on_point(10)
+		
+		with self.assertRaises(ValueError) as context:
+			self.black_checker.return_from_bar(15)
+		
+		self.assertIn("Checker is not on bar", str(context.exception))
+	
+	def test_bear_off_checker(self):
+		self.white_checker.place_on_point(2)
+		self.white_checker.bear_off()
+		
+		self.assertIsNone(self.white_checker.position)
+		self.assertFalse(self.white_checker.is_on_bar)
+		self.assertTrue(self.white_checker.is_borne_off)
+	
+	def test_bear_off_unplaced_checker_raises_exception(self):
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.bear_off()
+		
+		self.assertIn("Checker must be placed before bearing off", str(context.exception))
+	
+	def test_bear_off_checker_on_bar_raises_exception(self):
+		self.white_checker.place_on_point(8)
+		self.white_checker.send_to_bar()
+		
+		with self.assertRaises(ValueError) as context:
+			self.white_checker.bear_off()
+		
+		self.assertIn("Checker on bar cannot be borne off", str(context.exception))
+	
+	def test_bear_off_already_borne_off_checker_raises_exception(self):
+		self.black_checker.place_on_point(22)
+		self.black_checker.bear_off()
+		
+		with self.assertRaises(ValueError) as context:
+			self.black_checker.bear_off()
+		
+		self.assertIn("Checker has already been removed from board", str(context.exception))
+	
+	def test_checker_can_move_when_placed(self):
+		self.white_checker.place_on_point(15)
+		
+		self.assertTrue(self.white_checker.can_move())
+	
+	def test_checker_cannot_move_when_not_placed(self):
+		self.assertFalse(self.white_checker.can_move())
+	
+	def test_checker_cannot_move_when_on_bar(self):
+		self.black_checker.place_on_point(10)
+		self.black_checker.send_to_bar()
+		
+		self.assertFalse(self.black_checker.can_move())
+	
+	def test_checker_cannot_move_when_borne_off(self):
+		self.white_checker.place_on_point(3)
+		self.white_checker.bear_off()
+		
+		self.assertFalse(self.white_checker.can_move())
+	
+	def test_checker_can_be_captured_when_placed(self):
+		self.black_checker.place_on_point(18)
+		
+		self.assertTrue(self.black_checker.can_be_captured())
+	
+	def test_checker_cannot_be_captured_when_not_placed(self):
+		self.assertFalse(self.white_checker.can_be_captured())
+	
+	def test_checker_cannot_be_captured_when_on_bar(self):
+		self.white_checker.place_on_point(7)
+		self.white_checker.send_to_bar()
+		
+		self.assertFalse(self.white_checker.can_be_captured())
+	
+	def test_checker_cannot_be_captured_when_borne_off(self):
+		self.black_checker.place_on_point(19)
+		self.black_checker.bear_off()
+		
+		self.assertFalse(self.black_checker.can_be_captured())
+	
+	def test_checker_string_representation_when_not_placed(self):
+		expected = "Checker(color=white, position=None, on_bar=False, borne_off=False)"
+		self.assertEqual(str(self.white_checker), expected)
+	
+	def test_checker_string_representation_when_placed(self):
+		self.black_checker.place_on_point(12)
+		expected = "Checker(color=black, position=12, on_bar=False, borne_off=False)"
+		self.assertEqual(str(self.black_checker), expected)
+	
+	def test_checker_string_representation_when_on_bar(self):
+		self.white_checker.place_on_point(6)
+		self.white_checker.send_to_bar()
+		expected = "Checker(color=white, position=None, on_bar=True, borne_off=False)"
+		self.assertEqual(str(self.white_checker), expected)
+	
+	def test_checker_string_representation_when_borne_off(self):
+		self.black_checker.place_on_point(21)
+		self.black_checker.bear_off()
+		expected = "Checker(color=black, position=None, on_bar=False, borne_off=True)"
+		self.assertEqual(str(self.black_checker), expected)
+	
+	def test_checker_equality_based_on_color_and_state(self):
+		checker1 = Checker("white")
+		checker2 = Checker("white")
+		checker3 = Checker("black")
+		
+		checker1.place_on_point(5)
+		checker2.place_on_point(5)
+		
+		self.assertEqual(checker1, checker2)
+		self.assertNotEqual(checker1, checker3)
+	
+	def test_checker_hash_consistency(self):
+		checker1 = Checker("white")
+		checker2 = Checker("white")
+		
+		checker1.place_on_point(10)
+		checker2.place_on_point(10)
+		
+		self.assertEqual(hash(checker1), hash(checker2))
+	
+	def test_reset_checker_state(self):
+		self.white_checker.place_on_point(15)
+		self.white_checker.send_to_bar()
+		self.white_checker.reset()
+		
+		self.assertIsNone(self.white_checker.position)
+		self.assertFalse(self.white_checker.is_on_bar)
+		self.assertFalse(self.white_checker.is_borne_off)
+	
+	def test_get_checker_state(self):
+		self.black_checker.place_on_point(8)
+		state = self.black_checker.get_state()
+		
+		self.assertIn('color', state)
+		self.assertIn('position', state)
+		self.assertIn('is_on_bar', state)
+		self.assertIn('is_borne_off', state)
+		self.assertEqual(state['color'], 'black')
+		self.assertEqual(state['position'], 8)
+		self.assertFalse(state['is_on_bar'])
+		self.assertFalse(state['is_borne_off'])
+	
+	def test_copy_checker(self):
+		self.white_checker.place_on_point(20)
+		checker_copy = self.white_checker.copy()
+		
+		self.assertEqual(checker_copy.color, self.white_checker.color)
+		self.assertEqual(checker_copy.position, self.white_checker.position)
+		self.assertEqual(checker_copy.is_on_bar, self.white_checker.is_on_bar)
+		self.assertEqual(checker_copy.is_borne_off, self.white_checker.is_borne_off)
+		
+		self.white_checker.move_to_point(24)
+		self.assertEqual(checker_copy.position, 20)
+	
+	def test_multiple_state_transitions(self):
+		self.black_checker.place_on_point(10)
+		self.assertEqual(self.black_checker.position, 10)
+		
+		self.black_checker.move_to_point(15)
+		self.assertEqual(self.black_checker.position, 15)
+		
+		self.black_checker.send_to_bar()
+		self.assertTrue(self.black_checker.is_on_bar)
+		
+		self.black_checker.return_from_bar(20)
+		self.assertEqual(self.black_checker.position, 20)
+		self.assertFalse(self.black_checker.is_on_bar)
+		
+		self.black_checker.bear_off()
+		self.assertTrue(self.black_checker.is_borne_off)
+		self.assertIsNone(self.black_checker.position)
+```
+### What i do with the answer?
+I use the all the tests case
+
+### reference:
+
+test/test_checker.py
