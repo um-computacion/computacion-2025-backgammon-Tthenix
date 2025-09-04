@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Configured GitHub Actions to run tests correctly from `test/` directory
+- Updated unittest command in CI to use discovery with `test_*.py` pattern
+- Fixed incorrect references to non-existent files in Pylint configuration
+- Added pylint>=3.0.0 to requirements.txt
+- Created .pylintrc file with custom project configuration
+
 
 ## [0.0.4] - 2025-09 -28
 

@@ -1,0 +1,31 @@
+[DESIGN]
+# Maximum number of arguments for functions/methods.
+max-args=5
+
+# Maximum number of statements in a function/method.
+max-statements=50
+
+# Maximum number of local variables in a function/method.
+max-locals=15
+
+# Maximum number of return statements in a function/method.
+max-returns=6
+
+# Maximum number of branches in a function/method.
+max-branches=12
+
+# Maximum number of nested blocks in a function/method.
+max-nested-blocks=5
+
+# Maximum number of public methods in a class.
+max-public-methods=20
+
+# Maximum number of attributes in a class.
+max-attributes=7
+
+# Minimum number of public methods in a class.
+min-public-methods=2
+
+[REPORTS]
+# Disable the generation of reports.
+reports=no
