@@ -1,0 +1,2 @@
+class dice:
+    pass

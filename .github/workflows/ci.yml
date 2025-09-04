@@ -1,0 +1,89 @@
+name: CI with Coverage
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-analyze:
+    runs-on: ubuntu-latest
+    #Evitar bucle infinito
+    if: github.actor != 'github-actions[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests and generate coverage report
+        run: |
+          coverage run -m unittest discover -s test -p "test_*.py"
+          coverage xml -o cobertura.xml
+          coverage report -m > coverage_report.txt
+      - name: Run Pylint and generate report
+        run: |
+          pylint --rcfile=.pylintrc core/ test/ > pylint_report.txt || true
+      - name: Generate reports file
+        run: |
+          cat << 'EOF' > generate_reports.py
+          import os
+          def read_file(filepath):
+              if not os.path.exists(filepath):
+                  return f"Error: Report file not found at {filepath}"
+              with open(filepath, "r") as f:
+                  return f.read()
+          coverage_report = read_file("coverage_report.txt")
+          pylint_report = read_file("pylint_report.txt")
+          reports_content = f"""# Automated Reports
+          ## Coverage Report
+          ```text
+          {coverage_report}
+          ```
+          ## Pylint Report
+          ```text
+          {pylint_report}
+          ```
+          """
+          with open("REPORTS.md", "w") as f:
+              f.write(reports_content)
+          EOF
+          python generate_reports.py
+      - name: Create Pull Request for reports
+        if: github.ref == 'refs/heads/main'
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs: Update automated reports [skip ci]"
+          title: ":gráfico_de_barras: Update Automated Reports"
+          body: |
+            :cara_de_robot: **Automated report update**
+            This PR updates the REPORTS.md file with the latest:
+            - Coverage report
+            - Pylint analysis
+            Generated automatically by GitHub Actions.
+          branch: update-reports
+          delete-branch: true
+          base: main
+      - name: Auto-merge Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: |
+          # Esperar un momento para que el PR esté completamente creado
+          sleep 5
+          # Habilitar auto-merge y mergear inmediatamente
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} \
+            --squash \
+            --delete-branch \
+            --admin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
