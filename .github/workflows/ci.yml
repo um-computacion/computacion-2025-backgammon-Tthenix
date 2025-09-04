@@ -27,12 +27,12 @@ jobs:
           pip install -r requirements.txt
       - name: Run tests and generate coverage report
         run: |
-          coverage run -m unittest discover
+          coverage run -m unittest discover -s test -p "test_*.py"
           coverage xml -o cobertura.xml
           coverage report -m > coverage_report.txt
       - name: Run Pylint and generate report
         run: |
-          pylint --rcfile=.pylintrc main.py test.py > pylint_report.txt || true
+          pylint --rcfile=.pylintrc core/ test/ > pylint_report.txt || true
       - name: Generate reports file
         run: |
           cat << 'EOF' > generate_reports.py
