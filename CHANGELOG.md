@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pylint>=3.0.0 to requirements.txt
 - Created .pylintrc file with custom project configuration
 
+## [0.0.5] - 2025-10-08
+
+### Added
+-Create the skeleton backgammon test.py
+-Create the skeleton checker test.py
+
+## [0.0.5] - 2025-10-04
+
+### Added
+-Create github actions
 
 ## [0.0.4] - 2025-09 -28
 
