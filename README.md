@@ -23,3 +23,14 @@
 
 
 ### Anexos: diagramas UML(ej: diagrama de clases):
+
+![Class Diagram - Backgammon](assets/uml/Computacion%20nahue.jpeg)
+
+**Diagram Description:**
+The class diagram shows the complete structure of the Backgammon game with the following main classes:
+
+- **BackgammonGame**: Main class that coordinates the game
+- **Player**: Represents each player with their attributes and methods
+- **Board**: Manages the board and piece positions
+- **Checker**: Represents individual game pieces
+- **Dice**: Handles dice logic and movements
