@@ -30,6 +30,9 @@ jobs:
           coverage run -m unittest discover -s test -p "test_*.py"
           coverage xml -o cobertura.xml
           coverage report -m > coverage_report.txt
+          echo "Coverage debug info:"
+          ls -la core/
+          coverage report --show-missing
       - name: Run Pylint and generate report
         run: |
           pylint --rcfile=.pylintrc core/ test/ > pylint_report.txt || true
