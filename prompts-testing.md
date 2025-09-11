@@ -1503,5 +1503,3 @@ I use the all the tests case
 ### reference:
 
 test/test_backgammon.py
-
-
