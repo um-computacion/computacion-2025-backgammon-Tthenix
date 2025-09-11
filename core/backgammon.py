@@ -1,2 +1,2 @@
-class backgammon:
+class BackgammonGame:
     pass
