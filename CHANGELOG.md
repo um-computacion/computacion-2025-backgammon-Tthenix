@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Fix
 - Add mock to test dice
-- Add mock to backgammon
+- Add mock to test backgammon
+- Add mock to test board
 
 ### [0.0.8] - 2025-09-11
 
