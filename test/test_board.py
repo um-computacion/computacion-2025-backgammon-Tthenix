@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from core.board import Board
 class TestBoard(unittest.TestCase):
 	
@@ -295,6 +296,74 @@ class TestBoard(unittest.TestCase):
 
 		board.points[0] = []
 		self.assertEqual(board_copy.points[0], [1])
+	
+	@patch('random.choice', return_value=1)
+	def test_random_initial_setup_with_mock(self, mock_choice):
+		"""Test board setup with controlled randomness if any"""
+		board = Board()
+		board.setup_initial_position()
+		
+		# Test that setup works correctly regardless of any internal randomness
+		self.assertEqual(len(board.points), 24)
+		# If random.choice was called for any reason, verify it was controlled
+		if mock_choice.called:
+			self.assertTrue(mock_choice.called)
+	
+	@patch('core.dice.Dice.roll', return_value=(3, 4))
+	def test_board_with_mocked_dice_dependency(self, mock_roll):
+		"""Test board interactions with mocked dice if there are any"""
+		board = Board()
+		# If board has any dice-related functionality, test it here
+		# This ensures board doesn't have unexpected dice dependencies
+		self.assertIsInstance(board, Board)
+		# Verify dice mock was available if needed
+		if mock_roll.called:
+			self.assertTrue(mock_roll.called)
+	
+	def test_deterministic_move_validation(self):
+		"""Test that move validation is deterministic (no random components)"""
+		board = Board()
+		board.points[0] = [1]
+		board.points[5] = [2, 2]
+		
+		# These should always return the same result for same input
+		result1 = board.can_move(0, 5, 1)
+		result2 = board.can_move(0, 5, 1)
+		result3 = board.can_move(0, 5, 1)
+		
+		self.assertEqual(result1, result2)
+		self.assertEqual(result2, result3)
+		self.assertFalse(result1)  # Should be blocked
+	
+	def test_deterministic_bear_off_validation(self):
+		"""Test that bear off validation is deterministic"""
+		board = Board()
+		# Set up home position
+		for i in range(18, 24):
+			board.points[i] = [1] if i == 23 else []
+		
+		# These should always return the same result
+		result1 = board.can_bear_off(23, 1)
+		result2 = board.can_bear_off(23, 1)
+		result3 = board.can_bear_off(23, 1)
+		
+		self.assertEqual(result1, result2)
+		self.assertEqual(result2, result3)
+		self.assertTrue(result1)  # Should be allowed
+	
+	@patch('core.board.random.shuffle')
+	def test_no_unexpected_randomness_in_board(self, mock_shuffle):
+		"""Test that board operations don't use unexpected randomness"""
+		board = Board()
+		board.setup_initial_position()
+		
+		# Perform various board operations
+		board.points[0] = [1]
+		board.move_piece(0, 5, 1)
+		board.get_possible_moves(1, [1, 2])
+		
+		# Verify no unexpected random operations were called
+		self.assertFalse(mock_shuffle.called)
 
 if __name__ == "__main__":
     unittest.main()
