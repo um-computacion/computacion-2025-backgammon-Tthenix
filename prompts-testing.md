@@ -1698,3 +1698,149 @@ I use the all the answer
 ### reference:
 
 test/test_dice.py
+
+## Prompt 7
+
+### Claude-4-sonnet:
+### Prompt:
+@test_backgammon.py @test_board.py right now i testing the backgammon and board class witout ussing unittest.mock and this is a problem becaose the dice is ramdom, so add a mock for
+
+### Answer:
+
+You're absolutely right! The same random behavior problem that affected the dice tests is also present in both `test_backgammon.py` and `test_board.py`. These tests were unreliable because they depend on random dice rolls, making them non-deterministic.
+
+#### Problem Analysis:
+
+**test_backgammon.py Issues:**
+- `test_roll_dice_returns_valid_values()` - Uses actual random dice rolls
+- `test_roll_dice_updates_last_roll()` - Unpredictable roll results
+- `test_get_available_moves_normal_roll()` - Depends on dice behavior
+- Multiple tests manually setting `last_roll` without controlling the source
+
+**test_board.py Issues:**
+- Board tests that might depend on dice interactions
+- Potential random behavior in move generation
+- Risk of hidden random dependencies
+
+#### Solution Implemented:
+
+### **1. Enhanced test_backgammon.py with Comprehensive Mocking:**
+
+**Basic Dice Roll Mocking:**
+```python
+@patch('core.dice.Dice.roll', return_value=(3, 5))
+def test_roll_dice_returns_valid_values(self, mock_roll):
+    """Test dice rolling with controlled values"""
+    roll = self.game.roll_dice()
+    
+    self.assertEqual(roll, (3, 5))
+    self.assertTrue(mock_roll.called)
+```
+
+**Multiple Dice Method Mocking:**
+```python
+@patch('core.dice.Dice.get_moves', return_value=[1, 2])
+def test_get_available_moves_normal_roll(self, mock_get_moves):
+    """Test getting available moves with controlled normal roll"""
+    self.game.setup_initial_position()
+    self.game.last_roll = (1, 2)
+    
+    moves = self.game.get_available_moves()
+    mock_get_moves.assert_called_with((1, 2))
+```
+
+**Sequential Roll Testing:**
+```python
+@patch('core.dice.Dice.roll', side_effect=[(1, 2), (6, 6), (3, 4)])
+def test_multiple_dice_rolls_sequence(self, mock_roll):
+    """Test sequence of multiple controlled dice rolls"""
+    roll1 = self.game.roll_dice()  # (1, 2)
+    roll2 = self.game.roll_dice()  # (6, 6)
+    roll3 = self.game.roll_dice()  # (3, 4)
+    
+    self.assertEqual(mock_roll.call_count, 3)
+```
+
+**Complete Workflow Testing:**
+```python
+@patch('core.dice.Dice.roll', return_value=(6, 6))
+@patch('core.dice.Dice.is_double', return_value=True)
+@patch('core.dice.Dice.get_moves', return_value=[6, 6, 6, 6])
+def test_complete_double_workflow(self, mock_get_moves, mock_is_double, mock_roll):
+    """Test complete workflow with double roll"""
+    # Test entire dice interaction workflow with controlled values
+```
+
+### **2. Enhanced test_board.py with Preventive Mocking:**
+
+**Random Dependency Protection:**
+```python
+@patch('random.choice', return_value=1)
+def test_random_initial_setup_with_mock(self, mock_choice):
+    """Test board setup with controlled randomness if any"""
+    board = Board()
+    board.setup_initial_position()
+    # Ensures any random behavior is controlled
+```
+
+**Dice Dependency Isolation:**
+```python
+@patch('core.dice.Dice')
+def test_board_with_mocked_dice_dependency(self, mock_dice_class):
+    """Test board interactions with mocked dice if there are any"""
+    # Prevents unexpected dice interactions
+```
+
+**Deterministic Behavior Verification:**
+```python
+def test_deterministic_move_validation(self):
+    """Test that move validation is deterministic (no random components)"""
+    # Ensures consistent results for same inputs
+```
+
+### **3. Key Improvements Made:**
+
+#### **Reliability:**
+- **Deterministic Results:** All tests now produce consistent outcomes
+- **Controlled Randomness:** Every random element is mocked and controlled
+- **Predictable Testing:** No more random test failures
+
+#### **Coverage:**
+- **Edge Cases:** Can test specific scenarios (doubles, edge values)
+- **Error Handling:** Mock exceptions to test error scenarios
+- **Workflow Testing:** Complete end-to-end testing with known values
+
+#### **Verification:**
+- **Mock Assertions:** Verify that methods are called correctly
+- **Call Count Tracking:** Ensure proper number of method calls
+- **Parameter Verification:** Check that methods receive correct arguments
+
+### **4. Testing Patterns Applied:**
+
+1. **`@patch` with `return_value`** - Single controlled value
+2. **`@patch` with `side_effect`** - Sequence of values or exceptions
+3. **Multiple `@patch` decorators** - Control multiple methods simultaneously
+4. **Mock assertion methods** - Verify mock usage
+5. **Exception testing** - Control error scenarios
+
+### **5. Benefits Achieved:**
+
+**Before (Without Mocking):**
+- ❌ Random test failures
+- ❌ Unpredictable outcomes
+- ❌ Difficult debugging
+- ❌ Limited scenario testing
+
+**After (With Mocking):**
+- ✅ Consistent test results
+- ✅ Controlled test scenarios
+- ✅ Easy debugging and maintenance
+- ✅ Comprehensive coverage
+
+The implementation now follows the same professional testing standards as the dice tests, ensuring reliable, maintainable, and comprehensive test coverage for both BackgammonGame and Board classes.
+
+### What I did with the answer:
+I completely enhanced both test files with comprehensive mocking patterns, making all tests deterministic and reliable while maintaining full functionality coverage.
+
+### Reference:
+test/test_backgammon.py, test/test_board.py
