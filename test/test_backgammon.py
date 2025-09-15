@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from core.backgammon import BackgammonGame
 from core.player import Player
 from core.board import Board
@@ -52,33 +53,48 @@ class TestBackgammonGame(unittest.TestCase):
 		self.assertEqual(len(self.game.board.points[7]), 3)
 		self.assertEqual(len(self.game.board.points[5]), 5)
 	
-	def test_roll_dice_returns_valid_values(self):
+	@patch('core.dice.Dice.roll', return_value=(3, 5))
+	def test_roll_dice_returns_valid_values(self, mock_roll):
+		"""Test dice rolling with controlled values"""
 		roll = self.game.roll_dice()
 		
 		self.assertIsInstance(roll, tuple)
 		self.assertEqual(len(roll), 2)
-		self.assertTrue(all(1 <= v <= 6 for v in roll))
+		self.assertEqual(roll, (3, 5))
+		self.assertTrue(mock_roll.called)
 	
-	def test_roll_dice_updates_last_roll(self):
+	@patch('core.dice.Dice.roll', return_value=(2, 4))
+	def test_roll_dice_updates_last_roll(self, mock_roll):
+		"""Test that last_roll is updated with controlled dice values"""
 		roll = self.game.roll_dice()
 		
 		self.assertEqual(self.game.last_roll, roll)
+		self.assertEqual(self.game.last_roll, (2, 4))
+		self.assertTrue(mock_roll.called)
 	
-	def test_get_available_moves_normal_roll(self):
+	@patch('core.dice.Dice.get_moves', return_value=[1, 2])
+	def test_get_available_moves_normal_roll(self, mock_get_moves):
+		"""Test getting available moves with controlled normal roll"""
 		self.game.setup_initial_position()
 		self.game.last_roll = (1, 2)
 		
 		moves = self.game.get_available_moves()
 		
 		self.assertIsInstance(moves, list)
+		self.assertTrue(mock_get_moves.called)
+		mock_get_moves.assert_called_with((1, 2))
 	
-	def test_get_available_moves_double_roll(self):
+	@patch('core.dice.Dice.get_moves', return_value=[3, 3, 3, 3])
+	def test_get_available_moves_double_roll(self, mock_get_moves):
+		"""Test getting available moves with controlled double roll"""
 		self.game.setup_initial_position()
 		self.game.last_roll = (3, 3)
 		
 		moves = self.game.get_available_moves()
 		
 		self.assertIsInstance(moves, list)
+		self.assertTrue(mock_get_moves.called)
+		mock_get_moves.assert_called_with((3, 3))
 	
 	def test_get_available_moves_no_roll(self):
 		moves = self.game.get_available_moves()
@@ -395,7 +411,9 @@ class TestBackgammonGame(unittest.TestCase):
 		self.assertIsInstance(pip_count, int)
 		self.assertGreater(pip_count, 0)
 	
-	def test_auto_play_turn_when_no_moves(self):
+	@patch('core.dice.Dice.roll', return_value=(1, 2))
+	def test_auto_play_turn_when_no_moves(self, mock_roll):
+		"""Test auto play turn with controlled dice values"""
 		self.game.last_roll = (1, 2)
 		
 		result = self.game.auto_play_turn()
