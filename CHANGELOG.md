@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 - Add checker logic
 - Add board logic
+- Add backgammon logic
 
 #### Fix
 - Checker test(test_move_checker_when_on_bar_raises_exception)
