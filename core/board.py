@@ -1,4 +1,5 @@
 import copy
+import random
 class Board:
     """Represents a backgammon board with points, bar, and off-board areas."""
     
