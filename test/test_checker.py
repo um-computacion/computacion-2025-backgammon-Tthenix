@@ -103,12 +103,14 @@ class TestChecker(unittest.TestCase):
 		self.assertTrue(self.white_checker.is_on_bar)
 		self.assertFalse(self.white_checker.is_borne_off)
 	
-	def test_send_unplaced_checker_to_bar_raises_exception(self):
-		with self.assertRaises(ValueError) as context:
-			self.white_checker.send_to_bar()
-		
-		self.assertIn("Checker must be placed before sending to bar", str(context.exception))
-	
+	def test_move_checker_when_on_bar_raises_exception(self):
+		self.white_checker.place_on_point(1)
+		self.white_checker.send_to_bar()
+  
+		with self.assertRaises(ValueError) as ctx:
+			self.white_checker.move_to_point(2)
+		self.assertIn("Checker on bar cannot move directly", str(ctx.exception))
+
 	def test_send_already_barred_checker_to_bar_raises_exception(self):
 		self.white_checker.place_on_point(5)
 		self.white_checker.send_to_bar()

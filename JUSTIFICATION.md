@@ -31,6 +31,3 @@ The class diagram shows the complete structure of the Backgammon game with the f
 - **Board**: Manages the board and piece positions
 - **Checker**: Represents individual game pieces
 - **Dice**: Handles dice logic and movements
-
-To fix
-    covarege dont pass test dice but now dice logic was implemented
