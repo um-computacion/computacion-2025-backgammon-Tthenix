@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### [Unreleased]
+## Sprint 3
+### [0.0.8] - 2025-09-19
+
+#### Added
+- Add checker logic
+
+#### Fix
+- Checker test(test_move_checker_when_on_bar_raises_exception)
 
 ## Sprint 2
 
