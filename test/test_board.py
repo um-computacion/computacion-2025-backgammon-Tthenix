@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch
 from core.board import Board
+import random
+
 class TestBoard(unittest.TestCase):
 	
 	def setUp(self):
