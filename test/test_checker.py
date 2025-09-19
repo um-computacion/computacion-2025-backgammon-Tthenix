@@ -44,18 +44,13 @@ class TestChecker(unittest.TestCase):
 	
 	def test_place_checker_on_point_1(self):
 		self.black_checker.place_on_point(1)
-		
 		self.assertEqual(self.black_checker.position, 1)
-	
 	def test_place_checker_on_point_24(self):
 		self.white_checker.place_on_point(24)
-		
 		self.assertEqual(self.white_checker.position, 24)
-	
 	def test_place_checker_on_invalid_point_below_range(self):
 		with self.assertRaises(ValueError) as context:
 			self.white_checker.place_on_point(0)
-		
 		self.assertIn("Position must be between 1 and 24", str(context.exception))
 	
 	def test_place_checker_on_invalid_point_above_range(self):
@@ -102,15 +97,10 @@ class TestChecker(unittest.TestCase):
 		self.assertIsNone(self.white_checker.position)
 		self.assertTrue(self.white_checker.is_on_bar)
 		self.assertFalse(self.white_checker.is_borne_off)
-	
-	def test_move_checker_when_on_bar_raises_exception(self):
-		self.white_checker.place_on_point(1)
-		self.white_checker.send_to_bar()
-  
 		with self.assertRaises(ValueError) as ctx:
 			self.white_checker.move_to_point(2)
 		self.assertIn("Checker on bar cannot move directly", str(ctx.exception))
-
+  
 	def test_send_already_barred_checker_to_bar_raises_exception(self):
 		self.white_checker.place_on_point(5)
 		self.white_checker.send_to_bar()

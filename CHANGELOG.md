@@ -8,12 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [Unreleased]
 ## Sprint 3
 ### [0.0.8] - 2025-09-19
-
 #### Added
 - Add checker logic
+- Add board logic
 
 #### Fix
 - Checker test(test_move_checker_when_on_bar_raises_exception)
+- Add random import to board.py
 
 ## Sprint 2
 
