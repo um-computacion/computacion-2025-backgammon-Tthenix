@@ -3,3 +3,4 @@ venv/
 .cursor/
 .coverage
 .github/copilot-instructions.md
+htmlcov/

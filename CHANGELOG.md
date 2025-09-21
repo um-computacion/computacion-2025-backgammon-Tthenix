@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [Unreleased]
 ## Sprint 3
+
+### [0.0.10] - 2025-09-21
+#### Fix
+- Upgrade board and backgammon test for coverage 98%
+
 ### [0.0.8] - 2025-09-19
 #### Added
 - Add checker logic
