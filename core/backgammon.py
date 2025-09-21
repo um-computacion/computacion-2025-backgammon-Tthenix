@@ -1,6 +1,7 @@
 from .player import Player
 from .board import Board
 from .dice import Dice
+from .checker import Checker
 class BackgammonGame:
     """Main Backgammon game class."""
     
@@ -22,10 +23,149 @@ class BackgammonGame:
         self.last_roll = None
         self.available_moves = []
         self.move_history = []
+        
+        # Initialize checker objects for each player
+        self.player1_checkers = [Checker("white") for _ in range(15)]
+        self.player2_checkers = [Checker("black") for _ in range(15)]
     
     def setup_initial_position(self):
-        """Set up the initial board position."""
+        """Set up the initial board position using Checker objects."""
         self.board.setup_initial_position()
+        
+        # Reset all checkers
+        for checker in self.player1_checkers:
+            checker.reset()
+        for checker in self.player2_checkers:
+            checker.reset()
+            
+        # Place player 1 checkers in their initial positions
+        checker_index = 0
+        # Point 1 (0-indexed as 0): 2 checkers
+        for i in range(2):
+            self.player1_checkers[checker_index].place_on_point(1)
+            checker_index += 1
+        # Point 12 (0-indexed as 11): 5 checkers  
+        for i in range(5):
+            self.player1_checkers[checker_index].place_on_point(12)
+            checker_index += 1
+        # Point 17 (0-indexed as 16): 3 checkers
+        for i in range(3):
+            self.player1_checkers[checker_index].place_on_point(17)
+            checker_index += 1
+        # Point 19 (0-indexed as 18): 5 checkers
+        for i in range(5):
+            self.player1_checkers[checker_index].place_on_point(19)
+            checker_index += 1
+            
+        # Place player 2 checkers in their initial positions  
+        checker_index = 0
+        # Point 24 (0-indexed as 23): 2 checkers
+        for i in range(2):
+            self.player2_checkers[checker_index].place_on_point(24)
+            checker_index += 1
+        # Point 13 (0-indexed as 12): 5 checkers
+        for i in range(5):
+            self.player2_checkers[checker_index].place_on_point(13)
+            checker_index += 1
+        # Point 8 (0-indexed as 7): 3 checkers
+        for i in range(3):
+            self.player2_checkers[checker_index].place_on_point(8)
+            checker_index += 1
+        # Point 6 (0-indexed as 5): 5 checkers
+        for i in range(5):
+            self.player2_checkers[checker_index].place_on_point(6)
+            checker_index += 1
+    
+    def get_checkers_at_point(self, point, player_num):
+        """Get all checker objects at a specific point for a player."""
+        checkers = []
+        if player_num == 1:
+            for checker in self.player1_checkers:
+                if checker.position == point + 1:  # Convert 0-based to 1-based
+                    checkers.append(checker)
+        else:
+            for checker in self.player2_checkers:
+                if checker.position == point + 1:  # Convert 0-based to 1-based
+                    checkers.append(checker)
+        return checkers
+    
+    def get_checkers_on_bar(self, player_num):
+        """Get all checker objects on the bar for a player."""
+        checkers = []
+        if player_num == 1:
+            for checker in self.player1_checkers:
+                if checker.is_on_bar:
+                    checkers.append(checker)
+        else:
+            for checker in self.player2_checkers:
+                if checker.is_on_bar:
+                    checkers.append(checker)
+        return checkers
+    
+    def get_borne_off_checkers(self, player_num):
+        """Get all checker objects that have been borne off for a player."""
+        checkers = []
+        if player_num == 1:
+            for checker in self.player1_checkers:
+                if checker.is_borne_off:
+                    checkers.append(checker)
+        else:
+            for checker in self.player2_checkers:
+                if checker.is_borne_off:
+                    checkers.append(checker)
+        return checkers
+    
+    def move_checker_object(self, from_point, to_point, player_num):
+        """Move a checker object from one point to another."""
+        checkers_at_point = self.get_checkers_at_point(from_point, player_num)
+        if not checkers_at_point:
+            return False
+        
+        checker = checkers_at_point[0]  # Move the first checker
+        
+        # Check if there's an opponent checker to capture
+        opponent_num = 2 if player_num == 1 else 1
+        opponent_checkers = self.get_checkers_at_point(to_point, opponent_num)
+        
+        if len(opponent_checkers) == 1:
+            # Capture the opponent checker
+            opponent_checker = opponent_checkers[0]
+            opponent_checker.send_to_bar()
+        
+        # Move our checker
+        checker.move_to_point(to_point + 1)  # Convert 0-based to 1-based
+        return True
+    
+    def move_checker_from_bar_object(self, to_point, player_num):
+        """Move a checker object from the bar to a point."""
+        checkers_on_bar = self.get_checkers_on_bar(player_num)
+        if not checkers_on_bar:
+            return False
+        
+        checker = checkers_on_bar[0]  # Move the first checker from bar
+        
+        # Check if there's an opponent checker to capture
+        opponent_num = 2 if player_num == 1 else 1
+        opponent_checkers = self.get_checkers_at_point(to_point, opponent_num)
+        
+        if len(opponent_checkers) == 1:
+            # Capture the opponent checker
+            opponent_checker = opponent_checkers[0]
+            opponent_checker.send_to_bar()
+        
+        # Return checker from bar
+        checker.return_from_bar(to_point + 1)  # Convert 0-based to 1-based
+        return True
+    
+    def bear_off_checker_object(self, point, player_num):
+        """Bear off a checker object from a point."""
+        checkers_at_point = self.get_checkers_at_point(point, player_num)
+        if not checkers_at_point:
+            return False
+        
+        checker = checkers_at_point[0]  # Bear off the first checker
+        checker.bear_off()
+        return True
     
     def roll_dice(self):
         """Roll dice and update game state."""
@@ -277,6 +417,12 @@ class BackgammonGame:
         self.move_history = []
         self.player1.reset()
         self.player2.reset()
+        
+        # Reset all checker objects
+        for checker in self.player1_checkers:
+            checker.reset()
+        for checker in self.player2_checkers:
+            checker.reset()
     
     def copy_game_state(self):
         """Create a copy of the current game state."""

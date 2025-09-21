@@ -367,5 +367,138 @@ class TestBoard(unittest.TestCase):
 		# Verify no unexpected random operations were called
 		self.assertFalse(mock_shuffle.called)
 
+	def test_can_move_out_of_bounds_from_point(self):
+		"""Test can_move with out of bounds from_point"""
+		board = Board()
+		board.points[0] = [1]
+		
+		# Test negative from_point
+		self.assertFalse(board.can_move(-1, 5, 1))
+		# Test from_point >= 24
+		self.assertFalse(board.can_move(24, 5, 1))
+	
+	def test_can_move_out_of_bounds_to_point(self):
+		"""Test can_move with out of bounds to_point"""
+		board = Board()
+		board.points[0] = [1]
+		
+		# Test negative to_point
+		self.assertFalse(board.can_move(0, -1, 1))
+		# Test to_point >= 24
+		self.assertFalse(board.can_move(0, 24, 1))
+	
+	def test_can_bear_off_no_piece_at_point(self):
+		"""Test can_bear_off when no piece at point for player"""
+		board = Board()
+		# Set up home board scenario but no piece at test point
+		for i in range(18, 24):
+			board.points[i] = [1] if i != 20 else []
+		
+		# Try to bear off from point without player's piece
+		self.assertFalse(board.can_bear_off(20, 1))
+	
+	def test_can_bear_off_wrong_player_piece(self):
+		"""Test can_bear_off when point has wrong player's piece"""
+		board = Board()
+		# Set up home board scenario
+		for i in range(18, 24):
+			board.points[i] = [1] if i != 20 else [2]  # Point 21 has player 2 piece
+		
+		# Try to bear off player 1 from point with player 2 piece
+		self.assertFalse(board.can_bear_off(20, 1))
+	
+	def test_bear_off_piece_no_piece_to_bear_off(self):
+		"""Test bear_off_piece when there's no piece to bear off"""
+		board = Board()
+		# Set up home board but no piece at the target point
+		for i in range(18, 24):
+			board.points[i] = [1] if i != 23 else []
+		
+		result = board.bear_off_piece(23, 1)
+		self.assertFalse(result)
+	
+	def test_bear_off_piece_wrong_player(self):
+		"""Test bear_off_piece when point has wrong player's piece"""
+		board = Board()
+		# Set up home board but with wrong player at target point
+		for i in range(18, 24):
+			board.points[i] = [1] if i != 23 else [2]  # Player 2 piece instead
+		
+		result = board.bear_off_piece(23, 1)
+		self.assertFalse(result)
+	
+	def test_bear_off_piece_not_in_home(self):
+		"""Test bear_off_piece when not all pieces are in home"""
+		board = Board()
+		board.points[23] = [1]  # Piece to bear off
+		board.points[10] = [1]  # Piece outside home
+		
+		result = board.bear_off_piece(23, 1)
+		self.assertFalse(result)
+	
+	def test_is_all_pieces_in_home_pieces_outside_home(self):
+		"""Test is_all_pieces_in_home when pieces are outside home board"""
+		board = Board()
+		board.points[18] = [1]  # In home
+		board.points[10] = [1]  # Outside home
+		
+		result = board.is_all_pieces_in_home(1)
+		self.assertFalse(result)
+	
+	def test_enter_from_bar_no_bar_pieces(self):
+		"""Test enter_from_bar when no pieces on bar"""
+		board = Board()
+		# No pieces on bar
+		
+		result = board.enter_from_bar(18, 1)
+		self.assertFalse(result)
+	
+	def test_get_possible_moves_bar_must_enter_blocked(self):
+		"""Test get_possible_moves when must enter from bar but blocked"""
+		board = Board()
+		board.bar[0] = [1]  # Player 1 on bar
+		
+		# Block all possible entry points for dice values 1 and 2
+		board.points[23] = [2, 2]  # Block entry for dice 1 (24-1=23)
+		board.points[22] = [2, 2]  # Block entry for dice 2 (24-2=22)
+		
+		moves = board.get_possible_moves(1, [1, 2])
+		
+		# Should have moves but they should all be blocked bar entries
+		for move in moves:
+			self.assertEqual(move['from'], 'bar')
+	
+	def test_get_possible_moves_bearing_off_multiple_dice(self):
+		"""Test get_possible_moves for bearing off with multiple dice values"""
+		board = Board()
+		# Set up bear off scenario
+		for i in range(18, 24):
+			board.points[i] = [1] if i in [20, 22, 23] else []
+		
+		moves = board.get_possible_moves(1, [1, 3, 6])
+		
+		# Should have bear off moves
+		bear_off_moves = [m for m in moves if m['to'] == 'off']
+		self.assertGreater(len(bear_off_moves), 0)
+	
+	def test_copy_preserves_independence(self):
+		"""Test that copy creates independent board"""
+		board = Board()
+		board.points[0] = [1]
+		board.bar[0] = [1]
+		board.off_board[0] = [1]
+		
+		board_copy = board.copy()
+		
+		# Modify original
+		board.points[0] = [2, 2]
+		board.bar[0] = [2, 2]
+		board.off_board[0] = [2, 2]
+		
+		# Copy should remain unchanged
+		self.assertEqual(board_copy.points[0], [1])
+		self.assertEqual(board_copy.bar[0], [1])
+		self.assertEqual(board_copy.off_board[0], [1])
+
 if __name__ == "__main__":
     unittest.main()
