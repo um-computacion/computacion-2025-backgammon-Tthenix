@@ -53,34 +53,34 @@ class BackgammonGame:
             self.player1_checkers[checker_index].place_on_point(1)
             checker_index += 1
         # Point 12 (0-indexed as 11): 5 checkers
-        for i in range(5):
+        for _i in range(5):
             self.player1_checkers[checker_index].place_on_point(12)
             checker_index += 1
         # Point 17 (0-indexed as 16): 3 checkers
-        for i in range(3):
+        for _i in range(3):
             self.player1_checkers[checker_index].place_on_point(17)
             checker_index += 1
         # Point 19 (0-indexed as 18): 5 checkers
-        for i in range(5):
+        for _i in range(5):
             self.player1_checkers[checker_index].place_on_point(19)
             checker_index += 1
 
         # Place player 2 checkers in their initial positions
         checker_index = 0
         # Point 24 (0-indexed as 23): 2 checkers
-        for i in range(2):
+        for _i in range(2):
             self.player2_checkers[checker_index].place_on_point(24)
             checker_index += 1
         # Point 13 (0-indexed as 12): 5 checkers
-        for i in range(5):
+        for _i in range(5):
             self.player2_checkers[checker_index].place_on_point(13)
             checker_index += 1
         # Point 8 (0-indexed as 7): 3 checkers
-        for i in range(3):
+        for _i in range(3):
             self.player2_checkers[checker_index].place_on_point(8)
             checker_index += 1
         # Point 6 (0-indexed as 5): 5 checkers
-        for i in range(5):
+        for _i in range(5):
             self.player2_checkers[checker_index].place_on_point(6)
             checker_index += 1
 
@@ -269,8 +269,8 @@ class BackgammonGame:
 
         if success:
             # Remove used dice value
-            for i in range(len(self.available_moves)):
-                if self.available_moves[i] == distance:
+            for i, move in enumerate(self.available_moves):
+                if move == distance:
                     self.available_moves.pop(i)
                     break
             self.move_history.append(move_info)
@@ -324,8 +324,8 @@ class BackgammonGame:
 
         if success:
             # Remove used dice value
-            for i in range(len(self.available_moves)):
-                if self.available_moves[i] == dice_value:
+            for i, move in enumerate(self.available_moves):
+                if move == dice_value:
                     self.available_moves.pop(i)
                     break
             self.move_history.append(move_info)
@@ -355,8 +355,7 @@ class BackgammonGame:
             return False
 
         # Try each available dice value
-        for i in range(len(self.available_moves)):
-            dice_value = self.available_moves[i]
+        for i, dice_value in enumerate(self.available_moves):
             if self.board.can_bear_off(point, player_num, dice_value):
                 # Save move for history
                 old_board = self.board.copy()
@@ -640,8 +639,8 @@ class BackgammonGame:
             distance = abs(to_point - from_point)
 
             found_distance = False
-            for i in range(len(temp_moves)):
-                if temp_moves[i] == distance:
+            for i, move in enumerate(temp_moves):
+                if move == distance:
                     found_distance = True
                     temp_moves.pop(i)
                     break
