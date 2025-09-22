@@ -1,9 +1,16 @@
+"""
+Unit tests for the Player class.
+
+This module contains a suite of unit tests for the Player class, which represents a player in a
+backgammon game. The tests cover the following functionalities:
+"""
 import unittest
 from core.player import Player
 
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestPlayer(unittest.TestCase):
-
+    """Test suite for core Player behavior and edge cases."""
     def setUp(self):
         self.player_white = Player("Player1", "white")
         self.player_black = Player("Player2", "black")

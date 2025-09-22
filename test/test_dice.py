@@ -1,9 +1,18 @@
+"""
+Unit tests for the Dice class.
+
+This module contains a suite of unit tests for the Dice class, which is used to simulate dice rolls
+and related operations in a backgammon game.
+"""
+
 import unittest
 from unittest.mock import patch
 from core.dice import Dice
 
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestDice(unittest.TestCase):
+    """Test suite for core Dice behavior and edge cases."""
 
     @patch("random.randint", side_effect=[5, 2])
     def test_roll_different_values(self, mock_randint):

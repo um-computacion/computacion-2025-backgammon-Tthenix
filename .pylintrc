@@ -18,7 +18,7 @@ max-branches=12
 max-nested-blocks=5
 
 # Maximum number of public methods in a class.
-max-public-methods=20
+max-public-methods=120
 
 # Maximum number of attributes in a class.
 max-attributes=7

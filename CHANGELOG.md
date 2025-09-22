@@ -7,23 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [Unreleased]
 
-#### Fix
-
-- Resolve pylint warning "Statement seems to have no effect" in `test/test_backgammon.py`
-
-#### Chore
-
-- Suppress Pylint C0302 (too-many-lines) in `test/test_backgammon.py` to keep comprehensive tests intact
-
-#### Test
-
-- `test/test_board.py`: add module/class docstrings, remove unused import, disable C0116 for concise tests
-- `test/test_checker.py`: add class docstring to resolve lint warning
-- `test/test_checker.py`: add module docstring to resolve C0114
-
 ## Sprint 3
 
-### [0.0.11] - 2025-09-21
+### [0.0.11] - 2025-09-22
 
 #### Fix
 
@@ -41,9 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [0.0.10] - 2025-09-21
 
 #### Fix
-
 - Upgrade board and backgammon test for coverage 98%
-
+- Fix pylint on test_backgammon
 ### [0.0.8] - 2025-09-19
 
 #### Added
