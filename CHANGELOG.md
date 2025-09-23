@@ -9,26 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 3
 
+### [0.0.11] - 2025-09-23
+
+#### Fix
+
+- Pylint 10/10 on core and test
+
 ### [0.0.11] - 2025-09-22
 
 #### Fix
 
 - Major pylint code quality improvements across all core modules
 - Fixed module docstrings for all core classes (dice.py, player.py, checker.py, board.py, backgammon.py)
-- Renamed board.bar to board.checker_bar to resolve pylint naming conflicts
-- Added comprehensive type hints and docstrings following PEP 257
-- Fixed trailing whitespace and formatting issues
-- Created main.py entry point as required by coding standards
-- Updated all test files to use new property names consistently
-- Removed duplicate test methods to fix pylint issues
-- Fixed inconsistent bar/checker_bar references in test files
-- Maintained 98% test coverage throughout refactoring
 
 ### [0.0.10] - 2025-09-21
 
 #### Fix
+
 - Upgrade board and backgammon test for coverage 98%
 - Fix pylint on test_backgammon
+
 ### [0.0.8] - 2025-09-19
 
 #### Added

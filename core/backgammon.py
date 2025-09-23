@@ -11,7 +11,14 @@ from .checker import Checker
 
 
 class BackgammonGame:
-    """Main Backgammon game class."""
+    """Main Backgammon game class.
+
+    Note: This class holds core game state and therefore carries several
+    instance attributes by design. The attribute count is justified by the
+    domain model (players, board, dice, history, etc.).
+    """
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, player1=None, player2=None):
         """Initialize a new backgammon game."""
@@ -190,51 +197,62 @@ class BackgammonGame:
 
     def validate_move(self, from_point, to_point):
         """Validate if a move is legal."""
-        # Check if dice have been rolled
+        # Ensure dice have been rolled and moves are available
+        if not self._ensure_moves_available():
+            return False
+
+        player_num = self._get_current_player_num()
+
+        # Validate origin ownership and bounds
+        if not self._has_player_piece_at(from_point, player_num):
+            return False
+
+        distance = abs(to_point - from_point)
+
+        # Validate distance and direction
+        if not self._is_distance_available(distance):
+            return False
+        if not self._is_correct_direction(from_point, to_point, player_num):
+            return False
+
+        # Delegate final validation to the board
+        return self.board.can_move(from_point, to_point, player_num)
+
+    # ---- Internal helpers to keep validate_move simple (reduce branches/returns) ----
+    def _ensure_moves_available(self):
+        """Return True if there is a last roll and available moves are populated."""
         if self.last_roll is None:
             return False
-
-        # Update available moves if they are empty
-        if len(self.available_moves) == 0 and self.last_roll is not None:
-            self.available_moves = self.dice.get_moves(self.last_roll)
-
         if len(self.available_moves) == 0:
-            return False
+            self.available_moves = self.dice.get_moves(self.last_roll)
+        return len(self.available_moves) > 0
 
-        # Get current player number
-        if self.current_player == self.player1:
-            player_num = 1
-        else:
-            player_num = 2
+    def _get_current_player_num(self):
+        """Return 1 for player1, 2 for player2."""
+        return 1 if self.current_player == self.player1 else 2
 
-        # Check if there's a piece at the origin
+    def _has_player_piece_at(self, from_point, player_num):
+        """Check bounds and that the top checker at from_point belongs to player_num."""
         if from_point < 0 or from_point >= 24:
             return False
         if len(self.board.points[from_point]) == 0:
             return False
-        if self.board.points[from_point][0] != player_num:
-            return False
+        return self.board.points[from_point][0] == player_num
 
-        # Calculate movement distance
-        distance = abs(to_point - from_point)
+    def _is_distance_available(self, distance):
+        """Check whether the rolled distances include the given distance."""
+        for move_distance in self.available_moves:
+            if move_distance == distance:
+                return True
+        return False
 
-        # Check if this distance is available
-        found_distance = False
-        for move in self.available_moves:
-            if move == distance:
-                found_distance = True
-                break
-        if not found_distance:
-            return False
-
-        # Check movement direction
+    def _is_correct_direction(self, from_point, to_point, player_num):
+        """Validate that the move goes in the correct direction for the player."""
         if player_num == 1 and to_point <= from_point:
             return False
         if player_num == 2 and to_point >= from_point:
             return False
-
-        # Use board method to check if movement is valid
-        return self.board.can_move(from_point, to_point, player_num)
+        return True
 
     def make_move(self, from_point, to_point):
         """Execute a move on the board."""
@@ -391,7 +409,7 @@ class BackgammonGame:
         winner_num = self.board.get_winner()
         if winner_num == 1:
             return self.player1
-        elif winner_num == 2:
+        if winner_num == 2:
             return self.player2
         return None
 
@@ -411,7 +429,7 @@ class BackgammonGame:
         """Get player by color."""
         if self.player1.color == color:
             return self.player1
-        elif self.player2.color == color:
+        if self.player2.color == color:
             return self.player2
         return None
 
@@ -491,7 +509,7 @@ class BackgammonGame:
             else:
                 to_point = from_point - move_dist
 
-            if to_point >= 0 and to_point < 24:
+            if 0 <= to_point < 24:
                 if self.board.can_move(from_point, to_point, player_num):
                     destinations.append(to_point)
 
@@ -513,20 +531,7 @@ class BackgammonGame:
 
         # Check if player must enter from bar first
         if self.must_enter_from_bar():
-            for dice_value in self.available_moves:
-                if player_num == 1:
-                    entry_point = 24 - dice_value
-                else:
-                    entry_point = dice_value - 1
-
-                if entry_point >= 0 and entry_point < 24:
-                    if len(self.board.points[entry_point]) == 0:
-                        return True
-                    elif len(self.board.points[entry_point]) < 2:
-                        return True
-                    elif self.board.points[entry_point][0] == player_num:
-                        return True
-            return False
+            return self._can_enter_from_bar(player_num)
 
         # Check regular moves
         for point in range(24):
@@ -534,20 +539,41 @@ class BackgammonGame:
             if len(destinations) > 0:
                 return True
 
-        # Check bearing off
-        if self.can_bear_off(player_num):
-            if player_num == 1:
-                home_points = [18, 19, 20, 21, 22, 23]
-            else:
-                home_points = [0, 1, 2, 3, 4, 5]
+        # Finally, check bearing off possibilities
+        return self._can_bear_off_any(player_num)
 
-            for point in home_points:
-                if len(self.board.points[point]) > 0:
-                    if self.board.points[point][0] == player_num:
-                        for dice_value in self.available_moves:
-                            if self.board.can_bear_off(point, player_num, dice_value):
-                                return True
+    def _can_enter_from_bar(self, player_num):
+        """Return True if the player can legally enter from the bar with any die."""
+        for dice_value in self.available_moves:
+            entry_point = 24 - dice_value if player_num == 1 else dice_value - 1
+            if 0 <= entry_point < 24:
+                point = self.board.points[entry_point]
+                if len(point) == 0:
+                    return True
+                if len(point) < 2:
+                    return True
+                if point[0] == player_num:
+                    return True
+        return False
 
+    def _can_bear_off_any(self, player_num):
+        """Return True if any bearing off move is possible with current dice."""
+        if not self.can_bear_off(player_num):
+            return False
+
+        home_points = (
+            [18, 19, 20, 21, 22, 23] if player_num == 1 else [0, 1, 2, 3, 4, 5]
+        )
+
+        for point in home_points:
+            if (
+                not self.board.points[point]
+                or self.board.points[point][0] != player_num
+            ):
+                continue
+            for dice_value in self.available_moves:
+                if self.board.can_bear_off(point, player_num, dice_value):
+                    return True
         return False
 
     def must_enter_from_bar(self):

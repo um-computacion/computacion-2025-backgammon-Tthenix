@@ -328,7 +328,7 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertIsInstance(pip_count, int)
         self.assertGreater(pip_count, 0)
     @patch('core.dice.Dice.roll', return_value=(1, 2))
-    def test_auto_play_turn_when_no_moves(self, mock_roll):
+    def test_auto_play_turn_when_no_moves(self, _mock_roll):
         """Test auto play turn with controlled dice values."""
         self.game.last_roll = (1, 2)
         result = self.game.auto_play_turn()
