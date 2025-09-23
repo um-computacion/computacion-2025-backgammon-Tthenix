@@ -129,19 +129,17 @@ class Board:
 
     def can_bear_off(self, point, player, dice_value=None):
         """Check if a player can bear off a piece from a specific point."""
-        # Check if all pieces are in home
+        # Must have all pieces in home and own a piece at the point
         if not self.is_all_pieces_in_home(player):
             return False
-
-        # Check if the point has a piece of the player
         if not self.points[point] or self.points[point][0] != player:
             return False
 
-        # If no dice value specified, just check if in home board
+        # If no dice value specified, being in home is enough
         if dice_value is None:
             return True
 
-        # Calculate distance to off-board
+        # Calculate distance to off-board and the range to check for higher points
         if player == 1:
             distance = 23 - point + 1
             higher_points_range = range(point + 1, 24)
@@ -149,19 +147,22 @@ class Board:
             distance = point + 1
             higher_points_range = range(0, point)
 
-        # Exact roll
+        # Decide allowance with a single final return
+        allowed = False
         if distance == dice_value:
-            return True
-
-        # Higher roll, but need to check if no pieces on higher points
-        if distance < dice_value:
+            allowed = True
+        elif distance < dice_value:
+            has_higher_piece = False
             for i in higher_points_range:
                 for p in self.points[i]:
                     if p == player:
-                        return False
-            return True
+                        has_higher_piece = True
+                        break
+                if has_higher_piece:
+                    break
+            allowed = not has_higher_piece
 
-        return False
+        return allowed
 
     def bear_off_piece(self, point, player):
         """Bear off a piece from the board."""
@@ -217,54 +218,55 @@ class Board:
 
     def get_possible_moves(self, player, dice_values):
         """Get all possible moves for a player given dice values."""
-        moves = []
         player_bar_index = 0 if player == 1 else 1
-
-        # If player has pieces on bar, they must move those first
         if self.checker_bar[player_bar_index]:
-            for dice in dice_values:
-                if player == 1:
-                    entry_point = 24 - dice
-                else:
-                    entry_point = dice - 1
+            # Must enter from bar first
+            return self._get_bar_entry_moves(player, dice_values)
 
-                if 0 <= entry_point < 24:
-                    # Check if can enter from bar
-                    destination_pieces = self.points[entry_point]
-                    if (
-                        not destination_pieces
-                        or len(destination_pieces) < 2
-                        or destination_pieces[0] == player
-                    ):
-                        moves.append({"from": "bar", "to": entry_point, "dice": dice})
+        moves = []
+        moves.extend(self._get_bear_off_moves(player, dice_values))
+        moves.extend(self._get_regular_moves(player, dice_values))
+        return moves
+
+    def _get_bar_entry_moves(self, player, dice_values):
+        """Generate legal bar entry moves for a player and dice values."""
+        moves = []
+        for dice in dice_values:
+            entry_point = 24 - dice if player == 1 else dice - 1
+            if 0 <= entry_point < 24:
+                destination_pieces = self.points[entry_point]
+                if (
+                    not destination_pieces
+                    or len(destination_pieces) < 2
+                    or destination_pieces[0] == player
+                ):
+                    moves.append({"from": "bar", "to": entry_point, "dice": dice})
+        return moves
+
+    def _get_bear_off_moves(self, player, dice_values):
+        """Generate legal bearing-off moves for a player and dice values."""
+        moves = []
+        if not self.is_all_pieces_in_home(player):
             return moves
-        # Check for bearing off
-        if self.is_all_pieces_in_home(player):
-            if player == 1:
-                home_range = range(18, 24)
-            else:
-                home_range = range(0, 6)
-
-            for point in home_range:
+        home_range = range(18, 24) if player == 1 else range(0, 6)
+        for point in home_range:
+            if self.points[point] and self.points[point][0] == player:
                 for dice in dice_values:
-                    if self.points[point] and self.points[point][0] == player:
-                        if self.can_bear_off(point, player, dice):
-                            moves.append({"from": point, "to": "off", "dice": dice})
-        # Regular moves
+                    if self.can_bear_off(point, player, dice):
+                        moves.append({"from": point, "to": "off", "dice": dice})
+        return moves
+
+    def _get_regular_moves(self, player, dice_values):
+        """Generate legal on-board moves (non-bar, non-bear-off)."""
+        moves = []
         for from_point in range(24):
             if self.points[from_point] and self.points[from_point][0] == player:
                 for dice in dice_values:
-                    if player == 1:
-                        to_point = from_point + dice
-                    else:
-                        to_point = from_point - dice
-
-                    if 0 <= to_point < 24:
-                        if self.can_move(from_point, to_point, player):
-                            moves.append(
-                                {"from": from_point, "to": to_point, "dice": dice}
-                            )
-
+                    to_point = from_point + dice if player == 1 else from_point - dice
+                    if 0 <= to_point < 24 and self.can_move(
+                        from_point, to_point, player
+                    ):
+                        moves.append({"from": from_point, "to": to_point, "dice": dice})
         return moves
 
     def is_game_over(self):

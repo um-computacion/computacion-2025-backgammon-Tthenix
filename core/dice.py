@@ -15,7 +15,6 @@ class Dice:
 
     def __init__(self):
         """Initialize the dice."""
-        pass
 
     def roll(self):
         """Roll two dice and return the result.
