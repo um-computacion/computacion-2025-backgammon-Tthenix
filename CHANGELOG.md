@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 
 - skleton of cli
+- commandas for cli help, roll, board, turn, quit
 
 #### Fix
 
