@@ -1,8 +1,3 @@
-## 2025-09-23
-
-- Added CLI skeleton: `BackgammonCLI` with ASCII board header/footer rendering.
-- Exposed `BackgammonGame` and `BackgammonCLI` via package `__init__` files.
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -14,12 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 3
 
+### [0.0.12] - 2025-09-24
+
+#### Added
+
+- Pieces to board
+- commandas for cli: status, moves, move, enter, bearoff, end.
+
+#### Fix
+
+- Pylint 10/10 on core and test
+
 ### [0.0.11] - 2025-09-23
 
 #### Added
 
 - skleton of cli
-- commandas for cli help, roll, board, turn, quit
+- commandas for cli: help, roll, board, turn, quit
 
 #### Fix
 
