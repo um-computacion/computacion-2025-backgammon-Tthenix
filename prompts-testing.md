@@ -2611,3 +2611,249 @@ I use all the answer
 ### reference:
 
 test/test_backgammon.py
+
+## Promt 9
+
+### GPT-5:
+
+### Prompt:
+
+Create the test for all the cli, to test all the functionabilitys cover all the cases for the backgammon
+
+### Answer:
+
+I'll add a new CLI test file covering help, roll/status/end, moves prompt, and game-over detection;
+
+added test/test_cli.py to cover:
+help and quit
+roll → status → end flow
+moves prompt flow
+game-over announcement
+
+```python
+"""CLI tests for BackgammonCLI.
+
+Covers help, roll/status/end, moves prompting, and game-over announcement.
+"""
+
+import io
+import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
+
+from cli.cli import BackgammonCLI
+
+
+class TestBackgammonCLI(unittest.TestCase):
+    """Tests for the Backgammon CLI behavior."""
+
+    def setUp(self):
+        """Initialize a fresh CLI instance before each test."""
+        self.cli = BackgammonCLI()
+
+    def _run_commands(self, commands):
+        """Run a sequence of commands through the CLI loop and capture output."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            with patch("builtins.input", side_effect=commands):
+                self.cli.run()
+        return buf.getvalue()
+
+    def test_help_and_quit(self):
+        """It should show help and exit cleanly on quit."""
+        output = self._run_commands(["help", "quit"])
+        self.assertIn("Commands:", output)
+        self.assertIn("Bye.", output)
+
+    @patch("core.dice.Dice.roll", return_value=(2, 4))
+    def test_roll_status_end_and_quit(self, _mock_roll):
+        """It should roll, show status, end turn, and quit."""
+        output = self._run_commands(["roll", "status", "end", "quit"])
+        self.assertIn("Rolled: 2 and 4", output)
+        self.assertIn("Last roll:", output)
+        self.assertIn("Now it's", output)
+        self.assertIn("Bye.", output)
+
+    @patch("core.dice.Dice.roll", return_value=(1, 2))
+    def test_moves_prompt_lists_points(self, _mock_roll):
+        """It should list available points and destinations for moves."""
+        # roll so moves are available, then call moves and choose an input, then quit
+        # The exact destinations may vary; assert prompts and listing are shown
+        output = self._run_commands(["roll", "moves", "1", "quit"])
+        self.assertIn("Available points with your pieces:", output)
+        # When input() is patched, the prompt text is not printed by mock
+        # so we assert destinations listing instead
+        self.assertIn("Destinations:", output)
+
+    def test_game_over_announced_on_end(self):
+        """It should announce game over when a player has won."""
+        # Force a game-over state and then end turn
+        # Player1 wins
+        self.cli.game.board.off_board[0] = [1] * 15
+        output = self._run_commands(["end", "quit"])
+        self.assertIn("GAME OVER!", output)
+
+    # --- Additional coverage ---
+    def test_status_before_roll(self):
+        """Status should show None roll and empty moves before rolling."""
+        output = self._run_commands(["status", "quit"])
+        self.assertIn("Last roll: None", output)
+        self.assertIn("moves: []", output)
+
+    def test_reroll_blocked_when_moves_remain(self):
+        """Re-rolling should be blocked while moves remain."""
+        # Simulate existing roll with remaining moves
+        self.cli.game.last_roll = (2, 3)
+        self.cli.game.available_moves = [2, 3]
+        output = self._run_commands(["roll", "quit"])
+        self.assertIn("You still have moves left. Use them or 'end' the turn.", output)
+
+    def test_move_illegal_shows_message(self):
+        """Illegal move attempts should print an error message."""
+        # Roll first
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "move", "10", "11", "quit"])
+        self.assertIn("Illegal move.", output)
+
+    def test_bearoff_invalid_message(self):
+        """Bearoff should be rejected when conditions are not met."""
+        # Not allowed at start
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "bearoff", "6", "quit"])
+        self.assertIn("Cannot bear off from there.", output)
+
+    def test_enter_success(self):
+        """Entering from bar should succeed on a legal entry point."""
+        # Prepare bar and open entry for player1 using die=1 -> entry point index 23
+        self.cli.game.board.checker_bar[0] = [1]
+        self.cli.game.board.points[23] = []
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1, 2]
+        output = self._run_commands(["enter", "1", "quit"])
+        self.assertIn("Entered from bar.", output)
+
+    def test_enter_blocked(self):
+        """Entering from bar should fail if the point is blocked."""
+        # Block entry with two opponent pieces
+        self.cli.game.board.checker_bar[0] = [1]
+        self.cli.game.board.points[23] = [2, 2]
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1, 2]
+        output = self._run_commands(["enter", "1", "quit"])
+        self.assertIn("Cannot enter with that die.", output)
+
+    def test_alias_commands(self):
+        """Short aliases should behave like their full command names."""
+        with patch("core.dice.Dice.roll", return_value=(3, 5)):
+            output = self._run_commands(["h", "b", "t", "r", "s", "q"])
+        self.assertIn("Commands:", output)
+        self.assertIn("Current player:", output)
+        self.assertIn("Rolled: 3 and 5", output)
+        self.assertIn("Last roll:", output)
+
+    def test_unknown_command(self):
+        """Unknown commands should print a helpful message."""
+        output = self._run_commands(["xyz", "quit"])
+        self.assertIn("Unknown command.", output)
+
+    def test_moves_requires_enter_from_bar(self):
+        """Moves command should require entering from bar when needed."""
+        # Put a checker on bar for player1, roll so command is allowed
+        self.cli.game.board.checker_bar[0] = [1]
+        with patch("core.dice.Dice.roll", return_value=(2, 3)):
+            output = self._run_commands(["roll", "moves", "quit"])
+        self.assertIn("You must enter from bar. Use 'enter'.", output)
+
+    def test_moves_no_own_pieces(self):
+        """Moves should inform when no movable own pieces are on board."""
+        # Clear all points so no available_points are found
+        self.cli.game.board.points = [[] for _ in range(24)]
+        with patch("core.dice.Dice.roll", return_value=(2, 3)):
+            output = self._run_commands(["roll", "moves", "quit"])
+        self.assertIn("No pieces available to move.", output)
+
+    def test_prompt_int_invalid_value(self):
+        """_prompt_int should handle non-integer input gracefully."""
+        # Trigger _prompt_int with non-integer input during move
+        with patch("core.dice.Dice.roll", return_value=(2, 3)):
+            output = self._run_commands(["roll", "move", "abc", "quit", "quit"])
+        self.assertIn("Please enter a number.", output)
+
+    def test_move_exhausts_moves_message(self):
+        """After consuming last move, it should prompt to end the turn."""
+        # Prepare exactly one legal move (1->2)
+        self.cli.game.setup_initial_position()
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1]
+        output = self._run_commands(["move", "1", "2", "quit"])
+        self.assertIn("No moves left. 'end' to switch player.", output)
+
+    def test_enter_when_bar_empty(self):
+        """Entering should be disallowed when the bar is empty."""
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1, 2]
+        # Ensure bar empty
+        self.cli.game.board.checker_bar[0] = []
+        output = self._run_commands(["enter", "1", "quit"])
+        self.assertIn("No checkers on bar.", output)
+
+    def test_keyboard_interrupt_exit(self):
+        """The loop should exit gracefully on KeyboardInterrupt."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            with patch("builtins.input", side_effect=KeyboardInterrupt):
+                self.cli.run()
+        output = buf.getvalue()
+        self.assertIn("Exiting.", output)
+
+    def test_eoferror_exit(self):
+        """The loop should exit gracefully on EOFError."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            with patch("builtins.input", side_effect=EOFError):
+                self.cli.run()
+        output = buf.getvalue()
+        self.assertIn("Exiting.", output)
+
+    @patch("core.dice.Dice.roll", return_value=(2, 3))
+    def test_moves_invalid_point_range(self, _mock_roll):
+        """Moves should validate origin point range (1-24)."""
+        output = self._run_commands(["roll", "moves", "30", "quit"])
+        self.assertIn("Point must be 1-24.", output)
+
+    def test_move_when_moves_remain_no_exhaust_message(self):
+        """When moves remain after a move, no exhaustion message is shown."""
+        # Prepare two moves available and a likely legal small move won't exhaust all
+        self.cli.game.setup_initial_position()
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1, 2]
+        # Attempt a move that may succeed; even if illegal, it prints message
+        # To ensure success, move from point 1 to 2 for player1 at start
+        output = self._run_commands(["move", "1", "2", "quit"])
+        # We only care that the exhaust message is not shown when moves remain
+        self.assertNotIn("No moves left. 'end' to switch player.", output)
+
+    def test_bearoff_valid_path(self):
+        """Bearoff should succeed when all pieces are in home and die fits."""
+        # Setup all-in-home for player1 with a checker at 24 (index 23)
+        self.cli.game.board.points = [[] for _ in range(24)]
+        self.cli.game.board.points[23] = [1]
+        self.cli.game.last_roll = (1, 2)
+        self.cli.game.available_moves = [1, 2]
+        output = self._run_commands(["bearoff", "24", "quit"])
+        self.assertIn("Borne off.", output)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+```
+
+### What i do with the answer?
+
+I use all the answer but i fix the pylint errors
+
+### reference:
+
+test/test_cli.py
+cli/cli.py

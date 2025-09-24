@@ -1,6 +1,8 @@
 # Backgammon Game
 
-## CLI Usage
+### Alumno: Nahuel Quiroga - 64048
+
+### CLI Usage
 
 Run the CLI:
 
