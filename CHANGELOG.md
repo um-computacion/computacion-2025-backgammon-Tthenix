@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pieces to board
 - commandas for cli: status, moves, move, enter, bearoff, end.
+- Game-over detection and announcement in CLI after moves and at turn end.
 
 #### Fix
 

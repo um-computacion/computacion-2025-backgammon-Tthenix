@@ -1694,3 +1694,34 @@ Your code has been rated at 10.00/10 (previous run: 9.84/10, +0.16)
 ### reference:
 
 cli/cli.py
+
+## Prompt 7
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+add the game over detection
+
+### Answer:
+
+'ll add a helper to detect and announce game over, call it after state-changing commands and at turn end, then update the changelog.
+Added \_check_game_over in cli/cli.py and call it after move, enter, and bearoff, and block end if the game is already over. The CLI now announces the winner when someone bears off all 15.
+
+```python
+    def _check_game_over(self) -> None:
+        """Check and announce game over if a player has won."""
+        if self.game.is_game_over():
+            winner = self.game.get_winner()
+            if winner is not None:
+                print(f"\nGAME OVER! {winner.name} ({winner.color}) wins!")
+                print("Type 'quit' to exit or 'help' for options.")
+```
+
+### What i do with the answer?
+
+i use all the answer and i test it
+
+### reference:
+
+cli/cli.py

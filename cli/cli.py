@@ -152,6 +152,14 @@ class BackgammonCLI:
         """Handle status command."""
         print(f"Last roll: {self.game.last_roll} | moves: {self.game.available_moves}")
 
+    def _check_game_over(self) -> None:
+        """Check and announce game over if a player has won."""
+        if self.game.is_game_over():
+            winner = self.game.get_winner()
+            if winner is not None:
+                print(f"\nGAME OVER! {winner.name} ({winner.color}) wins!")
+                print("Type 'quit' to exit or 'help' for options.")
+
     # ----- Command handlers -----
     def _prompt_int(self, message: str) -> int | None:
         try:
@@ -215,6 +223,7 @@ class BackgammonCLI:
             return
         print("Moved.")
         self.render_board()
+        self._check_game_over()
         if not self.game.available_moves:
             print("No moves left. 'end' to switch player.")
 
@@ -234,6 +243,7 @@ class BackgammonCLI:
             return
         print("Entered from bar.")
         self.render_board()
+        self._check_game_over()
         if not self.game.available_moves:
             print("No moves left. 'end' to switch player.")
 
@@ -253,10 +263,15 @@ class BackgammonCLI:
             return
         print("Borne off.")
         self.render_board()
+        self._check_game_over()
         if not self.game.available_moves:
             print("No moves left. 'end' to switch player.")
 
     def _cmd_end_turn(self) -> None:
+        # If game is over, announce and do not switch
+        if self.game.is_game_over():
+            self._check_game_over()
+            return
         # Reset dice for next player and switch
         self.game.last_roll = None
         self.game.available_moves = []
