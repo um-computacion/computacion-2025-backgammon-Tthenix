@@ -15,11 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pieces to board
 - commandas for cli: status, moves, move, enter, bearoff, end.
-- Game-over detection and announcement in CLI after moves and at turn end.
-
-#### Fix
-
-- Pylint 10/10 on core and test
+- game-over detection and announcement in CLI after moves and at turn end.
+- test for CLI
 
 ### [0.0.11] - 2025-09-23
 
