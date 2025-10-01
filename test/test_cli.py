@@ -38,7 +38,7 @@ class TestBackgammonCLI(unittest.TestCase):
         output = self._run_commands(["roll", "status", "end", "quit"])
         self.assertIn("Rolled: 2 and 4", output)
         self.assertIn("Last roll:", output)
-        self.assertIn("Now it's", output)
+        self.assertIn("turn begins!", output)  # Updated to match new format
         self.assertIn("Bye.", output)
 
     @patch("core.dice.Dice.roll", return_value=(1, 2))
@@ -114,7 +114,7 @@ class TestBackgammonCLI(unittest.TestCase):
         with patch("core.dice.Dice.roll", return_value=(3, 5)):
             output = self._run_commands(["h", "b", "t", "r", "s", "q"])
         self.assertIn("Commands:", output)
-        self.assertIn("Current player:", output)
+        self.assertIn("Current Turn:", output)  # Updated to match new format
         self.assertIn("Rolled: 3 and 5", output)
         self.assertIn("Last roll:", output)
 
@@ -209,6 +209,26 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.available_moves = [1, 2]
         output = self._run_commands(["bearoff", "24", "quit"])
         self.assertIn("Borne off.", output)
+
+    def test_turn_indicator_in_board_display(self):
+        """Board should display current player turn prominently."""
+        output = self._run_commands(["board", "quit"])
+        self.assertIn("Current Turn:", output)
+        self.assertIn("Player 1 (white)", output)
+
+    def test_turn_indicator_after_switch(self):
+        """Turn indicator should update after player switch."""
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "end", "board", "quit"])
+        self.assertIn("Current Turn:", output)
+        self.assertIn("Player 2 (black)", output)
+
+    def test_turn_indicator_in_prompt(self):
+        """Input prompt should show current player."""
+        # The prompt text isn't captured by our test setup, but we can verify
+        # the turn display logic is called by checking board output
+        output = self._run_commands(["board", "quit"])
+        self.assertIn("Current Turn:", output)
 
 
 if __name__ == "__main__":

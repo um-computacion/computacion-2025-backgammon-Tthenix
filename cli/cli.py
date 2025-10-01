@@ -21,6 +21,14 @@ class BackgammonCLI:
         """Render the board skeleton to stdout with current counts."""
         board = self.game.board
 
+        # Display current turn prominently
+        current_player = self.game.current_player
+        turn_indicator = f"Current Turn: {current_player.name} ({current_player.color})"
+        separator = "=" * len(turn_indicator)
+        print(f"\n{separator}")
+        print(turn_indicator)
+        print(separator)
+
         # Helpers to format a point as owner initial + count or blanks
         def fmt_point(idx: int) -> str:
             pieces = board.points[idx]
@@ -56,7 +64,10 @@ class BackgammonCLI:
         self.render_board()
         while self._running:
             try:
-                command = input("> ").strip()
+                # Show current player in prompt
+                current_player = self.game.current_player
+                prompt = f"{current_player.name} ({current_player.color}) > "
+                command = input(prompt).strip()
             except (EOFError, KeyboardInterrupt):
                 print("\nExiting.")
                 break
@@ -136,9 +147,20 @@ class BackgammonCLI:
 
     def _cmd_turn(self) -> None:
         """Handle turn command."""
-        print(
-            f"Current player: {self.game.current_player.name} ({self.game.current_player.color})"
-        )
+        current_player = self.game.current_player
+        turn_info = f"Current Turn: {current_player.name} ({current_player.color})"
+        separator = "=" * len(turn_info)
+        print(f"\n{separator}")
+        print(turn_info)
+        print(separator)
+
+        # Show additional turn status
+        if self.game.last_roll:
+            print(f"Last roll: {self.game.last_roll}")
+            print(f"Available moves: {self.game.available_moves}")
+        else:
+            print("No dice rolled yet - use 'roll' to start your turn")
+        print()
 
     def _cmd_roll(self) -> None:
         """Handle roll command."""
@@ -268,17 +290,29 @@ class BackgammonCLI:
             print("No moves left. 'end' to switch player.")
 
     def _cmd_end_turn(self) -> None:
+        """Handle end turn command."""
         # If game is over, announce and do not switch
         if self.game.is_game_over():
             self._check_game_over()
             return
+
+        # Show turn ending message
+        ending_player = self.game.current_player
+        print(f"\n{ending_player.name}'s turn ended.")
+
         # Reset dice for next player and switch
         self.game.last_roll = None
         self.game.available_moves = []
         self.game.switch_current_player()
-        print(
-            f"Now it's {self.game.current_player.name} ({self.game.current_player.color})"
-        )
+
+        # Show new turn with visual separator
+        new_player = self.game.current_player
+        separator = "=" * 50
+        print(f"\n{separator}")
+        print(f"{new_player.name} ({new_player.color})'s turn begins!")
+        print(f"{separator}")
+        print("Type 'roll' to roll the dice")
+        print()
 
 
 def run_cli() -> None:
