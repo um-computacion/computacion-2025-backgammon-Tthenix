@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 4
 
+### Changed
+- Enhanced CLI UX/UI with improved visual formatting and clearer messages 
 ### Added
 - Player turn on cli
 

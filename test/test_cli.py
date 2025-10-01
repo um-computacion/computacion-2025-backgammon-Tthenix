@@ -29,8 +29,8 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_help_and_quit(self):
         """It should show help and exit cleanly on quit."""
         output = self._run_commands(["help", "quit"])
-        self.assertIn("Commands:", output)
-        self.assertIn("Bye.", output)
+        self.assertIn("AVAILABLE COMMANDS", output)
+        self.assertIn("Thanks for playing Backgammon! Goodbye.", output)
 
     @patch("core.dice.Dice.roll", return_value=(2, 4))
     def test_roll_status_end_and_quit(self, _mock_roll):
@@ -38,8 +38,8 @@ class TestBackgammonCLI(unittest.TestCase):
         output = self._run_commands(["roll", "status", "end", "quit"])
         self.assertIn("Rolled: 2 and 4", output)
         self.assertIn("Last roll:", output)
-        self.assertIn("turn begins!", output)  # Updated to match new format
-        self.assertIn("Bye.", output)
+        self.assertIn("turn begins", output)  # Updated to match new format
+        self.assertIn("Thanks for playing Backgammon! Goodbye.", output)
 
     @patch("core.dice.Dice.roll", return_value=(1, 2))
     def test_moves_prompt_lists_points(self, _mock_roll):
@@ -47,10 +47,10 @@ class TestBackgammonCLI(unittest.TestCase):
         # roll so moves are available, then call moves and choose an input, then quit
         # The exact destinations may vary; assert prompts and listing are shown
         output = self._run_commands(["roll", "moves", "1", "quit"])
-        self.assertIn("Available points with your pieces:", output)
+        self.assertIn("Points with your pieces:", output)
         # When input() is patched, the prompt text is not printed by mock
         # so we assert destinations listing instead
-        self.assertIn("Destinations:", output)
+        self.assertIn("Possible destinations:", output)
 
     def test_game_over_announced_on_end(self):
         """It should announce game over when a player has won."""
@@ -73,21 +73,21 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.last_roll = (2, 3)
         self.cli.game.available_moves = [2, 3]
         output = self._run_commands(["roll", "quit"])
-        self.assertIn("You still have moves left. Use them or 'end' the turn.", output)
+        self.assertIn("You still have moves left.", output)
 
     def test_move_illegal_shows_message(self):
         """Illegal move attempts should print an error message."""
         # Roll first
         with patch("core.dice.Dice.roll", return_value=(1, 2)):
             output = self._run_commands(["roll", "move", "10", "11", "quit"])
-        self.assertIn("Illegal move.", output)
+        self.assertIn("[ERROR] Illegal move", output)
 
     def test_bearoff_invalid_message(self):
         """Bearoff should be rejected when conditions are not met."""
         # Not allowed at start
         with patch("core.dice.Dice.roll", return_value=(1, 2)):
             output = self._run_commands(["roll", "bearoff", "6", "quit"])
-        self.assertIn("Cannot bear off from there.", output)
+        self.assertIn("Cannot bear off from that point", output)
 
     def test_enter_success(self):
         """Entering from bar should succeed on a legal entry point."""
@@ -97,7 +97,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1, 2]
         output = self._run_commands(["enter", "1", "quit"])
-        self.assertIn("Entered from bar.", output)
+        self.assertIn("Checker entered from bar", output)
 
     def test_enter_blocked(self):
         """Entering from bar should fail if the point is blocked."""
@@ -107,14 +107,14 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1, 2]
         output = self._run_commands(["enter", "1", "quit"])
-        self.assertIn("Cannot enter with that die.", output)
+        self.assertIn("Cannot enter with that die value", output)
 
     def test_alias_commands(self):
         """Short aliases should behave like their full command names."""
         with patch("core.dice.Dice.roll", return_value=(3, 5)):
             output = self._run_commands(["h", "b", "t", "r", "s", "q"])
-        self.assertIn("Commands:", output)
-        self.assertIn("Current Turn:", output)  # Updated to match new format
+        self.assertIn("AVAILABLE COMMANDS", output)
+        self.assertIn("CURRENT TURN:", output)  # Updated to match new format
         self.assertIn("Rolled: 3 and 5", output)
         self.assertIn("Last roll:", output)
 
@@ -129,7 +129,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.board.checker_bar[0] = [1]
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "moves", "quit"])
-        self.assertIn("You must enter from bar. Use 'enter'.", output)
+        self.assertIn("You have checkers on the bar", output)
 
     def test_moves_no_own_pieces(self):
         """Moves should inform when no movable own pieces are on board."""
@@ -137,14 +137,14 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.board.points = [[] for _ in range(24)]
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "moves", "quit"])
-        self.assertIn("No pieces available to move.", output)
+        self.assertIn("No pieces available to move", output)
 
     def test_prompt_int_invalid_value(self):
         """_prompt_int should handle non-integer input gracefully."""
         # Trigger _prompt_int with non-integer input during move
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "move", "abc", "quit", "quit"])
-        self.assertIn("Please enter a number.", output)
+        self.assertIn("Please enter a valid number", output)
 
     def test_move_exhausts_moves_message(self):
         """After consuming last move, it should prompt to end the turn."""
@@ -153,7 +153,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1]
         output = self._run_commands(["move", "1", "2", "quit"])
-        self.assertIn("No moves left. 'end' to switch player.", output)
+        self.assertIn("No moves remaining", output)
 
     def test_enter_when_bar_empty(self):
         """Entering should be disallowed when the bar is empty."""
@@ -162,7 +162,7 @@ class TestBackgammonCLI(unittest.TestCase):
         # Ensure bar empty
         self.cli.game.board.checker_bar[0] = []
         output = self._run_commands(["enter", "1", "quit"])
-        self.assertIn("No checkers on bar.", output)
+        self.assertIn("You have no checkers on the bar", output)
 
     def test_keyboard_interrupt_exit(self):
         """The loop should exit gracefully on KeyboardInterrupt."""
@@ -171,7 +171,7 @@ class TestBackgammonCLI(unittest.TestCase):
             with patch("builtins.input", side_effect=KeyboardInterrupt):
                 self.cli.run()
         output = buf.getvalue()
-        self.assertIn("Exiting.", output)
+        self.assertIn("Exiting game", output)
 
     def test_eoferror_exit(self):
         """The loop should exit gracefully on EOFError."""
@@ -180,13 +180,13 @@ class TestBackgammonCLI(unittest.TestCase):
             with patch("builtins.input", side_effect=EOFError):
                 self.cli.run()
         output = buf.getvalue()
-        self.assertIn("Exiting.", output)
+        self.assertIn("Exiting game", output)
 
     @patch("core.dice.Dice.roll", return_value=(2, 3))
     def test_moves_invalid_point_range(self, _mock_roll):
         """Moves should validate origin point range (1-24)."""
         output = self._run_commands(["roll", "moves", "30", "quit"])
-        self.assertIn("Point must be 1-24.", output)
+        self.assertIn("Point must be between 1 and 24", output)
 
     def test_move_when_moves_remain_no_exhaust_message(self):
         """When moves remain after a move, no exhaustion message is shown."""
@@ -198,7 +198,7 @@ class TestBackgammonCLI(unittest.TestCase):
         # To ensure success, move from point 1 to 2 for player1 at start
         output = self._run_commands(["move", "1", "2", "quit"])
         # We only care that the exhaust message is not shown when moves remain
-        self.assertNotIn("No moves left. 'end' to switch player.", output)
+        self.assertNotIn("No moves remaining", output)
 
     def test_bearoff_valid_path(self):
         """Bearoff should succeed when all pieces are in home and die fits."""
@@ -208,19 +208,19 @@ class TestBackgammonCLI(unittest.TestCase):
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1, 2]
         output = self._run_commands(["bearoff", "24", "quit"])
-        self.assertIn("Borne off.", output)
+        self.assertIn("Checker borne off", output)
 
     def test_turn_indicator_in_board_display(self):
         """Board should display current player turn prominently."""
         output = self._run_commands(["board", "quit"])
-        self.assertIn("Current Turn:", output)
+        self.assertIn("CURRENT TURN:", output)
         self.assertIn("Player 1 (white)", output)
 
     def test_turn_indicator_after_switch(self):
         """Turn indicator should update after player switch."""
         with patch("core.dice.Dice.roll", return_value=(1, 2)):
             output = self._run_commands(["roll", "end", "board", "quit"])
-        self.assertIn("Current Turn:", output)
+        self.assertIn("CURRENT TURN:", output)
         self.assertIn("Player 2 (black)", output)
 
     def test_turn_indicator_in_prompt(self):
@@ -228,7 +228,7 @@ class TestBackgammonCLI(unittest.TestCase):
         # The prompt text isn't captured by our test setup, but we can verify
         # the turn display logic is called by checking board output
         output = self._run_commands(["board", "quit"])
-        self.assertIn("Current Turn:", output)
+        self.assertIn("CURRENT TURN:", output)
 
 
 if __name__ == "__main__":
