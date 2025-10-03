@@ -1725,3 +1725,157 @@ i use all the answer and i test it
 ### reference:
 
 cli/cli.py
+
+## Prompt 8
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+on cli add player-turn-on-cli
+
+### Answer:
+
+I'll enhance the CLI to make player turn information more prominent by adding a visual turn indicator to the board rendering and improving the turn display throughout the interface. Following TDD methodology, I'll first create tests for the enhanced functionality, then implement the feature.
+```python
+    def _cmd_turn(self) -> None:
+        """Handle turn command."""
+        current_player = self.game.current_player
+        turn_info = f"Current Turn: {current_player.name} ({current_player.color})"
+        separator = "=" * len(turn_info)
+        print(f"\n{separator}")
+        print(turn_info)
+        print(separator)
+
+        # Show additional turn status
+        if self.game.last_roll:
+            print(f"Last roll: {self.game.last_roll}")
+            print(f"Available moves: {self.game.available_moves}")
+        else:
+            print("No dice rolled yet - use 'roll' to start your turn")
+        print()
+```
+**Implementation Details:**
+
+1. **Enhanced Board Rendering**: Added a prominent "Current Turn" header with visual separators at the top of the board display
+2. **Dynamic Input Prompt**: Modified the input prompt to show the current player's name and color (e.g., "Player 1 (white) > ")  
+3. **Enhanced Turn Command**: Improved the `turn` command to show comprehensive turn status including dice roll information
+4. **Visual Turn Transitions**: Added clear turn transition messages with separators and emoji indicators when switching players
+5. **Turn Status Integration**: Integrated turn status throughout the CLI for better user experience
+
+**Key Features Added:**
+- Prominent turn indicator at the top of board display
+- Visual separators using '=' characters for clear section delineation  
+- Enhanced end turn command with turn transition messages
+- Turn status showing dice roll state and available moves
+- Player-specific command prompts for better context
+
+**Tests Added:**
+- `test_turn_indicator_in_board_display()`: Verifies turn indicator appears in board output
+- `test_turn_indicator_after_switch()`: Ensures turn indicator updates after player switch
+- `test_turn_indicator_in_prompt()`: Validates turn information is displayed prominently
+
+All tests pass and the enhancement follows SOLID principles by extending existing functionality without breaking changes.
+
+### What i do with the answer?
+
+I used the complete answer and implemented all the enhancements. The CLI now provides a much better user experience with prominent player turn information throughout the interface. All existing tests continue to pass, and the new functionality is well-tested. The implementation follows the TDD approach with tests written first, then the implementation, ensuring high code quality.
+
+### reference:
+
+cli/cli.py
+test/test_cli.py
+
+## Prompt 9
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+I want to create a backgammon board using Pygame. Please create the visual board layout based on this reference image. Here are the specific characteristics I need:
+Board Structure:
+
+The board should be divided into two halves (left and right sides) separated by a central bar
+The board has a wooden texture background with a brown/orange color scheme
+There's a darker brown border/frame around the entire board
+
+Triangular Points:
+
+24 triangular points total (12 on each side of the board)
+Points alternate in color between two shades: a lighter tan/beige and a darker brown
+6 points on the top of each half, 6 points on the bottom of each half
+The triangles should point inward (top triangles point down, bottom triangles point up)
+The triangles should be evenly spaced and properly sized
+
+Central Bar:
+
+A vertical green bar divides the board into left and right sections
+The bar has a wooden texture or pattern with brass-colored hinges (top and bottom)
+The bar should be proportional to the board size
+
+Right Side Panel:
+
+There's a panel on the far right side of the board
+This panel has a striped green/yellow diagonal pattern in its upper and lower sections
+The middle section matches the wooden board texture
+This appears to be the checker collection/bearing off area
+
+Color Scheme:
+
+Main board: Wood texture in orange/tan tones
+Dark border: Deep brown
+Alternating points: Light tan and dark brown
+Central bar: Green with brass hinges
+Right panel: Green/yellow diagonal stripes
+
+Important: For now, do NOT include dice or checker pieces. I only want the empty board layout rendered properly.
+
+### Answer:
+
+I'll create a detailed Backgammon board UI in Pygame based on your specifications. Let me break this down step-by-step and then provide the implementation.
+
+Solution Steps:
+Create the main board background with wooden texture color
+Draw the border frame in dark brown
+Implement the 24 triangular points with alternating colors
+Add the central bar with green color and brass hinges
+Create the right-side bearing-off panel with diagonal stripes
+Ensure proper spacing and proportions for all elements
+Here are the changes:
+
+pygame_ui.py
+Create a detailed Backgammon board layout with proper structure, colors, and all visual elements.
+Explanation:
+Key Features Implemented:
+Board Structure:
+
+Main wooden board with proper dimensions
+Thick dark brown border frame (20px)
+Two halves separated by central bar
+24 Triangular Points:
+
+6 points on top-left, 6 on top-right (pointing down)
+6 points on bottom-left, 6 on bottom-right (pointing up)
+Alternating light tan and dark brown colors
+Proper spacing and alignment
+Central Bar:
+
+Green vertical bar dividing left and right sections
+Brass-colored hinges at top and bottom
+Border outline for definition
+Right Side Panel:
+
+Bearing-off area with diagonal stripe pattern
+Green and yellow alternating stripes in top and bottom sections
+Wooden texture in middle section
+Color Scheme:
+
+Authentic wood tones and colors matching traditional backgammon boards
+Professional appearance with proper contrast
+
+### What i do with the answer?
+
+I use all the answer and i test it
+### reference:
+
+pygame_ui/pygame_ui.py

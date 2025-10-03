@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [Unreleased]
 
 ## Sprint 4
+### [0.0.14] - 2025-10-2
 
-### Changed
-- Enhanced CLI UX/UI with improved visual formatting and clearer messages 
 ### Added
-- Player turn on cli
+- Board design for pygame
+
+### [0.0.13] - 2025-10-1
+
+### Added
+Player turn on cli
 
 ## Sprint 3
 
