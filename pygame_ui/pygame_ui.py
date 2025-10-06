@@ -18,7 +18,12 @@ class BackgammonBoard:
 
     This class handles the drawing and rendering of all board elements
     including triangular points, central bar, borders, and bearing off area.
+
+    Note: This class holds many visual properties (colors, dimensions, positions)
+    which justifies the high attribute count for proper rendering.
     """
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, width: int = 1000, height: int = 700) -> None:
         """
@@ -48,6 +53,12 @@ class BackgammonBoard:
             "bear_off_border": (110, 75, 45),  # Darker brown for bear off borders
             "black": (0, 0, 0),
             "white": (255, 255, 255),
+            "checker_white": (245, 245, 245),  # White checker main color
+            "checker_white_highlight": (255, 255, 255),  # White checker highlight
+            "checker_white_shadow": (200, 200, 200),  # White checker shadow
+            "checker_black": (40, 40, 40),  # Black checker main color
+            "checker_black_highlight": (80, 80, 80),  # Black checker highlight
+            "checker_black_shadow": (10, 10, 10),  # Black checker shadow
         }
 
         # Board layout dimensions
@@ -58,6 +69,13 @@ class BackgammonBoard:
 
         # Calculate main board area (with bear off area)
         self._calculate_dimensions()
+
+        # Checker properties
+        self.checker_radius = min(self.point_width // 2 - 4, 20)
+        self.checker_spacing = self.checker_radius * 2 + 2
+
+        # Game state - will be set by external game logic
+        self.board_state = None
 
     def _calculate_dimensions(self) -> None:
         """Calculate all board dimensions and positions."""
@@ -109,7 +127,7 @@ class BackgammonBoard:
 
         return surface
 
-    def draw_triangular_point(
+    def draw_triangular_point(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         surface: pygame.Surface,
         x: int,
@@ -311,6 +329,234 @@ class BackgammonBoard:
                 8,
             )
 
+    def draw_checker(
+        self,
+        surface: pygame.Surface,
+        x: int,
+        y: int,
+        player: int,
+    ) -> None:
+        """
+        Draw a single checker with 3D effect.
+
+        Args:
+            surface: Surface to draw on
+            x: X position (center of checker)
+            y: Y position (center of checker)
+            player: Player number (1 for white, 2 for black)
+        """
+        # Determine colors based on player
+        if player == 1:
+            main_color = self.colors["checker_white"]
+            highlight_color = self.colors["checker_white_highlight"]
+            shadow_color = self.colors["checker_white_shadow"]
+        else:
+            main_color = self.colors["checker_black"]
+            highlight_color = self.colors["checker_black_highlight"]
+            shadow_color = self.colors["checker_black_shadow"]
+
+        # Draw shadow (bottom-right offset)
+        shadow_offset = 2
+        pygame.draw.circle(
+            surface,
+            shadow_color,
+            (x + shadow_offset, y + shadow_offset),
+            self.checker_radius,
+        )
+
+        # Draw main checker body
+        pygame.draw.circle(surface, main_color, (x, y), self.checker_radius)
+
+        # Draw highlight (top-left partial circle for 3D effect)
+        highlight_radius = self.checker_radius // 3
+        highlight_offset_x = -self.checker_radius // 3
+        highlight_offset_y = -self.checker_radius // 3
+        pygame.draw.circle(
+            surface,
+            highlight_color,
+            (x + highlight_offset_x, y + highlight_offset_y),
+            highlight_radius,
+        )
+
+        # Draw border
+        pygame.draw.circle(surface, self.colors["black"], (x, y), self.checker_radius, 2)
+
+    def draw_checkers_on_point(
+        self,
+        surface: pygame.Surface,
+        point_index: int,
+        checkers: list,
+    ) -> None:
+        """
+        Draw checkers stacked on a specific point.
+
+        Args:
+            surface: Surface to draw on
+            point_index: Point index (0-23)
+            checkers: List of player numbers representing checkers on this point
+        """
+        if not checkers:
+            return
+
+        # Determine if point is on top or bottom half
+        is_top_half = point_index >= 12
+
+        # Calculate point X position
+        if point_index < 6:
+            # Right side, bottom
+            point_x = (
+                self.play_area_x + self.half_width + self.center_gap_width +
+                (5 - point_index) * self.point_width
+            )
+        elif point_index < 12:
+            # Left side, bottom
+            point_x = self.play_area_x + (11 - point_index) * self.point_width
+        elif point_index < 18:
+            # Left side, top
+            point_x = self.play_area_x + (point_index - 12) * self.point_width
+        else:
+            # Right side, top
+            point_x = (
+                self.play_area_x + self.half_width + self.center_gap_width +
+                (point_index - 18) * self.point_width
+            )
+
+        # Center of the point
+        checker_x = point_x + self.point_width // 2
+
+        # Draw checkers stacked vertically
+        max_visible_checkers = 5  # Show max 5 checkers before condensing
+        checker_count = len(checkers)
+
+        if checker_count <= max_visible_checkers:
+            # Normal spacing
+            spacing = self.checker_radius * 2 + 2
+        else:
+            # Condensed spacing for many checkers
+            spacing = (self.point_height - self.checker_radius * 2) // (checker_count - 1)
+            spacing = max(spacing, self.checker_radius + 2)
+
+        for i, player in enumerate(checkers):
+            if is_top_half:
+                # Stack downward from top
+                checker_y = self.play_area_y + self.checker_radius + 5 + i * spacing
+            else:
+                # Stack upward from bottom
+                checker_y = (
+                    self.play_area_y + self.play_area_height - self.checker_radius - 5 - i * spacing
+                )
+
+            self.draw_checker(surface, checker_x, checker_y, player)
+
+        # Draw count number if more than 5 checkers
+        if checker_count > 5:
+            self._draw_checker_count(surface, checker_x, checker_y, checker_count)
+
+    def _draw_checker_count(
+        self,
+        surface: pygame.Surface,
+        x: int,
+        y: int,
+        count: int,
+    ) -> None:
+        """
+        Draw the count number on top of stacked checkers.
+
+        Args:
+            surface: Surface to draw on
+            x: X position
+            y: Y position
+            count: Number of checkers
+        """
+        try:
+            font = pygame.font.Font(None, 20)
+            text = font.render(str(count), True, self.colors["white"])
+            text_rect = text.get_rect(center=(x, y))
+            surface.blit(text, text_rect)
+        except pygame.error:  # pylint: disable=no-member
+            pass  # If font fails, just skip the count
+
+    def draw_checkers_on_bar(
+        self,
+        surface: pygame.Surface,
+        player1_bar: list,
+        player2_bar: list,
+    ) -> None:
+        """
+        Draw checkers on the bar (captured pieces).
+
+        Args:
+            surface: Surface to draw on
+            player1_bar: List of player 1 checkers on bar
+            player2_bar: List of player 2 checkers on bar
+        """
+        bar_center_x = self.play_area_x + self.half_width + self.center_gap_width // 2
+
+        # Draw player 1 checkers (bottom half of bar)
+        for i, player in enumerate(player1_bar):
+            checker_y = (
+                self.play_area_y + self.play_area_height // 2 +
+                20 + i * (self.checker_radius * 2 + 2)
+            )
+            self.draw_checker(surface, bar_center_x, checker_y, player)
+
+        # Draw player 2 checkers (top half of bar)
+        for i, player in enumerate(player2_bar):
+            checker_y = (
+                self.play_area_y + self.play_area_height // 2 -
+                20 - i * (self.checker_radius * 2 + 2)
+            )
+            self.draw_checker(surface, bar_center_x, checker_y, player)
+
+    def draw_borne_off_checkers(
+        self,
+        surface: pygame.Surface,
+        player1_off: list,
+        player2_off: list,
+    ) -> None:
+        """
+        Draw borne-off checkers in the bear-off area.
+
+        Args:
+            surface: Surface to draw on
+            player1_off: List of player 1 borne-off checkers
+            player2_off: List of player 2 borne-off checkers
+        """
+        bear_off_center_x = self.bear_off_x + self.bear_off_width // 2
+
+        # Draw player 1 (white) checkers in bottom half
+        for i, player in enumerate(player1_off):
+            row = i // 3  # 3 checkers per row
+            col = i % 3
+            col_offset = (col - 1) * (self.checker_radius * 2 + 4)
+            checker_x = bear_off_center_x + col_offset - self.checker_radius
+            checker_y = (
+                self.bear_off_y + 3 * self.board_height // 4 +
+                row * (self.checker_radius * 2 + 2)
+            )
+            self.draw_checker(surface, checker_x, checker_y, player)
+
+        # Draw player 2 (black) checkers in top half
+        for i, player in enumerate(player2_off):
+            row = i // 3  # 3 checkers per row
+            col = i % 3
+            col_offset = (col - 1) * (self.checker_radius * 2 + 4)
+            checker_x = bear_off_center_x + col_offset - self.checker_radius
+            checker_y = (
+                self.bear_off_y + self.board_height // 4 +
+                row * (self.checker_radius * 2 + 2)
+            )
+            self.draw_checker(surface, checker_x, checker_y, player)
+
+    def set_board_state(self, board_state: dict) -> None:
+        """
+        Set the current board state to display.
+
+        Args:
+            board_state: Dictionary containing board state with points, bar, and off_board
+        """
+        self.board_state = board_state
+
     def draw_board(self) -> None:
         """Draw the complete backgammon board."""
         # Create wood textured background
@@ -335,6 +581,33 @@ class BackgammonBoard:
 
         # Draw bear off area
         self.draw_bear_off_area(self.screen)
+
+        # Draw checkers if board state is set
+        if self.board_state:
+            self.draw_all_checkers()
+
+    def draw_all_checkers(self) -> None:
+        """Draw all checkers on the board based on current game state."""
+        if not self.board_state:
+            return
+
+        # Draw checkers on each point
+        for point_index in range(24):
+            if point_index < len(self.board_state["points"]):
+                checkers = self.board_state["points"][point_index]
+                self.draw_checkers_on_point(self.screen, point_index, checkers)
+
+        # Draw checkers on the bar
+        if "checker_bar" in self.board_state:
+            player1_bar = self.board_state["checker_bar"][0]
+            player2_bar = self.board_state["checker_bar"][1]
+            self.draw_checkers_on_bar(self.screen, player1_bar, player2_bar)
+
+        # Draw borne-off checkers
+        if "off_board" in self.board_state:
+            player1_off = self.board_state["off_board"][0]
+            player2_off = self.board_state["off_board"][1]
+            self.draw_borne_off_checkers(self.screen, player1_off, player2_off)
 
     def draw_points(self) -> None:
         """Draw all 24 triangular points on the board."""
@@ -409,6 +682,28 @@ def main() -> None:
     board = BackgammonBoard()
     clock = pygame.time.Clock()
     running = True
+
+    # Create initial board state with standard backgammon setup
+    initial_state = {
+        "points": [[] for _ in range(24)],
+        "checker_bar": [[], []],
+        "off_board": [[], []],
+    }
+
+    # Set up Player 1 pieces (white)
+    initial_state["points"][0] = [1, 1]  # Point 1
+    initial_state["points"][11] = [1, 1, 1, 1, 1]  # Point 12
+    initial_state["points"][16] = [1, 1, 1]  # Point 17
+    initial_state["points"][18] = [1, 1, 1, 1, 1]  # Point 19
+
+    # Set up Player 2 pieces (black)
+    initial_state["points"][23] = [2, 2]  # Point 24
+    initial_state["points"][12] = [2, 2, 2, 2, 2]  # Point 13
+    initial_state["points"][7] = [2, 2, 2]  # Point 8
+    initial_state["points"][5] = [2, 2, 2, 2, 2]  # Point 6
+
+    # Set the board state
+    board.set_board_state(initial_state)
 
     while running:
         for event in pygame.event.get():

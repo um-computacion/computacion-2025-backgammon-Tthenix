@@ -1879,3 +1879,163 @@ I use all the answer and i test it
 ### reference:
 
 pygame_ui/pygame_ui.py
+
+## Prompt 10
+
+### Claude-4-sonnet:
+
+### Prompt:
+Now make draw Checkers on the Board
+You need to visually represent the game pieces. This should:
+
+Draw circular checkers with 3D effect (like real backgammon pieces)
+Position them on the correct points based on initial setup
+Stack multiple checkers on the same point
+Show checkers on the bar when captured
+Show borne-off checkers in the bear-off area
+
+### Answer:
+I'll help you implement the visual representation of checkers on the backgammon board. Let me start by examining the current code structure and then add the checker drawing functionality.
+
+```python
+def draw_checker(
+    self,
+    surface: pygame.Surface,
+    x: int,
+    y: int,
+    player: int,
+) -> None:
+    """
+    Draw a single checker with 3D effect.
+
+    Args:
+        surface: Surface to draw on
+        x: X position (center of checker)
+        y: Y position (center of checker)
+        player: Player number (1 for white, 2 for black)
+    """
+    # Determine colors based on player
+    if player == 1:
+        main_color = self.colors["checker_white"]
+        highlight_color = self.colors["checker_white_highlight"]
+        shadow_color = self.colors["checker_white_shadow"]
+    else:
+        main_color = self.colors["checker_black"]
+        highlight_color = self.colors["checker_black_highlight"]
+        shadow_color = self.colors["checker_black_shadow"]
+
+    # Draw shadow (bottom-right offset)
+    shadow_offset = 2
+    pygame.draw.circle(
+        surface,
+        shadow_color,
+        (x + shadow_offset, y + shadow_offset),
+        self.checker_radius,
+    )
+
+    # Draw main checker body
+    pygame.draw.circle(surface, main_color, (x, y), self.checker_radius)
+
+    # Draw highlight (top-left) for 3D effect
+    highlight_offset = self.checker_radius // 3
+    pygame.draw.circle(
+        surface,
+        highlight_color,
+        (x - highlight_offset, y - highlight_offset),
+        self.checker_radius // 3,
+    )
+
+    # Draw border for definition
+    pygame.draw.circle(surface, self.colors["black"], (x, y), self.checker_radius, 2)
+
+    def draw_checkers_on_point(
+    self,
+    surface: pygame.Surface,
+    point_index: int,
+    checkers: list,
+) -> None:
+    """
+    Draw all checkers on a specific point.
+
+    Args:
+        surface: Surface to draw on
+        point_index: Index of the point (0-23)
+        checkers: List of checker values (1 or 2) on this point
+    """
+    if not checkers:
+        return
+
+    # Determine if point is on top or bottom
+    is_top = point_index >= 12
+
+    # Calculate which half of the board (left or right of center gap)
+    if point_index < 6 or (12 <= point_index < 18):
+        # Right half
+        if point_index < 6:
+            position_in_half = 5 - point_index
+        else:
+            position_in_half = 17 - point_index
+        base_x = (
+            self.play_area_x
+            + self.half_width
+            + self.center_gap_width
+            + position_in_half * self.point_width
+            + self.point_width // 2
+        )
+    else:
+        # Left half
+        if point_index < 12:
+            position_in_half = 11 - point_index
+        else:
+            position_in_half = 23 - point_index
+        base_x = (
+            self.play_area_x
+            + position_in_half * self.point_width
+            + self.point_width // 2
+        )
+
+    # Calculate starting Y position
+    if is_top:
+        start_y = self.play_area_y + self.checker_radius + 5
+    else:
+        start_y = (
+            self.play_area_y + self.play_area_height - self.checker_radius - 5
+        )
+
+    # Draw checkers
+    num_checkers = len(checkers)
+    max_visible_checkers = 5
+
+    if num_checkers <= max_visible_checkers:
+        # Draw all checkers with normal spacing
+        for i, player in enumerate(checkers):
+            if is_top:
+                y_pos = start_y + i * self.checker_spacing
+            else:
+                y_pos = start_y - i * self.checker_spacing
+            self.draw_checker(surface, base_x, y_pos, player)
+    else:
+        # Draw condensed stack with count label
+        condensed_spacing = self.checker_spacing // 2
+        for i in range(max_visible_checkers):
+            player = checkers[i]
+            if is_top:
+                y_pos = start_y + i * condensed_spacing
+            else:
+                y_pos = start_y - i * condensed_spacing
+            self.draw_checker(surface, base_x, y_pos, player)
+
+        # Draw count label on the last visible checker
+        if is_top:
+            label_y = start_y + (max_visible_checkers - 1) * condensed_spacing
+        else:
+            label_y = start_y - (max_visible_checkers - 1) * condensed_spacing
+        self._draw_checker_count(surface, base_x, label_y, num_checkers)
+```
+
+### What i do with the answer?
+
+I use all the answer and i test it and fix pylint erros
+### reference:
+
+pygame_ui/pygame_ui.py
