@@ -23,11 +23,9 @@ class BackgammonCLI:
 
         # Display current turn prominently
         current_player = self.game.current_player
-        turn_indicator = f"Current Turn: {current_player.name} ({current_player.color})"
-        separator = "=" * len(turn_indicator)
-        print(f"\n{separator}")
-        print(turn_indicator)
-        print(separator)
+        print("\n" + "=" * 60)
+        print(f"  CURRENT TURN: {current_player.name} ({current_player.color})")
+        print("=" * 60)
 
         # Helpers to format a point as owner initial + count or blanks
         def fmt_point(idx: int) -> str:
@@ -40,7 +38,7 @@ class BackgammonCLI:
 
         # Top half (points 13-24)
         print("\n  13 14 15 16 17 18    BAR    19 20 21 22 23 24")
-        print(" ┌────────────────────┐     ┌────────────────────┐")
+        print(" +--------------------+     +--------------------+")
 
         left_top = [fmt_point(i) for i in range(12, 18)]  # 13..18
         right_top = [fmt_point(i) for i in range(18, 24)]  # 19..24
@@ -48,28 +46,38 @@ class BackgammonCLI:
         bar_b = len(board.checker_bar[1])
         print(f"  {' '.join(left_top)}    W:{bar_w}|B:{bar_b}    {' '.join(right_top)}")
 
-        print(" └────────────────────┘     └────────────────────┘")
+        print(" +--------------------+     +--------------------+")
 
         # Bottom half (points 12-1)
         # Insert a line showing bottom points counts before labels
         left_bot = [fmt_point(i) for i in range(11, 5, -1)]  # 12..7
         right_bot = [fmt_point(i) for i in range(5, -1, -1)]  # 6..1
         print(f"  {' '.join(left_bot)}               {' '.join(right_bot)}")
-        print("  12 11 10  9  8  7           6  5  4  3  2  1\n")
+        print("  12 11 10  9  8  7           6  5  4  3  2  1")
+
+        # Display borne off checkers
+        white_off = len(board.off_board[0])
+        black_off = len(board.off_board[1])
+        print(f"\n  Bearing off - White: {white_off} | Black: {black_off}")
+        print("=" * 60 + "\n")
 
     def run(self) -> None:
         """Start the interactive CLI loop."""
         self._running = True
-        print("Backgammon CLI - type 'help' for commands.\n")
+        print("\n" + "=" * 60)
+        print("  BACKGAMMON GAME")
+        print("=" * 60)
+        print("  Type 'help' or 'h' for available commands")
+        print("=" * 60)
         self.render_board()
         while self._running:
             try:
                 # Show current player in prompt
                 current_player = self.game.current_player
-                prompt = f"{current_player.name} ({current_player.color}) > "
+                prompt = f"[{current_player.name} - {current_player.color}] > "
                 command = input(prompt).strip()
             except (EOFError, KeyboardInterrupt):
-                print("\nExiting.")
+                print("\n\nExiting game. Thanks for playing!")
                 break
             if not command:
                 continue
@@ -116,26 +124,27 @@ class BackgammonCLI:
 
     def _print_help(self) -> None:
         """Print available commands."""
-        print(
-            "\nCommands:\n"
-            "  help (h)    Show this help\n"
-            "  board (b)   Print board\n"
-            "  turn (t)    Show current player\n"
-            "  roll (r)    Roll dice for current player\n"
-            "  status (s)  Show last roll and remaining moves\n"
-            "  moves       Show possible moves (context-aware)\n"
-            "  move        Make a move (interactive prompts)\n"
-            "  enter       Enter from bar using a die\n"
-            "  bearoff     Bear off a checker (if allowed)\n"
-            "  end (e)     End current player's turn\n"
-            "  quit (q)    Exit\n"
-        )
+        print("\n" + "-" * 60)
+        print("  AVAILABLE COMMANDS")
+        print("-" * 60)
+        print("  help (h)      - Show this help menu")
+        print("  board (b)     - Display the game board")
+        print("  turn (t)      - Show current player information")
+        print("  roll (r)      - Roll dice for current player")
+        print("  status (s)    - Show last roll and remaining moves")
+        print("  moves (mvs)   - Show possible moves (context-aware)")
+        print("  move (mv)     - Make a move (interactive prompts)")
+        print("  enter (ent)   - Enter a checker from the bar")
+        print("  bearoff (bo)  - Bear off a checker (if allowed)")
+        print("  end (e)       - End current player's turn")
+        print("  quit (q)      - Exit the game")
+        print("-" * 60 + "\n")
 
     # ----- Individual command handlers -----
     def _cmd_quit(self) -> None:
         """Handle quit command."""
         self._running = False
-        print("Bye.")
+        print("\nThanks for playing Backgammon! Goodbye.")
 
     def _cmd_help(self) -> None:
         """Handle help command."""
@@ -148,39 +157,50 @@ class BackgammonCLI:
     def _cmd_turn(self) -> None:
         """Handle turn command."""
         current_player = self.game.current_player
-        turn_info = f"Current Turn: {current_player.name} ({current_player.color})"
-        separator = "=" * len(turn_info)
-        print(f"\n{separator}")
-        print(turn_info)
-        print(separator)
+        print("\n" + "-" * 60)
+        print(f"  CURRENT TURN: {current_player.name} ({current_player.color})")
+        print("-" * 60)
 
         # Show additional turn status
         if self.game.last_roll:
-            print(f"Last roll: {self.game.last_roll}")
-            print(f"Available moves: {self.game.available_moves}")
+            print(f"  Last roll: {self.game.last_roll}")
+            print(f"  Available moves: {self.game.available_moves}")
         else:
-            print("No dice rolled yet - use 'roll' to start your turn")
-        print()
+            print("  No dice rolled yet")
+            print("  Use 'roll' command to start your turn")
+        print("-" * 60 + "\n")
 
     def _cmd_roll(self) -> None:
         """Handle roll command."""
         if self.game.last_roll is not None and self.game.available_moves:
-            print("You still have moves left. Use them or 'end' the turn.")
+            print("\n[!] You still have moves left.")
+            print("    Use your remaining moves or type 'end' to finish your turn.\n")
             return
         roll = self.game.roll_dice()
-        print(f"Rolled: {roll[0]} and {roll[1]} | moves: {self.game.available_moves}")
+        print(f"\n[DICE] Rolled: {roll[0]} and {roll[1]}")
+        print(f"[INFO] Available moves: {self.game.available_moves}\n")
 
     def _cmd_status(self) -> None:
         """Handle status command."""
-        print(f"Last roll: {self.game.last_roll} | moves: {self.game.available_moves}")
+        print("\n" + "-" * 60)
+        print("  GAME STATUS")
+        print("-" * 60)
+        print(f"  Last roll: {self.game.last_roll if self.game.last_roll else 'None'}")
+        print(f"  Remaining moves: {self.game.available_moves}")
+        print("-" * 60 + "\n")
 
     def _check_game_over(self) -> None:
         """Check and announce game over if a player has won."""
         if self.game.is_game_over():
             winner = self.game.get_winner()
             if winner is not None:
-                print(f"\nGAME OVER! {winner.name} ({winner.color}) wins!")
-                print("Type 'quit' to exit or 'help' for options.")
+                print("\n" + "=" * 60)
+                print("  GAME OVER!")
+                print("=" * 60)
+                print(f"  WINNER: {winner.name} ({winner.color})")
+                print("=" * 60)
+                print("  Type 'quit' to exit")
+                print("=" * 60 + "\n")
 
     # ----- Command handlers -----
     def _prompt_int(self, message: str) -> int | None:
@@ -188,15 +208,16 @@ class BackgammonCLI:
             value = int(input(message).strip())
             return value
         except ValueError:
-            print("Please enter a number.")
+            print("[ERROR] Invalid input. Please enter a valid number.")
             return None
 
     def _cmd_moves(self) -> None:
         if self.game.last_roll is None:
-            print("Roll first.")
+            print("\n[!] You must roll the dice first.\n")
             return
         if self.game.must_enter_from_bar():
-            print("You must enter from bar. Use 'enter'.")
+            print("\n[!] You have checkers on the bar.")
+            print("    Use 'enter' command to enter them first.\n")
             return
 
         # Show available points with pieces
@@ -207,87 +228,89 @@ class BackgammonCLI:
                 available_points.append(i + 1)  # Convert to 1-based
 
         if not available_points:
-            print("No pieces available to move.")
+            print("\n[INFO] No pieces available to move.\n")
             return
 
-        print(f"Available points with your pieces: {available_points}")
-        point_1b = self._prompt_int("From point (1-24): ")
+        print(f"\n[INFO] Points with your pieces: {available_points}")
+        point_1b = self._prompt_int("Enter point number (1-24): ")
         if point_1b is None:
             return
         if not 1 <= point_1b <= 24:
-            print("Point must be 1-24.")
+            print("[ERROR] Point must be between 1 and 24.\n")
             return
         from_point = point_1b - 1
         dests = self.game.get_possible_destinations(from_point)
         if not dests:
-            print("No destinations.")
+            print("[INFO] No valid destinations from this point.\n")
             return
         # Display as 1-based
-        print("Destinations:", [d + 1 for d in dests])
+        print(f"[INFO] Possible destinations: {[d + 1 for d in dests]}\n")
 
     def _cmd_move(self) -> None:
         if self.game.last_roll is None:
-            print("Roll first.")
+            print("\n[!] You must roll the dice first.\n")
             return
         if self.game.must_enter_from_bar():
-            print("You must enter from bar first. Use 'enter'.")
+            print("\n[!] You have checkers on the bar.")
+            print("    Use 'enter' command to enter them first.\n")
             return
-        from_1b = self._prompt_int("From (1-24): ")
-        to_1b = self._prompt_int("To (1-24): ")
+        from_1b = self._prompt_int("Move from point (1-24): ")
+        to_1b = self._prompt_int("Move to point (1-24): ")
         if from_1b is None or to_1b is None:
             return
         if not 1 <= from_1b <= 24 and 1 <= to_1b <= 24:
-            print("Points must be 1-24.")
+            print("[ERROR] Points must be between 1 and 24.\n")
             return
         ok = self.game.make_move(from_1b - 1, to_1b - 1)
         if not ok:
-            print("Illegal move.")
+            print("\n[ERROR] Illegal move. Please try again.\n")
             return
-        print("Moved.")
+        print("\n[SUCCESS] Move completed.")
         self.render_board()
         self._check_game_over()
         if not self.game.available_moves:
-            print("No moves left. 'end' to switch player.")
+            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
 
     def _cmd_enter(self) -> None:
         if self.game.last_roll is None:
-            print("Roll first.")
+            print("\n[!] You must roll the dice first.\n")
             return
         if not self.game.must_enter_from_bar():
-            print("No checkers on bar.")
+            print("\n[INFO] You have no checkers on the bar.\n")
             return
-        die = self._prompt_int("Die value to use: ")
+        print(f"[INFO] Available dice: {self.game.available_moves}")
+        die = self._prompt_int("Enter die value to use: ")
         if die is None:
             return
         ok = self.game.move_from_bar(die)
         if not ok:
-            print("Cannot enter with that die.")
+            print("\n[ERROR] Cannot enter with that die value.\n")
             return
-        print("Entered from bar.")
+        print("\n[SUCCESS] Checker entered from bar.")
         self.render_board()
         self._check_game_over()
         if not self.game.available_moves:
-            print("No moves left. 'end' to switch player.")
+            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
 
     def _cmd_bearoff(self) -> None:
         if self.game.last_roll is None:
-            print("Roll first.")
+            print("\n[!] You must roll the dice first.\n")
             return
-        point_1b = self._prompt_int("From point to bear off (1-24): ")
+        point_1b = self._prompt_int("Bear off from point (1-24): ")
         if point_1b is None:
             return
         if not 1 <= point_1b <= 24:
-            print("Point must be 1-24.")
+            print("[ERROR] Point must be between 1 and 24.\n")
             return
         ok = self.game.bear_off_checker(point_1b - 1)
         if not ok:
-            print("Cannot bear off from there.")
+            print("\n[ERROR] Cannot bear off from that point.\n")
             return
-        print("Borne off.")
+        print("\n[SUCCESS] Checker borne off.")
         self.render_board()
         self._check_game_over()
         if not self.game.available_moves:
-            print("No moves left. 'end' to switch player.")
+            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
 
     def _cmd_end_turn(self) -> None:
         """Handle end turn command."""
@@ -298,7 +321,9 @@ class BackgammonCLI:
 
         # Show turn ending message
         ending_player = self.game.current_player
-        print(f"\n{ending_player.name}'s turn ended.")
+        print("\n" + "-" * 60)
+        print(f"  {ending_player.name}'s turn has ended")
+        print("-" * 60)
 
         # Reset dice for next player and switch
         self.game.last_roll = None
@@ -307,12 +332,11 @@ class BackgammonCLI:
 
         # Show new turn with visual separator
         new_player = self.game.current_player
-        separator = "=" * 50
-        print(f"\n{separator}")
-        print(f"{new_player.name} ({new_player.color})'s turn begins!")
-        print(f"{separator}")
-        print("Type 'roll' to roll the dice")
-        print()
+        print("\n" + "=" * 60)
+        print(f"  {new_player.name} ({new_player.color})'s turn begins")
+        print("=" * 60)
+        print("  Type 'roll' to roll the dice")
+        print("=" * 60 + "\n")
 
 
 def run_cli() -> None:
