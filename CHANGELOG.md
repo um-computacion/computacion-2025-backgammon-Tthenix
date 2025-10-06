@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [Unreleased]
 
 ## Sprint 4
-### [0.0.15] - October 6, 2025
+### [0.0.15] - 2025-10-6
 
 #### Added
 - Add checkers design on board pygame
 
 
-### [0.0.14] - October 2, 2025
+### [0.0.14] - 2025-10-2
 
 #### Added
 - Board design for pygame
