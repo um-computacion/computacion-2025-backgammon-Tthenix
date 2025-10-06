@@ -12,7 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added
 - Add checkers design on board pygame
+- Added dice rolling functionality using core game logic (Space key to roll or press the button)
 
+#### Fixed
+- Fixed module import path in pygame_ui.py to allow running directly or from main.py
 
 ### [0.0.14] - 2025-10-2
 

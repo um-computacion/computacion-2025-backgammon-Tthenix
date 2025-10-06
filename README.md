@@ -2,6 +2,21 @@
 
 ### Alumno: Nahuel Quiroga - 64048
 
+## How to Run
+
+### GUI Mode (Pygame)
+
+Run the graphical interface:
+
+```bash
+python main.py --gui
+```
+
+Controls:
+- **SPACE**: Roll dice
+- **R**: Reset game
+- **ESC**: Exit
+
 ### CLI Usage
 
 Run the CLI:
@@ -23,3 +38,5 @@ Commands:
 - bearoff: Bear off a checker (if allowed)
 - end (e): End current player's turn
 - quit (q): Exit
+
+
