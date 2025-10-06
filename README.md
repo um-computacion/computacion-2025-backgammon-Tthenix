@@ -4,28 +4,19 @@
 
 ## How to Run
 
-### GUI Mode (Pygame)
-
-Run the graphical interface:
-
 ```bash
 python main.py --gui
 ```
+And choice the option do you want
 
-Controls:
+### Pygame Usage
+
 - **SPACE**: Roll dice
 - **R**: Reset game
 - **ESC**: Exit
 
 ### CLI Usage
 
-Run the CLI:
-
-```bash
-python main.py
-```
-
-Commands:
 
 - help (h): Show help
 - board (b): Print board
