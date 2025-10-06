@@ -7,9 +7,93 @@ triangular points, central bar, and bearing off area.
 """
 
 import sys
+import os
 from typing import Tuple
 
 import pygame  # pylint: disable=import-error
+
+# Add parent directory to path to import core modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from core.backgammon import BackgammonGame
+
+
+class Button:
+    """A simple button class for pygame UI."""
+
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        text: str,
+        color: Tuple[int, int, int],
+        hover_color: Tuple[int, int, int],
+        text_color: Tuple[int, int, int],
+    ) -> None:
+        """
+        Initialize a button.
+
+        Args:
+            x: X position of button
+            y: Y position of button
+            width: Button width
+            height: Button height
+            text: Button text
+            color: Normal button color
+            hover_color: Button color when hovered
+            text_color: Text color
+        """
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.hover_color = hover_color
+        self.text_color = text_color
+        self.is_hovered = False
+
+    def draw(self, surface: pygame.Surface) -> None:
+        """
+        Draw the button on the surface.
+
+        Args:
+            surface: Surface to draw on
+        """
+        # Choose color based on hover state
+        current_color = self.hover_color if self.is_hovered else self.color
+
+        # Draw button background with rounded corners
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=10)
+
+        # Draw button border
+        border_color = (0, 0, 0)
+        pygame.draw.rect(surface, border_color, self.rect, 3, border_radius=10)
+
+        # Draw button text
+        try:
+            font = pygame.font.Font(None, 28)
+            text_surface = font.render(self.text, True, self.text_color)
+            text_rect = text_surface.get_rect(center=self.rect.center)
+            surface.blit(text_surface, text_rect)
+        except pygame.error:  # pylint: disable=no-member
+            pass  # If font fails, button will still be visible
+
+    def handle_event(self, event: pygame.event.Event) -> bool:
+        """
+        Handle mouse events for the button.
+
+        Args:
+            event: Pygame event
+
+        Returns:
+            True if button was clicked, False otherwise
+        """
+        if event.type == pygame.MOUSEMOTION:  # pylint: disable=no-member
+            self.is_hovered = self.rect.collidepoint(event.pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN:  # pylint: disable=no-member
+            if event.button == 1 and self.rect.collidepoint(event.pos):
+                return True
+        return False
 
 
 class BackgammonBoard:
@@ -59,6 +143,10 @@ class BackgammonBoard:
             "checker_black": (40, 40, 40),  # Black checker main color
             "checker_black_highlight": (80, 80, 80),  # Black checker highlight
             "checker_black_shadow": (10, 10, 10),  # Black checker shadow
+            "dice_white": (255, 255, 255),  # White dice color
+            "dice_shadow": (180, 180, 180),  # Dice shadow
+            "dice_dot": (30, 30, 30),  # Dice dot color
+            "dice_border": (50, 50, 50),  # Dice border color
         }
 
         # Board layout dimensions
@@ -74,8 +162,30 @@ class BackgammonBoard:
         self.checker_radius = min(self.point_width // 2 - 4, 20)
         self.checker_spacing = self.checker_radius * 2 + 2
 
+        # Dice properties
+        self.dice_size = 40
+        self.dice_dot_radius = 4
+
         # Game state - will be set by external game logic
         self.board_state = None
+        self.dice_values = None  # Will store tuple of (die1, die2)
+        
+        # Game instance
+        self.game = None
+
+        # Create roll dice button in the bear-off area (right side)
+        button_width = 100
+        button_height = 50
+        self.roll_button = Button(
+            x=self.bear_off_x + (self.bear_off_width - button_width) // 2,
+            y=self.bear_off_y + self.board_height // 2 - button_height // 2,
+            width=button_width,
+            height=button_height,
+            text="ROLL DICE",
+            color=(139, 69, 19),  # Saddle brown
+            hover_color=(160, 82, 45),  # Sienna (lighter brown)
+            text_color=(255, 255, 255),  # White text
+        )
 
     def _calculate_dimensions(self) -> None:
         """Calculate all board dimensions and positions."""
@@ -586,6 +696,12 @@ class BackgammonBoard:
         if self.board_state:
             self.draw_all_checkers()
 
+        # Draw dice if dice values are set
+        self.draw_dice()
+
+        # Draw roll dice button
+        self.roll_button.draw(self.screen)
+
     def draw_all_checkers(self) -> None:
         """Draw all checkers on the board based on current game state."""
         if not self.board_state:
@@ -608,6 +724,128 @@ class BackgammonBoard:
             player1_off = self.board_state["off_board"][0]
             player2_off = self.board_state["off_board"][1]
             self.draw_borne_off_checkers(self.screen, player1_off, player2_off)
+
+    def draw_die_face(
+        self,
+        surface: pygame.Surface,
+        x: int,
+        y: int,
+        value: int,
+    ) -> None:
+        """
+        Draw a single die with the given value.
+
+        Args:
+            surface: Surface to draw on
+            x: X position (top-left corner)
+            y: Y position (top-left corner)
+            value: Die value (1-6)
+        """
+        # Draw shadow
+        shadow_offset = 3
+        shadow_rect = pygame.Rect(
+            x + shadow_offset,
+            y + shadow_offset,
+            self.dice_size,
+            self.dice_size,
+        )
+        pygame.draw.rect(surface, self.colors["dice_shadow"], shadow_rect, border_radius=5)
+
+        # Draw main die body
+        die_rect = pygame.Rect(x, y, self.dice_size, self.dice_size)
+        pygame.draw.rect(surface, self.colors["dice_white"], die_rect, border_radius=5)
+
+        # Draw border
+        pygame.draw.rect(surface, self.colors["dice_border"], die_rect, 2, border_radius=5)
+
+        # Calculate dot positions
+        center_x = x + self.dice_size // 2
+        center_y = y + self.dice_size // 2
+        offset = self.dice_size // 4
+
+        # Draw dots based on value
+        if value == 1:
+            # Center dot
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
+        elif value == 2:
+            # Top-left and bottom-right
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+        elif value == 3:
+            # Diagonal line (top-left, center, bottom-right)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+        elif value == 4:
+            # Four corners
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+        elif value == 5:
+            # Four corners + center
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+        elif value == 6:
+            # Two columns of three
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y), self.dice_dot_radius)
+            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+
+    def draw_dice(self) -> None:
+        """Draw the dice on the board if dice values are set."""
+        if not self.dice_values:
+            return
+
+        die1, die2 = self.dice_values
+
+        # Position dice in the center of the board (right side of center bar)
+        dice_x = self.play_area_x + self.half_width + self.center_gap_width + 20
+        dice_y = self.play_area_y + self.play_area_height // 2 - self.dice_size
+
+        # Draw first die
+        self.draw_die_face(self.screen, dice_x, dice_y, die1)
+
+        # Draw second die (offset to the right and down a bit)
+        self.draw_die_face(self.screen, dice_x + self.dice_size + 10, dice_y + 15, die2)
+
+    def set_dice_values(self, die1: int, die2: int) -> None:
+        """
+        Set the current dice values to display.
+
+        Args:
+            die1: First die value (1-6)
+            die2: Second die value (1-6)
+        """
+        self.dice_values = (die1, die2)
+
+    def set_game(self, game: 'BackgammonGame') -> None:
+        """
+        Set the game instance to use for game logic.
+
+        Args:
+            game: BackgammonGame instance
+        """
+        self.game = game
+
+    def update_from_game(self) -> None:
+        """Update the visual board state from the game instance."""
+        if not self.game:
+            return
+
+        # Get board state from game
+        board_state = self.game.board.get_board_state()
+        self.set_board_state(board_state)
+
+        # Update dice values if available
+        if self.game.last_roll:
+            self.set_dice_values(self.game.last_roll[0], self.game.last_roll[1])
 
     def draw_points(self) -> None:
         """Draw all 24 triangular points on the board."""
@@ -683,27 +921,15 @@ def main() -> None:
     clock = pygame.time.Clock()
     running = True
 
-    # Create initial board state with standard backgammon setup
-    initial_state = {
-        "points": [[] for _ in range(24)],
-        "checker_bar": [[], []],
-        "off_board": [[], []],
-    }
-
-    # Set up Player 1 pieces (white)
-    initial_state["points"][0] = [1, 1]  # Point 1
-    initial_state["points"][11] = [1, 1, 1, 1, 1]  # Point 12
-    initial_state["points"][16] = [1, 1, 1]  # Point 17
-    initial_state["points"][18] = [1, 1, 1, 1, 1]  # Point 19
-
-    # Set up Player 2 pieces (black)
-    initial_state["points"][23] = [2, 2]  # Point 24
-    initial_state["points"][12] = [2, 2, 2, 2, 2]  # Point 13
-    initial_state["points"][7] = [2, 2, 2]  # Point 8
-    initial_state["points"][5] = [2, 2, 2, 2, 2]  # Point 6
-
-    # Set the board state
-    board.set_board_state(initial_state)
+    # Create game instance
+    game = BackgammonGame()
+    game.setup_initial_position()
+    
+    # Set the game instance in the board
+    board.set_game(game)
+    
+    # Update board from game state
+    board.update_from_game()
 
     while running:
         for event in pygame.event.get():
@@ -712,6 +938,21 @@ def main() -> None:
             elif event.type == pygame.KEYDOWN:  # pylint: disable=no-member
                 if event.key == pygame.K_ESCAPE:  # pylint: disable=no-member
                     running = False
+                elif event.key == pygame.K_SPACE:  # pylint: disable=no-member
+                    # Press space to roll dice using game logic
+                    game.roll_dice()
+                    board.update_from_game()
+                elif event.key == pygame.K_r:  # pylint: disable=no-member
+                    # Press 'r' to reset game
+                    game.reset_game()
+                    game.setup_initial_position()
+                    board.update_from_game()
+
+            # Handle button clicks
+            if board.roll_button.handle_event(event):
+                # Roll dice when button is clicked
+                game.roll_dice()
+                board.update_from_game()
 
         # Clear screen with a neutral background
         board.screen.fill((50, 50, 50))  # Dark gray background
@@ -724,7 +965,6 @@ def main() -> None:
         clock.tick(60)  # Limit to 60 FPS
 
     pygame.quit()  # pylint: disable=no-member
-    sys.exit()
 
 
 if __name__ == "__main__":

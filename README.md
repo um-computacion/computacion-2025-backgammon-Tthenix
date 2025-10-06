@@ -2,15 +2,21 @@
 
 ### Alumno: Nahuel Quiroga - 64048
 
-### CLI Usage
-
-Run the CLI:
+## How to Run
 
 ```bash
-python main.py
+python main.py --gui
 ```
+And choice the option do you want
 
-Commands:
+### Pygame Usage
+
+- **SPACE**: Roll dice
+- **R**: Reset game
+- **ESC**: Exit
+
+### CLI Usage
+
 
 - help (h): Show help
 - board (b): Print board
@@ -23,3 +29,5 @@ Commands:
 - bearoff: Bear off a checker (if allowed)
 - end (e): End current player's turn
 - quit (q): Exit
+
+

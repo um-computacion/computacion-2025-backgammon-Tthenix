@@ -2039,3 +2039,29 @@ I use all the answer and i test it and fix pylint erros
 ### reference:
 
 pygame_ui/pygame_ui.py
+
+## Prompt 11
+
+### Claude-4-sonnet:
+
+### Prompt:
+add the logic for the dice following the class on core backgammon and a button
+
+### Answer:
+I'll analyze the code and add the dice logic to the pygame_ui to integrate with the BackgammonGame class from core.
+
+Let me first check the current state of the files to understand the structure better:
+
+Read dice.py
+
+Read main.py
+
+Now I'll modify the pygame_ui.py file to integrate the BackgammonGame logic, including the dice functionality. I'll update the main function to use the actual game logic instead of just displaying static state.
+
+
+### What i do with the answer?
+
+I use all the code but i modify the main file for run cli or pygame interface
+### reference:
+
+pygame_ui/pygame_ui.py
