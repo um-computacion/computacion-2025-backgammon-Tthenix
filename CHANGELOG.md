@@ -8,23 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [Unreleased]
 
 ## Sprint 4
+
+### [0.0.16] - 2025-10-12
+
+- Movement for checker on board
+
 ### [0.0.15] - 2025-10-6
 
 #### Added
+
 - Add checkers design on board pygame
 - Added dice rolling functionality using core game logic (Space key to roll or press the button)
 
 #### Fixed
+
 - Fixed module import path in pygame_ui.py to allow running directly or from main.py
 
 ### [0.0.14] - 2025-10-2
 
 #### Added
+
 - Board design for pygame
 
 ### [0.0.13] - 2025-10-1
 
 ### Added
+
 Player turn on cli
 
 ## Sprint 3

@@ -6,15 +6,9 @@ Based on the reference image, it creates a realistic board with proper colors,
 triangular points, central bar, and bearing off area.
 """
 
-import sys
-import os
-from typing import Tuple
+from typing import Tuple, Optional, List
 
 import pygame  # pylint: disable=import-error
-
-# Add parent directory to path to import core modules
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from core.backgammon import BackgammonGame
 
 
@@ -28,9 +22,10 @@ class Button:
         width: int,
         height: int,
         text: str,
-        color: Tuple[int, int, int],
-        hover_color: Tuple[int, int, int],
-        text_color: Tuple[int, int, int],
+        *,
+        color: Tuple[int, int, int] = (139, 69, 19),
+        hover_color: Tuple[int, int, int] = (160, 82, 45),
+        text_color: Tuple[int, int, int] = (255, 255, 255),
     ) -> None:
         """
         Initialize a button.
@@ -147,6 +142,8 @@ class BackgammonBoard:
             "dice_shadow": (180, 180, 180),  # Dice shadow
             "dice_dot": (30, 30, 30),  # Dice dot color
             "dice_border": (50, 50, 50),  # Dice border color
+            "selected_highlight": (255, 215, 0),  # Gold for selected checker
+            "valid_move_highlight": (50, 205, 50),  # Lime green for valid destinations
         }
 
         # Board layout dimensions
@@ -169,9 +166,12 @@ class BackgammonBoard:
         # Game state - will be set by external game logic
         self.board_state = None
         self.dice_values = None  # Will store tuple of (die1, die2)
-        
         # Game instance
         self.game = None
+
+        # Selection state for mouse interaction
+        self.selected_point: Optional[int] = None
+        self.valid_destinations: Optional[List[int]] = None
 
         # Create roll dice button in the bear-off area (right side)
         button_width = 100
@@ -489,7 +489,9 @@ class BackgammonBoard:
         )
 
         # Draw border
-        pygame.draw.circle(surface, self.colors["black"], (x, y), self.checker_radius, 2)
+        pygame.draw.circle(
+            surface, self.colors["black"], (x, y), self.checker_radius, 2
+        )
 
     def draw_checkers_on_point(
         self,
@@ -515,8 +517,10 @@ class BackgammonBoard:
         if point_index < 6:
             # Right side, bottom
             point_x = (
-                self.play_area_x + self.half_width + self.center_gap_width +
-                (5 - point_index) * self.point_width
+                self.play_area_x
+                + self.half_width
+                + self.center_gap_width
+                + (5 - point_index) * self.point_width
             )
         elif point_index < 12:
             # Left side, bottom
@@ -527,8 +531,10 @@ class BackgammonBoard:
         else:
             # Right side, top
             point_x = (
-                self.play_area_x + self.half_width + self.center_gap_width +
-                (point_index - 18) * self.point_width
+                self.play_area_x
+                + self.half_width
+                + self.center_gap_width
+                + (point_index - 18) * self.point_width
             )
 
         # Center of the point
@@ -543,7 +549,9 @@ class BackgammonBoard:
             spacing = self.checker_radius * 2 + 2
         else:
             # Condensed spacing for many checkers
-            spacing = (self.point_height - self.checker_radius * 2) // (checker_count - 1)
+            spacing = (self.point_height - self.checker_radius * 2) // (
+                checker_count - 1
+            )
             spacing = max(spacing, self.checker_radius + 2)
 
         for i, player in enumerate(checkers):
@@ -553,7 +561,11 @@ class BackgammonBoard:
             else:
                 # Stack upward from bottom
                 checker_y = (
-                    self.play_area_y + self.play_area_height - self.checker_radius - 5 - i * spacing
+                    self.play_area_y
+                    + self.play_area_height
+                    - self.checker_radius
+                    - 5
+                    - i * spacing
                 )
 
             self.draw_checker(surface, checker_x, checker_y, player)
@@ -605,16 +617,20 @@ class BackgammonBoard:
         # Draw player 1 checkers (bottom half of bar)
         for i, player in enumerate(player1_bar):
             checker_y = (
-                self.play_area_y + self.play_area_height // 2 +
-                20 + i * (self.checker_radius * 2 + 2)
+                self.play_area_y
+                + self.play_area_height // 2
+                + 20
+                + i * (self.checker_radius * 2 + 2)
             )
             self.draw_checker(surface, bar_center_x, checker_y, player)
 
         # Draw player 2 checkers (top half of bar)
         for i, player in enumerate(player2_bar):
             checker_y = (
-                self.play_area_y + self.play_area_height // 2 -
-                20 - i * (self.checker_radius * 2 + 2)
+                self.play_area_y
+                + self.play_area_height // 2
+                - 20
+                - i * (self.checker_radius * 2 + 2)
             )
             self.draw_checker(surface, bar_center_x, checker_y, player)
 
@@ -641,8 +657,9 @@ class BackgammonBoard:
             col_offset = (col - 1) * (self.checker_radius * 2 + 4)
             checker_x = bear_off_center_x + col_offset - self.checker_radius
             checker_y = (
-                self.bear_off_y + 3 * self.board_height // 4 +
-                row * (self.checker_radius * 2 + 2)
+                self.bear_off_y
+                + 3 * self.board_height // 4
+                + row * (self.checker_radius * 2 + 2)
             )
             self.draw_checker(surface, checker_x, checker_y, player)
 
@@ -653,8 +670,9 @@ class BackgammonBoard:
             col_offset = (col - 1) * (self.checker_radius * 2 + 4)
             checker_x = bear_off_center_x + col_offset - self.checker_radius
             checker_y = (
-                self.bear_off_y + self.board_height // 4 +
-                row * (self.checker_radius * 2 + 2)
+                self.bear_off_y
+                + self.board_height // 4
+                + row * (self.checker_radius * 2 + 2)
             )
             self.draw_checker(surface, checker_x, checker_y, player)
 
@@ -695,6 +713,9 @@ class BackgammonBoard:
         # Draw checkers if board state is set
         if self.board_state:
             self.draw_all_checkers()
+
+        # Draw selection highlights
+        self.draw_selection_highlights()
 
         # Draw dice if dice values are set
         self.draw_dice()
@@ -749,14 +770,18 @@ class BackgammonBoard:
             self.dice_size,
             self.dice_size,
         )
-        pygame.draw.rect(surface, self.colors["dice_shadow"], shadow_rect, border_radius=5)
+        pygame.draw.rect(
+            surface, self.colors["dice_shadow"], shadow_rect, border_radius=5
+        )
 
         # Draw main die body
         die_rect = pygame.Rect(x, y, self.dice_size, self.dice_size)
         pygame.draw.rect(surface, self.colors["dice_white"], die_rect, border_radius=5)
 
         # Draw border
-        pygame.draw.rect(surface, self.colors["dice_border"], die_rect, 2, border_radius=5)
+        pygame.draw.rect(
+            surface, self.colors["dice_border"], die_rect, 2, border_radius=5
+        )
 
         # Calculate dot positions
         center_x = x + self.dice_size // 2
@@ -766,37 +791,142 @@ class BackgammonBoard:
         # Draw dots based on value
         if value == 1:
             # Center dot
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x, center_y),
+                self.dice_dot_radius,
+            )
         elif value == 2:
             # Top-left and bottom-right
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y + offset),
+                self.dice_dot_radius,
+            )
         elif value == 3:
             # Diagonal line (top-left, center, bottom-right)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x, center_y),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y + offset),
+                self.dice_dot_radius,
+            )
         elif value == 4:
             # Four corners
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y + offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y + offset),
+                self.dice_dot_radius,
+            )
         elif value == 5:
             # Four corners + center
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x, center_y), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x, center_y),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y + offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y + offset),
+                self.dice_dot_radius,
+            )
         elif value == 6:
             # Two columns of three
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x - offset, center_y + offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y - offset), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y), self.dice_dot_radius)
-            pygame.draw.circle(surface, self.colors["dice_dot"], (center_x + offset, center_y + offset), self.dice_dot_radius)
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x - offset, center_y + offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y - offset),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y),
+                self.dice_dot_radius,
+            )
+            pygame.draw.circle(
+                surface,
+                self.colors["dice_dot"],
+                (center_x + offset, center_y + offset),
+                self.dice_dot_radius,
+            )
 
     def draw_dice(self) -> None:
         """Draw the dice on the board if dice values are set."""
@@ -825,7 +955,7 @@ class BackgammonBoard:
         """
         self.dice_values = (die1, die2)
 
-    def set_game(self, game: 'BackgammonGame') -> None:
+    def set_game(self, game: "BackgammonGame") -> None:
         """
         Set the game instance to use for game logic.
 
@@ -846,6 +976,224 @@ class BackgammonBoard:
         # Update dice values if available
         if self.game.last_roll:
             self.set_dice_values(self.game.last_roll[0], self.game.last_roll[1])
+
+    def get_point_from_coordinates(self, x: int, y: int) -> Optional[int]:
+        """
+        Convert screen coordinates to board point index.
+
+        Args:
+            x: X coordinate on screen
+            y: Y coordinate on screen
+
+        Returns:
+            Point index (0-23) or None if not on a valid point
+        """
+        # Check if click is within play area
+        if not (
+            self.play_area_x <= x <= self.play_area_x + self.play_area_width
+            and self.play_area_y <= y <= self.play_area_y + self.play_area_height
+        ):
+            return None
+
+        # Determine if click is in top or bottom half
+        mid_y = self.play_area_y + self.play_area_height // 2
+        is_top_half = y < mid_y
+
+        # Calculate relative x position
+        rel_x = x - self.play_area_x
+
+        # Check if in center gap
+        if self.half_width <= rel_x <= self.half_width + self.center_gap_width:
+            return None  # Click in center gap (bar area)
+
+        # Determine which side (left or right of center gap)
+        if rel_x < self.half_width:
+            # Left side
+            point_index_in_quadrant = int(rel_x / self.point_width)
+            if is_top_half:
+                # Top-left: points 12-17
+                return 12 + point_index_in_quadrant
+            # Bottom-left: points 11-6
+            return 11 - point_index_in_quadrant
+        else:
+            # Right side
+            rel_x_right = rel_x - self.half_width - self.center_gap_width
+            point_index_in_quadrant = int(rel_x_right / self.point_width)
+            if is_top_half:
+                # Top-right: points 18-23
+                return 18 + point_index_in_quadrant
+            # Bottom-right: points 5-0
+            return 5 - point_index_in_quadrant
+
+    def can_select_checker(self, point: int) -> bool:
+        """
+        Check if a checker at the given point can be selected.
+
+        Args:
+            point: Point index to check
+
+        Returns:
+            True if checker can be selected, False otherwise
+        """
+        if not self.game or not self.board_state:
+            return False
+
+        # Must have dice rolled
+        if not self.game.last_roll:
+            return False
+
+        # Check if point has checkers
+        if point >= len(self.board_state["points"]):
+            return False
+
+        checkers = self.board_state["points"][point]
+        if not checkers:
+            return False
+
+        # Check if checker belongs to current player
+        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        return checkers[0] == current_player_num
+
+    def get_valid_destinations(self, from_point: int) -> List[int]:
+        """
+        Get list of valid destination points for a checker.
+
+        Args:
+            from_point: Source point index
+
+        Returns:
+            List of valid destination point indices
+        """
+        if not self.game:
+            return []
+
+        # Use core game logic to get possible destinations
+        return self.game.get_possible_destinations(from_point)
+
+    def select_checker(self, point: int) -> None:
+        """
+        Select a checker at the given point.
+
+        Args:
+            point: Point index to select
+        """
+        if self.can_select_checker(point):
+            self.selected_point = point
+            self.valid_destinations = self.get_valid_destinations(point)
+
+    def deselect_checker(self) -> None:
+        """Deselect the currently selected checker."""
+        self.selected_point = None
+        self.valid_destinations = None
+
+    def execute_checker_move(self, from_point: int, to_point: int) -> bool:
+        """
+        Execute a checker move from one point to another.
+
+        Args:
+            from_point: Source point index
+            to_point: Destination point index
+
+        Returns:
+            True if move was successful, False otherwise
+        """
+        if not self.game:
+            return False
+
+        # Validate and execute the move
+        if self.game.validate_move(from_point, to_point):
+            success = self.game.make_move(from_point, to_point)
+            if success:
+                self.update_from_game()
+                self.deselect_checker()
+                return True
+
+        return False
+
+    def handle_board_click(self, x: int, y: int) -> None:
+        """
+        Handle a mouse click on the board.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+        """
+        point = self.get_point_from_coordinates(x, y)
+        if point is None:
+            # Click outside valid area - deselect
+            self.deselect_checker()
+            return
+
+        # If no checker selected, try to select one
+        if self.selected_point is None:
+            self.select_checker(point)
+        else:
+            # If clicked on selected point again, deselect
+            if point == self.selected_point:
+                self.deselect_checker()
+            # If clicked on valid destination, execute move
+            elif self.valid_destinations and point in self.valid_destinations:
+                self.execute_checker_move(self.selected_point, point)
+            # Otherwise, try to select new checker
+            else:
+                self.deselect_checker()
+                self.select_checker(point)
+
+    def draw_selection_highlights(self) -> None:
+        """Draw visual highlights for selected checker and valid moves."""
+        if self.selected_point is None:
+            return
+
+        # Highlight selected point
+        self._highlight_point(self.selected_point, self.colors["selected_highlight"])
+
+        # Highlight valid destination points
+        if self.valid_destinations:
+            for dest in self.valid_destinations:
+                self._highlight_point(dest, self.colors["valid_move_highlight"])
+
+    def _highlight_point(self, point: int, color: Tuple[int, int, int]) -> None:
+        """
+        Draw a highlight circle on a specific point.
+
+        Args:
+            point: Point index to highlight
+            color: RGB color tuple for highlight
+        """
+        # Calculate point position
+        if point < 6:
+            # Right side, bottom
+            point_x = (
+                self.play_area_x
+                + self.half_width
+                + self.center_gap_width
+                + (5 - point) * self.point_width
+            )
+            point_y = self.play_area_y + self.play_area_height - self.point_height // 2
+        elif point < 12:
+            # Left side, bottom
+            point_x = self.play_area_x + (11 - point) * self.point_width
+            point_y = self.play_area_y + self.play_area_height - self.point_height // 2
+        elif point < 18:
+            # Left side, top
+            point_x = self.play_area_x + (point - 12) * self.point_width
+            point_y = self.play_area_y + self.point_height // 2
+        else:
+            # Right side, top
+            point_x = (
+                self.play_area_x
+                + self.half_width
+                + self.center_gap_width
+                + (point - 18) * self.point_width
+            )
+            point_y = self.play_area_y + self.point_height // 2
+
+        # Center of the point
+        center_x = point_x + self.point_width // 2
+        # Draw highlight circle
+        pygame.draw.circle(
+            self.screen, color, (center_x, int(point_y)), self.checker_radius + 5, 3
+        )
 
     def draw_points(self) -> None:
         """Draw all 24 triangular points on the board."""
@@ -924,10 +1272,10 @@ def main() -> None:
     # Create game instance
     game = BackgammonGame()
     game.setup_initial_position()
-    
+
     # Set the game instance in the board
     board.set_game(game)
-    
+
     # Update board from game state
     board.update_from_game()
 
@@ -947,6 +1295,10 @@ def main() -> None:
                     game.reset_game()
                     game.setup_initial_position()
                     board.update_from_game()
+            elif event.type == pygame.MOUSEBUTTONDOWN:  # pylint: disable=no-member
+                # Handle mouse clicks on board
+                mouse_x, mouse_y = event.pos
+                board.handle_board_click(mouse_x, mouse_y)
 
             # Handle button clicks
             if board.roll_button.handle_event(event):
