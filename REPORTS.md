@@ -11,7 +11,7 @@ core/board.py               188      6    97%   109-110, 147-148, 179, 196
 core/checker.py              73      3    96%   67, 94, 189
 core/dice.py                 13      0   100%
 core/player.py               43      0   100%
-test/test_backgammon.py     651      3    99%   150, 800-801
+test/test_backgammon.py     651      3    99%   173, 909-910
 test/test_board.py          344      4    99%   316, 327, 473, 509
 test/test_checker.py        214      1    99%   311
 test/test_cli.py            146      1    99%   235
@@ -30,11 +30,11 @@ test/test_checker.py:4:0: E0401: Unable to import 'core.checker' (import-error)
 ************* Module computacion-2025-backgammon-Tthenix.test.test_player
 test/test_player.py:8:0: E0401: Unable to import 'core.player' (import-error)
 ************* Module computacion-2025-backgammon-Tthenix.test.test_backgammon
-test/test_backgammon.py:8:0: E0401: Unable to import 'core.backgammon' (import-error)
-test/test_backgammon.py:9:0: E0401: Unable to import 'core.player' (import-error)
-test/test_backgammon.py:10:0: E0401: Unable to import 'core.board' (import-error)
-test/test_backgammon.py:11:0: E0401: Unable to import 'core.dice' (import-error)
-test/test_backgammon.py:12:0: E0401: Unable to import 'core.checker' (import-error)
+test/test_backgammon.py:9:0: E0401: Unable to import 'core.backgammon' (import-error)
+test/test_backgammon.py:10:0: E0401: Unable to import 'core.player' (import-error)
+test/test_backgammon.py:11:0: E0401: Unable to import 'core.board' (import-error)
+test/test_backgammon.py:12:0: E0401: Unable to import 'core.dice' (import-error)
+test/test_backgammon.py:13:0: E0401: Unable to import 'core.checker' (import-error)
 ************* Module computacion-2025-backgammon-Tthenix.test.test_dice
 test/test_dice.py:10:0: E0401: Unable to import 'core.dice' (import-error)
 ************* Module computacion-2025-backgammon-Tthenix.test.test_board
