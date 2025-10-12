@@ -11,7 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [0.0.16] - 2025-10-12
 
+#### Added
+
 - Movement for checker on board
+
+#### Fix
+
+- Fix Pylint errors
 
 ### [0.0.15] - 2025-10-6
 
