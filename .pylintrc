@@ -1,3 +1,6 @@
+[MASTER]
+init-hook='import sys; sys.path.append(".")'
+
 [DESIGN]
 # Maximum number of arguments for functions/methods.
 max-args=5
