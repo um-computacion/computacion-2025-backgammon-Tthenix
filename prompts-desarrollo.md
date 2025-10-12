@@ -1737,6 +1737,7 @@ on cli add player-turn-on-cli
 ### Answer:
 
 I'll enhance the CLI to make player turn information more prominent by adding a visual turn indicator to the board rendering and improving the turn display throughout the interface. Following TDD methodology, I'll first create tests for the enhanced functionality, then implement the feature.
+
 ```python
     def _cmd_turn(self) -> None:
         """Handle turn command."""
@@ -1755,22 +1756,25 @@ I'll enhance the CLI to make player turn information more prominent by adding a 
             print("No dice rolled yet - use 'roll' to start your turn")
         print()
 ```
+
 **Implementation Details:**
 
 1. **Enhanced Board Rendering**: Added a prominent "Current Turn" header with visual separators at the top of the board display
-2. **Dynamic Input Prompt**: Modified the input prompt to show the current player's name and color (e.g., "Player 1 (white) > ")  
+2. **Dynamic Input Prompt**: Modified the input prompt to show the current player's name and color (e.g., "Player 1 (white) > ")
 3. **Enhanced Turn Command**: Improved the `turn` command to show comprehensive turn status including dice roll information
 4. **Visual Turn Transitions**: Added clear turn transition messages with separators and emoji indicators when switching players
 5. **Turn Status Integration**: Integrated turn status throughout the CLI for better user experience
 
 **Key Features Added:**
+
 - Prominent turn indicator at the top of board display
-- Visual separators using '=' characters for clear section delineation  
+- Visual separators using '=' characters for clear section delineation
 - Enhanced end turn command with turn transition messages
 - Turn status showing dice roll state and available moves
 - Player-specific command prompts for better context
 
 **Tests Added:**
+
 - `test_turn_indicator_in_board_display()`: Verifies turn indicator appears in board output
 - `test_turn_indicator_after_switch()`: Ensures turn indicator updates after player switch
 - `test_turn_indicator_in_prompt()`: Validates turn information is displayed prominently
@@ -1876,6 +1880,7 @@ Professional appearance with proper contrast
 ### What i do with the answer?
 
 I use all the answer and i test it
+
 ### reference:
 
 pygame_ui/pygame_ui.py
@@ -1885,6 +1890,7 @@ pygame_ui/pygame_ui.py
 ### Claude-4-sonnet:
 
 ### Prompt:
+
 Now make draw Checkers on the Board
 You need to visually represent the game pieces. This should:
 
@@ -1895,6 +1901,7 @@ Show checkers on the bar when captured
 Show borne-off checkers in the bear-off area
 
 ### Answer:
+
 I'll help you implement the visual representation of checkers on the backgammon board. Let me start by examining the current code structure and then add the checker drawing functionality.
 
 ```python
@@ -2036,6 +2043,7 @@ def draw_checker(
 ### What i do with the answer?
 
 I use all the answer and i test it and fix pylint erros
+
 ### reference:
 
 pygame_ui/pygame_ui.py
@@ -2045,9 +2053,11 @@ pygame_ui/pygame_ui.py
 ### Claude-4-sonnet:
 
 ### Prompt:
+
 add the logic for the dice following the class on core backgammon and a button
 
 ### Answer:
+
 I'll analyze the code and add the dice logic to the pygame_ui to integrate with the BackgammonGame class from core.
 
 Let me first check the current state of the files to understand the structure better:
@@ -2058,10 +2068,10 @@ Read main.py
 
 Now I'll modify the pygame_ui.py file to integrate the BackgammonGame logic, including the dice functionality. I'll update the main function to use the actual game logic instead of just displaying static state.
 
-
 ### What i do with the answer?
 
 I use all the code but i modify the main file for run cli or pygame interface
+
 ### reference:
 
 pygame_ui/pygame_ui.py
