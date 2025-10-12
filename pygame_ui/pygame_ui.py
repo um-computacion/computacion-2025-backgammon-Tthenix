@@ -1015,15 +1015,15 @@ class BackgammonBoard:
                 return 12 + point_index_in_quadrant
             # Bottom-left: points 11-6
             return 11 - point_index_in_quadrant
-        else:
-            # Right side
-            rel_x_right = rel_x - self.half_width - self.center_gap_width
-            point_index_in_quadrant = int(rel_x_right / self.point_width)
-            if is_top_half:
-                # Top-right: points 18-23
-                return 18 + point_index_in_quadrant
-            # Bottom-right: points 5-0
-            return 5 - point_index_in_quadrant
+
+        # Right side
+        rel_x_right = rel_x - self.half_width - self.center_gap_width
+        point_index_in_quadrant = int(rel_x_right / self.point_width)
+        if is_top_half:
+            # Top-right: points 18-23
+            return 18 + point_index_in_quadrant
+        # Bottom-right: points 5-0
+        return 5 - point_index_in_quadrant
 
     def can_select_checker(self, point: int) -> bool:
         """
