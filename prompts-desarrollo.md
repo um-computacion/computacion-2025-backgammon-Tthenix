@@ -2121,3 +2121,35 @@ I use all the code but i modify the colors of turn and fix pylint erros
 ### reference:
 
 pygame_ui/pygame_ui.py
+
+## Prompt 13
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+add the desgin for dice tuple, right now only show 2 dice but if roll tuple dont show 4 dice with the number
+
+### Answer:
+
+'ll implement showing four dice when doubles are rolled by updating the dice drawing logic in pygame_ui/pygame_ui.py, then document the change in prompts-desarrollo.md, run linting, and restart the UI for testing.
+Update pygame dice rendering to show four dice on doubles
+Append prompt/response documenting dice rendering change
+Restart UI to verify visual change
+I'll update the dice rendering to display four dice on doubles in pygame_ui/pygame_ui.py, document the change in prompts-desarrollo.md, run lint checks, and restart the UI to verify.
+
+Implemented doubles rendering: when a roll is a double, the UI now shows four dice with that value; otherwise, two dice as before.
+Documented the change in prompts-desarrollo.md.
+Lints are clean and the UI was restarted.
+Core edit in pygame_ui/pygame_ui.py:
+In draw_dice(), expanded logic to:
+Build values = [die1, die1, die1, die1] on doubles; else [die1, die2].
+Lay out dice horizontally with slight vertical offsets for depth.
+
+### What i do with the answer?
+
+I use all the code and i test it
+
+### reference:
+
+pygame_ui/pygame_ui.py
