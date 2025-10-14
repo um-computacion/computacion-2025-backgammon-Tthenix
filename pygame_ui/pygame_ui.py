@@ -947,15 +947,28 @@ class BackgammonBoard:
 
         die1, die2 = self.dice_values
 
-        # Position dice in the center of the board (right side of center bar)
+        # Si es doble, mostrar cuatro dados con el mismo valor; si no, dos dados
+        if die1 == die2:
+            values = [die1, die1, die1, die1]
+        else:
+            values = [die1, die2]
+
+        # Posición base para dados (a la derecha de la barra central)
         dice_x = self.play_area_x + self.half_width + self.center_gap_width + 20
         dice_y = self.play_area_y + self.play_area_height // 2 - self.dice_size
 
-        # Draw first die
-        self.draw_die_face(self.screen, dice_x, dice_y, die1)
+        # Dibujar dados con desplazamientos agradables
+        offsets = []
+        if len(values) == 2:
+            offsets = [(0, 0), (self.dice_size + 10, 15)]
+        else:
+            # 4 dados en fila con ligeros desplazamientos verticales
+            step = self.dice_size + 10
+            offsets = [(0, 0), (step, 15), (2 * step, 0), (3 * step, 15)]
 
-        # Draw second die (offset to the right and down a bit)
-        self.draw_die_face(self.screen, dice_x + self.dice_size + 10, dice_y + 15, die2)
+        for i, val in enumerate(values):
+            off_x, off_y = offsets[i]
+            self.draw_die_face(self.screen, dice_x + off_x, dice_y + off_y, val)
 
     def set_dice_values(self, die1: int, die2: int) -> None:
         """
