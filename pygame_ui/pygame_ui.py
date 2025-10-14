@@ -723,6 +723,18 @@ class BackgammonBoard:
         # Draw roll dice button
         self.roll_button.draw(self.screen)
 
+        # Dibujar indicador de jugador actual (arriba a la izquierda)
+        try:
+            font = pygame.font.Font(None, 28)
+            if self.game and self.game.current_player:
+                jugador = self.game.current_player
+                texto = f"Turno: {jugador.name} ({jugador.color})"
+                color = self.colors["white"]
+                texto_surface = font.render(texto, True, color)
+                self.screen.blit(texto_surface, (self.board_margin, 5))
+        except pygame.error:  # pylint: disable=no-member
+            pass
+
     def draw_all_checkers(self) -> None:
         """Draw all checkers on the board based on current game state."""
         if not self.board_state:
@@ -1104,8 +1116,18 @@ class BackgammonBoard:
         if self.game.validate_move(from_point, to_point):
             success = self.game.make_move(from_point, to_point)
             if success:
+                # Actualizar estado del tablero tras mover
                 self.update_from_game()
+                # Deseleccionar ficha
                 self.deselect_checker()
+                # Si no quedan movimientos disponibles, finalizar turno automáticamente
+                if not self.game.available_moves:
+                    # Reiniciar dados y movimientos (como en CLI) y cambiar turno
+                    self.game.last_roll = None
+                    self.game.available_moves = []
+                    self.game.switch_current_player()
+                    # Refrescar vista con nuevo jugador actual
+                    self.update_from_game()
                 return True
 
         return False
@@ -1287,9 +1309,10 @@ def main() -> None:
                 if event.key == pygame.K_ESCAPE:  # pylint: disable=no-member
                     running = False
                 elif event.key == pygame.K_SPACE:  # pylint: disable=no-member
-                    # Press space to roll dice using game logic
-                    game.roll_dice()
-                    board.update_from_game()
+                    # Presiona espacio para tirar dados (si corresponde)
+                    if game.last_roll is None or not game.available_moves:
+                        game.roll_dice()
+                        board.update_from_game()
                 elif event.key == pygame.K_r:  # pylint: disable=no-member
                     # Press 'r' to reset game
                     game.reset_game()
@@ -1302,9 +1325,10 @@ def main() -> None:
 
             # Handle button clicks
             if board.roll_button.handle_event(event):
-                # Roll dice when button is clicked
-                game.roll_dice()
-                board.update_from_game()
+                # Tirar dados desde botón (si corresponde)
+                if game.last_roll is None or not game.available_moves:
+                    game.roll_dice()
+                    board.update_from_game()
 
         # Clear screen with a neutral background
         board.screen.fill((50, 50, 50))  # Dark gray background

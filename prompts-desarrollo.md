@@ -2075,3 +2075,49 @@ I use all the code but i modify the main file for run cli or pygame interface
 ### reference:
 
 pygame_ui/pygame_ui.py
+
+## Prompt 12
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+add the functionality player, the player 1 have white check and player 2 black, when player 1 roll dice and made the movement its turn of player 2, dont forget is the backgammon game and dont create new logic, use the logic of core(backgammon.py) if you dont know somthing use the @cli.py like reference
+
+### Answer:
+
+I'll first review the existing main.py and core game logic to ensure I integrate turn switching correctly into the Pygame UI without introducing new logic. Then I'll update the Pygame UI so that rolling is only allowed when appropriate and the turn switches automatically after a move when there are no remaining moves. Finally, I'll document this prompt and response in prompts-desarrollo.md as required and propose a command to run the UI.
+I'll update the Pygame UI to enforce turn switching after a player's moves are exhausted, restrict rolling to appropriate times (mirroring the CLI), and add a small on-screen indicator for the current player's turn. I'll also record this prompt and response in prompts-desarrollo.md. Now I'll make the edits.
+I'll implement automatic turn switching and roll gating in pygame_ui/pygame_ui.py, add a small current-player indicator, and document this prompt/response in prompts-desarrollo.md. Then I'll propose a command to run the UI for testing.
+
+i’m going to update the Pygame UI to automatically switch turns after a player finishes all moves, restrict dice rolling to appropriate times, and show the current player on screen. Then I’ll document this prompt and response in prompts-desarrollo.md and propose a command to run the UI.
+I made a plan to update the UI logic and will modify the Pygame UI file accordingly. Let me open the file sections I need and then apply the edits.
+I'll update the event handlers in the Pygame UI to prevent rolling dice when there are still available moves, mirroring the CLI logic. Then I'll run a linter check on pygame_ui.py and update the todos accordingly.
+
+I implemented auto turn switching and roll gating in pygame_ui/pygame_ui.py, and added an on-screen current-player indicator.
+I documented the prompt and response in prompts-desarrollo.md.
+I killed any previous Python processes and started the Pygame UI using your venv for testing.
+What I changed:
+In BackgammonBoard.execute_checker_move(...), after a successful move I now:
+Refresh the UI and deselect.
+If available_moves is empty, reset last_roll, clear available_moves, call switch_current_player(), and refresh from game.
+In BackgammonBoard.draw_board(...), I render the current turn label: “Turno: Player N (white/black)”.
+In main() event loop:
+Space/roll button only roll if game.last_roll is None or not game.available_moves (mirrors CLI).
+
+Notes:
+Player 1 is white and starts; after rolling and using up the dice, turn switches to Player 2 (black) automatically.
+No new game logic was added; all functionality uses core/backgammon.py.
+Summary:
+Auto turn switch after moves exhausted.
+Dice roll gating to avoid re-rolling mid-turn.
+Current player indicator drawn.
+Changes documented, lints clean.
+
+### What i do with the answer?
+
+I use all the code but i modify the colors of turn and fix pylint erros
+
+### reference:
+
+pygame_ui/pygame_ui.py
