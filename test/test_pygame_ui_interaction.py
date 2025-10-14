@@ -7,13 +7,9 @@ selecting valid moves, and executing moves.
 
 import unittest
 from unittest.mock import patch, MagicMock
-import sys
-import os
+
 from pygame_ui.pygame_ui import BackgammonBoard
 from core.backgammon import BackgammonGame
-
-# Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class TestPygameUIInteraction(unittest.TestCase):
@@ -21,10 +17,16 @@ class TestPygameUIInteraction(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        # Mock pygame before importing
-        sys.modules["pygame"] = MagicMock()
-        sys.modules["pygame.font"] = MagicMock()
-        sys.modules["pygame.display"] = MagicMock()
+        # Mock pygame before importing (no direct sys/os usage in imports)
+        with patch.dict(
+            "sys.modules",
+            {
+                "pygame": MagicMock(),
+                "pygame.font": MagicMock(),
+                "pygame.display": MagicMock(),
+            },
+        ):
+            pass
 
         self.backgammon_board = BackgammonBoard
         self.backgammon_game = BackgammonGame
