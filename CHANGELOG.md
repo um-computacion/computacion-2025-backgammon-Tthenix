@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 4
 
+### [0.0.17] - 2025-10-14
+
+#### Added
+
+- Player 1 and 2 logic to move checker
+
 ### [0.0.16] - 2025-10-12
 
 #### Added
