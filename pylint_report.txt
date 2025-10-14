@@ -1,4 +1,28 @@
+************* Module computacion-2025-backgammon-Tthenix.test.test_board
+test/test_board.py:1:0: R0801: Similar lines in 2 files
+==computacion-2025-backgammon-Tthenix.test.test_pygame_ui_interaction:[33:44]
+==computacion-2025-backgammon-Tthenix.test.test_pygame_ui_rendering:[50:59]
+        with patch("pygame.display.set_mode"):
+            with patch("pygame.init"):
+                self.board = BackgammonBoard()
+                self.game = BackgammonGame()
+                self.game.setup_initial_position()
+                self.board.set_game(self.game)
+                self.board.update_from_game()
 
-------------------------------------
-Your code has been rated at 10.00/10
+    def test_get_point_from_coordinates_bottom_right(self):
+        """Test getting point index from coordinates - bottom right."""
+        # Point 0 is bottom-right corner (duplicate-code)
+test/test_board.py:1:0: R0801: Similar lines in 2 files
+==computacion-2025-backgammon-Tthenix.test.test_pygame_ui_interaction:[20:26]
+==computacion-2025-backgammon-Tthenix.test.test_pygame_ui_rendering:[17:23]
+    with patch.dict(
+        "sys.modules",
+        {
+            "pygame": MagicMock(),
+            "pygame.font": MagicMock(),
+            "pygame.display": MagicMock(), (duplicate-code)
+
+-----------------------------------
+Your code has been rated at 9.99/10
 
