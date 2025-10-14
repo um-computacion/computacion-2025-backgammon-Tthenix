@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Player 1 and 2 logic to move checker
 - Tuple design for dice
+- add test for dice and turn, ui interaction, ui rendering
 
 ### [0.0.16] - 2025-10-12
 

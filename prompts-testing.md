@@ -2857,3 +2857,30 @@ I use all the answer but i fix the pylint errors
 
 test/test_cli.py
 cli/cli.py
+
+## Promt 10
+
+### GPT-5:
+
+### Prompt:
+
+perfectm now fix my coverage @pygame_ui.py on pygame_ui
+
+### Answer:
+
+'ll quickly inspect the existing Pygame UI tests to see what's missing and then add small, testable helpers in pygame_ui.py plus unit tests to raise coverage without altering behavior.
+Added tests to improve coverage for pygame_ui.py:
+test/test_pygame_ui_dice_and_turn.py verifies:
+Two dice for non-doubles; four dice for doubles.
+Auto turn switch after moves are exhausted via UI move execution.
+Ensured tests don’t require real Pygame surfaces by mocking pygame.draw.rect and pygame.draw.circle, plus pygame.init and display.set_mode.
+Ran unittest discovery; all tests pass.
+If you want more coverage, we can add small unit tests around selection highlights or the current-turn label render path (using font mocks).
+
+### What i do with the answer?
+
+I use all the answer but i fix the pylint errors
+
+### reference:
+
+pygame_ui/pygame_ui.py
