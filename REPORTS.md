@@ -22,31 +22,19 @@ test/test_cli.py                         146      1    99%   235
 test/test_dice.py                        102      1    99%   178
 test/test_player.py                      126      1    99%   181
 test/test_pygame_ui_dice_and_turn.py      35      0   100%
-test/test_pygame_ui_interaction.py       113      3    97%   160-161, 240
+test/test_pygame_ui_interaction.py       113      1    99%   240
 test/test_pygame_ui_rendering.py          69      0   100%
 --------------------------------------------------------------------
-TOTAL                                   3255    184    94%
+TOTAL                                   3255    182    94%
 
 ```
 ## Pylint Report
 ```text
 ************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_rendering
-test/test_pygame_ui_rendering.py:10:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
-test/test_pygame_ui_rendering.py:10:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
-test/test_pygame_ui_rendering.py:46:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
-test/test_pygame_ui_rendering.py:67:4: C0103: Method name "tearDown" doesn't conform to snake_case naming style (invalid-name)
-************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_interaction
-test/test_pygame_ui_interaction.py:11:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
-test/test_pygame_ui_interaction.py:11:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
-test/test_pygame_ui_interaction.py:21:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
-************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_dice_and_turn
-test/test_pygame_ui_dice_and_turn.py:9:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
-test/test_pygame_ui_dice_and_turn.py:9:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
-test/test_pygame_ui_dice_and_turn.py:17:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
-test/test_pygame_ui_dice_and_turn.py:32:4: C0103: Method name "tearDown" doesn't conform to snake_case naming style (invalid-name)
+test/test_pygame_ui_rendering.py:13:0: C0411: standard import "test.base_pygame_test.BasePygameTest" should be placed before third party import "pygame" (wrong-import-order)
 
------------------------------------
-Your code has been rated at 9.86/10
+------------------------------------
+Your code has been rated at 10.00/10
 
 
 ```
