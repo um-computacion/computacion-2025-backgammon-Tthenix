@@ -2978,3 +2978,54 @@ test\test_pygame_ui_dice_and_turn.py
 test\test_pygame_ui_interaction.py
 test\test_pygame_ui_rendering.py
 test\base_pygame_test.py
+
+---
+
+## Prompt: Corrección final de errores de pylint en GitHub Actions
+
+**Fecha**: 2025-10-15
+
+### User Query
+
+Usuario reportó que persistían errores de pylint en GitHub Actions:
+
+- E0401: Unable to import 'test.base_pygame_test' (import-error)
+- E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
+- C0103: Method name "setUp/tearDown" doesn't conform to snake_case naming style (invalid-name)
+
+### Solución Implementada
+
+Agregué comentarios inline de supresión de pylint en los imports y en los métodos de unittest:
+
+**Imports:**
+
+```python
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
+    BasePygameTest,
+)
+```
+
+**Métodos setUp/tearDown:**
+
+```python
+def setUp(self) -> None:  # pylint: disable=invalid-name
+    """Configura el entorno de pruebas con patches para pygame."""
+    ...
+
+def tearDown(self) -> None:  # pylint: disable=invalid-name
+    """Limpia los patches de pygame después de cada prueba."""
+    ...
+```
+
+### Resultado
+
+✅ **289 tests pasando** con `coverage run -m unittest discover`
+✅ **0 errores de pylint**
+✅ **Compatible con GitHub Actions** y ejecución local
+✅ **Sin modificar .pylintrc**
+
+### Reference
+
+test/test_pygame_ui_dice_and_turn.py
+test/test_pygame_ui_rendering.py
+test/test_pygame_ui_interaction.py

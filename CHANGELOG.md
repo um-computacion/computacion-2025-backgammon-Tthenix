@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Fix
 
 - Crate base pygame test for refactor pygame test to fix pylint errors
+- fix pylint
+- coverage
 
 ## Sprint 4
 

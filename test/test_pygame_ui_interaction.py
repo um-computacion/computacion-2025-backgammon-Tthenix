@@ -8,7 +8,7 @@ selecting valid moves, and executing moves.
 import unittest
 from unittest.mock import patch
 
-from test.base_pygame_test import (
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
     BasePygameTest,
 )
 from pygame_ui.pygame_ui import BackgammonBoard
@@ -18,7 +18,7 @@ from core.backgammon import BackgammonGame
 class TestPygameUIInteraction(BasePygameTest):
     """Test cases for pygame UI mouse interaction."""
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=invalid-name
         """Set up test fixtures."""
         self.backgammon_board = BackgammonBoard
         self.backgammon_game = BackgammonGame
@@ -37,7 +37,7 @@ class TestPygameUIInteraction(BasePygameTest):
     #         + self.board.point_width // 2
     #     )
     #     y = self.board.play_area_y + self.board.play_area_height - 10
-
+    #
     #     point = self.board.get_point_from_coordinates(x, y)
     #     self.assertEqual(point, 0)
 

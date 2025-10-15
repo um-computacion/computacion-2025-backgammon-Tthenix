@@ -7,10 +7,12 @@ Rendering tests for pygame_ui.pygame_ui:
 """
 
 from unittest.mock import MagicMock, patch
-from test.base_pygame_test import (
+
+import pygame
+
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
     BasePygameTest,
 )
-import pygame
 
 
 def _mock_pygame_graphics() -> None:
@@ -43,7 +45,7 @@ def _mock_pygame_graphics() -> None:
 class TestPygameUIRendering(BasePygameTest):
     """General rendering tests for the UI."""
 
-    def setUp(self) -> None:
+    def setUp(self) -> None:  # pylint: disable=invalid-name
         """Configura el entorno de pruebas con mocks para pygame."""
         _mock_pygame_graphics()
 
@@ -64,7 +66,7 @@ class TestPygameUIRendering(BasePygameTest):
         # Mocked screen
         self.board.screen = MagicMock()
 
-    def tearDown(self) -> None:
+    def tearDown(self) -> None:  # pylint: disable=invalid-name
         """Limpia los patches de pygame después de cada prueba."""
         # Stop patches
         self._p_rect.stop()
