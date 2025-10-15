@@ -7,9 +7,9 @@ selecting valid moves, and executing moves.
 
 import unittest
 from unittest.mock import patch
-from test.base_pygame_test import BasePygameTest
 from pygame_ui.pygame_ui import BackgammonBoard
 from core.backgammon import BackgammonGame
+from .base_pygame_test import BasePygameTest  # pylint: disable=import-error
 
 
 class TestPygameUIInteraction(BasePygameTest):
