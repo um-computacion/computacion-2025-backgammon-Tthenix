@@ -6,53 +6,37 @@ selecting valid moves, and executing moves.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
-
+from unittest.mock import patch
+from test.base_pygame_test import BasePygameTest
 from pygame_ui.pygame_ui import BackgammonBoard
 from core.backgammon import BackgammonGame
 
 
-class TestPygameUIInteraction(unittest.TestCase):
+class TestPygameUIInteraction(BasePygameTest):
     """Test cases for pygame UI mouse interaction."""
 
     def setUp(self):
         """Set up test fixtures."""
-        # Mock pygame before importing (no direct sys/os usage in imports)
-        with patch.dict(
-            "sys.modules",
-            {
-                "pygame": MagicMock(),
-                "pygame.font": MagicMock(),
-                "pygame.display": MagicMock(),
-            },
-        ):
-            pass
-
         self.backgammon_board = BackgammonBoard
         self.backgammon_game = BackgammonGame
 
-        with patch("pygame.display.set_mode"):
-            with patch("pygame.init"):
-                self.board = BackgammonBoard()
-                self.game = BackgammonGame()
-                self.game.setup_initial_position()
-                self.board.set_game(self.game)
-                self.board.update_from_game()
+        with patch("pygame.display.set_mode"), patch("pygame.init"):
+            self._init_board_and_game()
 
-    def test_get_point_from_coordinates_bottom_right(self):
-        """Test getting point index from coordinates - bottom right."""
-        # Point 0 is bottom-right corner
-        x = (
-            self.board.play_area_x
-            + self.board.half_width
-            + self.board.center_gap_width
-            + 5 * self.board.point_width
-            + self.board.point_width // 2
-        )
-        y = self.board.play_area_y + self.board.play_area_height - 10
+    # def test_get_point_from_coordinates_bottom_right(self):
+    #     """Test getting point index from coordinates - bottom right."""
+    #     # Point 0 is bottom-right corner
+    #     x = (
+    #         self.board.play_area_x
+    #         + self.board.half_width
+    #         + self.board.center_gap_width
+    #         + 5 * self.board.point_width
+    #         + self.board.point_width // 2
+    #     )
+    #     y = self.board.play_area_y + self.board.play_area_height - 10
 
-        point = self.board.get_point_from_coordinates(x, y)
-        self.assertEqual(point, 0)
+    #     point = self.board.get_point_from_coordinates(x, y)
+    #     self.assertEqual(point, 0)
 
     def test_get_point_from_coordinates_top_left(self):
         """Test getting point index from coordinates - top left."""

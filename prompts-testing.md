@@ -2884,3 +2884,97 @@ I use all the answer but i fix the pylint errors
 ### reference:
 
 pygame_ui/pygame_ui.py
+
+## Promt 11
+
+### Claude-4.5-sonnet:
+
+### Prompt:
+
+How can i fix this pylint error, i dont understand how to separate de setup
+
+### Answer:
+
+I see that pylint is detecting duplicate code between the test files. Let me examine them to better understand the structure:
+
+Perfect, I see the problem. Pylint is flagging duplicate code (R0801) in the three test classes. All three files have a nearly identical method for initializing the board and the game:
+
+test_pygame_ui_dice_and_turn.py → \_init_board_and_game() (lines 16-22)
+
+test_pygame_ui_interaction.py → \_create_board_and_game() (lines 18-24)
+
+test_pygame_ui_rendering.py → \_init_board_and_game() (lines 46-52)
+
+To eliminate this duplication while following SOLID principles and project rules, you should create a common base test class that contains this shared logic. Here is the solution:
+
+Solution: Create a common base class
+
+1. Create a new file: test/base_pygame_test.py
+
+```python
+"""
+Clase base para tests de pygame UI.
+Contiene métodos comunes de inicialización para evitar duplicación.
+"""
+
+from unittest import TestCase
+from pygame_ui.pygame_ui import BackgammonBoard
+from core.backgammon import BackgammonGame
+
+
+class BasePygameTest(TestCase):
+	"""Clase base con lógica compartida para tests de pygame UI."""
+
+	def _init_board_and_game(self) -> None:
+		"""Crear tablero y juego inicializados y reflejarlos en el tablero."""
+		self.board = BackgammonBoard()
+		self.game = BackgammonGame()
+		self.game.setup_initial_position()
+		self.board.set_game(self.game)
+		self.board.update_from_game()
+```
+
+update test pygame
+
+```python
+"""
+Additional Pygame UI tests focused on:
+- Dice rendering: two vs four when doubles are rolled
+- Automatic turn switch when no moves remain
+"""
+
+from unittest.mock import MagicMock, patch
+from pygame_ui.pygame_ui import BackgammonBoard  # type: ignore
+from core.backgammon import BackgammonGame  # type: ignore
+from test.base_pygame_test import BasePygameTest  # type: ignore
+
+
+class TestPygameUIDiceAndTurn(BasePygameTest):
+	"""Dice rendering and auto turn switch tests."""
+
+	def setUp(self) -> None:
+		# Patch real drawing calls inside the UI module to avoid real Surface requirement
+		self._patch_draw_rect = patch(
+			"pygame_ui.pygame_ui.pygame.draw.rect", MagicMock()
+		)
+		self._patch_draw_circle = patch(
+			"pygame_ui.pygame_ui.pygame.draw.circle", MagicMock()
+		)
+		self._patch_draw_rect.start()
+		self._patch_draw_circle.start()
+
+		with patch("pygame.display.set_mode"), patch("pygame.init"):
+			self._init_board_and_game()
+```
+
+### What i do with the answer?
+
+I use all the answer but i fix the pylint errors
+
+### reference:
+
+pygame_ui/pygame_ui.py
+test\test_pygame_ui_dice_and_turn.py
+test\test_pygame_ui_interaction.py
+test\test_pygame_ui_rendering.py
+test\base_pygame_test.py
