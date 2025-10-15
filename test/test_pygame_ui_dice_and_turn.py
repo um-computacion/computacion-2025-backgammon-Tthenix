@@ -6,7 +6,9 @@ Additional Pygame UI tests focused on:
 
 from unittest.mock import MagicMock, patch
 
-from .base_pygame_test import BasePygameTest  # pylint: disable=import-error
+from test.base_pygame_test import (
+    BasePygameTest,
+)
 
 
 class TestPygameUIDiceAndTurn(BasePygameTest):
