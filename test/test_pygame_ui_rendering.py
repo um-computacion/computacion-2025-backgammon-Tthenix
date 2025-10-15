@@ -7,10 +7,10 @@ Rendering tests for pygame_ui.pygame_ui:
 """
 
 from unittest.mock import MagicMock, patch
-
+from test.base_pygame_test import (
+    BasePygameTest,
+)
 import pygame
-
-from .base_pygame_test import BasePygameTest  # pylint: disable=import-error
 
 
 def _mock_pygame_graphics() -> None:
