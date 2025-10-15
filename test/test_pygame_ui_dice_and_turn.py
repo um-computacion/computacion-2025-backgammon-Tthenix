@@ -6,7 +6,7 @@ Additional Pygame UI tests focused on:
 
 from unittest.mock import MagicMock, patch
 
-from test.base_pygame_test import (
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
     BasePygameTest,
 )
 
@@ -14,7 +14,7 @@ from test.base_pygame_test import (
 class TestPygameUIDiceAndTurn(BasePygameTest):
     """Dice rendering and auto turn switch tests."""
 
-    def setUp(self) -> None:
+    def setUp(self) -> None:  # pylint: disable=invalid-name
         """Configura el entorno de pruebas con patches para pygame."""
         # Patch real drawing calls inside the UI module to avoid real Surface requirement
         self._patch_draw_rect = patch(
@@ -29,7 +29,7 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
         with patch("pygame.display.set_mode"), patch("pygame.init"):
             self._init_board_and_game()
 
-    def tearDown(self) -> None:
+    def tearDown(self) -> None:  # pylint: disable=invalid-name
         """Limpia los patches de pygame después de cada prueba."""
         # Stop drawing patches
         self._patch_draw_rect.stop()
