@@ -6,11 +6,11 @@ Rendering tests for pygame_ui.pygame_ui:
 - Selection highlights and points
 """
 
-from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+from test.base_pygame_test import BasePygameTest
+
 import pygame
-from pygame_ui.pygame_ui import BackgammonBoard
-from core.backgammon import BackgammonGame
 
 
 def _mock_pygame_graphics() -> None:
@@ -40,21 +40,15 @@ def _mock_pygame_graphics() -> None:
         pygame.font.Font.return_value = mock_font_obj
 
 
-class TestPygameUIRendering(TestCase):
+class TestPygameUIRendering(BasePygameTest):
     """General rendering tests for the UI."""
 
     def setUp(self) -> None:
         _mock_pygame_graphics()
 
         # Deferred import after mocks
-
-        with patch("pygame.display.set_mode"):
-            with patch("pygame.init"):
-                self.board = BackgammonBoard()
-        self.game = BackgammonGame()
-        self.game.setup_initial_position()
-        self.board.set_game(self.game)
-        self.board.update_from_game()
+        with patch("pygame.display.set_mode"), patch("pygame.init"):
+            self._init_board_and_game()
 
         # Patch drawing functions inside the concrete module to avoid real Surface use
         self._p_rect = patch("pygame_ui.pygame_ui.pygame.draw.rect", MagicMock())

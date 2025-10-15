@@ -4,13 +4,12 @@ Additional Pygame UI tests focused on:
 - Automatic turn switch when no moves remain
 """
 
-from unittest import TestCase
 from unittest.mock import MagicMock, patch
-from pygame_ui.pygame_ui import BackgammonBoard  # type: ignore
-from core.backgammon import BackgammonGame  # type: ignore
+
+from test.base_pygame_test import BasePygameTest
 
 
-class TestPygameUIDiceAndTurn(TestCase):
+class TestPygameUIDiceAndTurn(BasePygameTest):
     """Dice rendering and auto turn switch tests."""
 
     def setUp(self) -> None:
@@ -24,13 +23,8 @@ class TestPygameUIDiceAndTurn(TestCase):
         self._patch_draw_rect.start()
         self._patch_draw_circle.start()
 
-        with patch("pygame.display.set_mode"):
-            with patch("pygame.init"):
-                self.board = BackgammonBoard()
-                self.game = BackgammonGame()
-                self.game.setup_initial_position()
-                self.board.set_game(self.game)
-                self.board.update_from_game()
+        with patch("pygame.display.set_mode"), patch("pygame.init"):
+            self._init_board_and_game()
 
     def tearDown(self) -> None:
         # Stop drawing patches
