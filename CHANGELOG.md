@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 5
 
+### [0.0.20] - 2025-10-18
+
+#### Changed
+
+- Refactored pygame_ui.py following SOLID principles
+- Each component now has a single responsibility
+- Reduced file complexity (from 1360 lines to multiple focused files under 400 lines each)
+- Updated all pygame UI tests to work with new structure:
+
+#### Fix
+
+- Fixed pylint warnings in Button class
+
+### [0.0.19] - 2025-10-18
+
+#### Fix
+
+- fix pylint
+
 ### [0.0.18] - 2025-10-15
 
 #### Fix
