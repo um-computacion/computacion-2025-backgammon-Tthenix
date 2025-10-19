@@ -1,5 +1,3 @@
-************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_rendering
-test/test_pygame_ui_rendering.py:13:0: C0411: standard import "test.base_pygame_test.BasePygameTest" should be placed before third party import "pygame" (wrong-import-order)
 
 ------------------------------------
 Your code has been rated at 10.00/10
