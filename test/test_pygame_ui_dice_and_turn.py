@@ -16,12 +16,12 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
 
     def setUp(self) -> None:  # pylint: disable=invalid-name
         """Configura el entorno de pruebas con patches para pygame."""
-        # Patch real drawing calls inside the UI module to avoid real Surface requirement
+        # Patch real drawing calls inside the renderer modules to avoid real Surface requirement
         self._patch_draw_rect = patch(
-            "pygame_ui.pygame_ui.pygame.draw.rect", MagicMock()
+            "pygame_ui.renderers.dice_renderer.pygame.draw.rect", MagicMock()
         )
         self._patch_draw_circle = patch(
-            "pygame_ui.pygame_ui.pygame.draw.circle", MagicMock()
+            "pygame_ui.renderers.dice_renderer.pygame.draw.circle", MagicMock()
         )
         self._patch_draw_rect.start()
         self._patch_draw_circle.start()
@@ -42,7 +42,9 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
 
         # Patch draw_die_face to count calls
         with patch.object(
-            self.board, "draw_die_face", wraps=self.board.draw_die_face
+            self.board.dice_renderer,
+            "draw_die_face",
+            wraps=self.board.dice_renderer.draw_die_face,
         ) as draw_face:
             # Non-doubles case
             self.board.set_dice_values(2, 5)
@@ -51,7 +53,9 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
             self.assertEqual(draw_face.call_count, 2)
 
         with patch.object(
-            self.board, "draw_die_face", wraps=self.board.draw_die_face
+            self.board.dice_renderer,
+            "draw_die_face",
+            wraps=self.board.dice_renderer.draw_die_face,
         ) as draw_face:
             # Doubles case
             self.board.set_dice_values(3, 3)
@@ -73,7 +77,7 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
         # Ensure the move is valid before executing
         if self.game.validate_move(from_point, to_point):
             # Execute via UI to trigger auto turn switch logic
-            moved = self.board.execute_checker_move(from_point, to_point)
+            moved = self.board.interaction.execute_checker_move(from_point, to_point)
             self.assertTrue(moved)
             # When moves are exhausted, UI must clear roll and switch player
             self.assertIsNone(self.game.last_roll)
