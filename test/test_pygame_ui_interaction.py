@@ -77,8 +77,8 @@ class TestPygameUIInteraction(BasePygameTest):
         self.assertIsNone(point)
 
     def test_get_point_from_coordinates_center_gap(self):
-        """Test click in center gap returns None."""
-        # Center gap area
+        """Test click in center gap returns 'bar'."""
+        # Center gap area (where the bar is located)
         x = (
             self.board.play_area_x
             + self.board.half_width
@@ -97,7 +97,8 @@ class TestPygameUIInteraction(BasePygameTest):
             self.board.half_width,
             self.board.center_gap_width,
         )
-        self.assertIsNone(point)
+        # El centro es la barra, debe devolver "bar"
+        self.assertEqual(point, "bar")
 
     def test_can_select_checker_own_piece(self):
         """Test can select own checker."""

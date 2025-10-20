@@ -13,7 +13,10 @@ class Board:
     def __init__(self):
         """Initialize an empty backgammon board."""
         self.points = [[] for _ in range(24)]
-        self.checker_bar = [[], []]  # Index 0 for player 1, index 1 for player 2
+        # BARRA: Fichas capturadas van al lado del OPONENTE
+        # Index 0 = lado blanco (fichas negras capturadas entran aquí)
+        # Index 1 = lado negro (fichas blancas capturadas entran aquí)
+        self.checker_bar = [[], []]
         self.off_board = [[], []]  # Index 0 for player 1, index 1 for player 2
 
     def setup_initial_position(self):
@@ -86,8 +89,11 @@ class Board:
         destination_pieces = self.points[to_point]
         if len(destination_pieces) == 1 and destination_pieces[0] != player:
             captured_piece = self.points[to_point].pop()
-            opponent_bar_index = 0 if captured_piece == 1 else 1
-            self.checker_bar[opponent_bar_index].append(captured_piece)
+            # CORRECTO: La ficha capturada va al lado del OPONENTE (para reentrar desde allí):
+            # - Ficha blanca (1) capturada va al lado negro (index 1)
+            # - Ficha negra (2) capturada va al lado blanco (index 0)
+            captured_piece_bar_index = 1 if captured_piece == 1 else 0
+            self.checker_bar[captured_piece_bar_index].append(captured_piece)
 
         # Place piece at destination
         self.points[to_point].append(piece)
@@ -97,7 +103,9 @@ class Board:
     def is_all_pieces_in_home(self, player):
         """Check if all player's pieces are in their home board."""
         # Check if any pieces on bar
-        player_bar_index = 0 if player == 1 else 1
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        player_bar_index = 1 if player == 1 else 0
         if self.checker_bar[player_bar_index]:
             return False
 
@@ -180,15 +188,23 @@ class Board:
 
     def has_pieces_on_bar(self, player):
         """Check if a player has pieces on the bar."""
-        player_bar_index = 0 if player == 1 else 1
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        player_bar_index = 1 if player == 1 else 0
         return len(self.checker_bar[player_bar_index]) > 0
 
     def enter_from_bar(self, to_point, player):
         """Move a piece from the bar to a point on the board."""
-        player_bar_index = 0 if player == 1 else 1
+        # Con lógica corregida: las fichas capturadas están en el lado del OPONENTE
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        player_bar_index = 1 if player == 1 else 0
 
-        # Check if player has pieces on bar
-        if not self.checker_bar[player_bar_index]:
+        # Check if player has their own pieces on opponent's side
+        player_pieces_on_bar = [
+            piece for piece in self.checker_bar[player_bar_index] if piece == player
+        ]
+        if not player_pieces_on_bar:
             return False
 
         # Check if destination is valid
@@ -204,21 +220,32 @@ class Board:
         ):
             return False
 
-        # Handle capture
+        # Store the piece to move BEFORE handling capture to avoid confusion
+        # Remove the player's own piece from opponent's side
+        for i, piece in enumerate(self.checker_bar[player_bar_index]):
+            if piece == player:
+                piece_to_move = self.checker_bar[player_bar_index].pop(i)
+                break
+
+        # Handle capture (after removing our piece from bar)
         if len(destination_pieces) == 1 and destination_pieces[0] != player:
             captured_piece = self.points[to_point].pop()
-            opponent_bar_index = 0 if captured_piece == 1 else 1
-            self.checker_bar[opponent_bar_index].append(captured_piece)
+            # CORRECTO: La ficha capturada va al lado del OPONENTE (para reentrar desde allí):
+            # - Ficha blanca (1) capturada va al lado negro (index 1)
+            # - Ficha negra (2) capturada va al lado blanco (index 0)
+            captured_piece_bar_index = 1 if captured_piece == 1 else 0
+            self.checker_bar[captured_piece_bar_index].append(captured_piece)
 
-        # Move piece from bar to point
-        piece = self.checker_bar[player_bar_index].pop()
-        self.points[to_point].append(piece)
+        # Move our piece to the destination
+        self.points[to_point].append(piece_to_move)
 
         return True
 
     def get_possible_moves(self, player, dice_values):
         """Get all possible moves for a player given dice values."""
-        player_bar_index = 0 if player == 1 else 1
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        player_bar_index = 1 if player == 1 else 0
         if self.checker_bar[player_bar_index]:
             # Must enter from bar first
             return self._get_bar_entry_moves(player, dice_values)
@@ -230,9 +257,12 @@ class Board:
 
     def _get_bar_entry_moves(self, player, dice_values):
         """Generate legal bar entry moves for a player and dice values."""
+        # REGLA BACKGAMMON: Las fichas RE-ENTRAN por la HOME del OPONENTE
+        # Blancas (1) re-entran en puntos 0-5 (home de negras)
+        # Negras (2) re-entran en puntos 19-24 (home de blancas)
         moves = []
         for dice in dice_values:
-            entry_point = 24 - dice if player == 1 else dice - 1
+            entry_point = dice - 1 if player == 1 else 24 - dice
             if 0 <= entry_point < 24:
                 destination_pieces = self.points[entry_point]
                 if (
@@ -283,7 +313,9 @@ class Board:
 
     def count_pieces_for_player(self, player):
         """Count pieces for a player across the board."""
-        player_bar_index = 0 if player == 1 else 1
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        player_bar_index = 1 if player == 1 else 0
         count = 0
 
         # Count pieces on board
@@ -293,10 +325,15 @@ class Board:
                     count += 1
 
         # Count pieces on bar
-        count += len(self.checker_bar[player_bar_index])
+        # Contar SOLO las fichas del jugador en la barra
+        for piece in self.checker_bar[player_bar_index]:
+            if piece == player:
+                count += 1
 
         # Count pieces off board
-        count += len(self.off_board[player_bar_index])
+        # El off_board usa el índice basado en el jugador (0 para jugador 1, 1 para jugador 2)
+        player_off_index = 0 if player == 1 else 1
+        count += len(self.off_board[player_off_index])
 
         return count
 

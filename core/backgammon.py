@@ -308,20 +308,30 @@ class BackgammonGame:
 
         if self.current_player == self.player1:
             player_num = 1
-            player_bar_index = 0
+            # Fichas blancas (1) capturadas están en el lado negro (index 1)
+            player_bar_index = 1
         else:
             player_num = 2
-            player_bar_index = 1
+            # Fichas negras (2) capturadas están en el lado blanco (index 0)
+            player_bar_index = 0
 
-        # Check if player has checkers on bar
-        if len(self.board.checker_bar[player_bar_index]) == 0:
+        # Check if player has their own checkers on opponent's side
+        player_pieces_on_bar = [
+            piece
+            for piece in self.board.checker_bar[player_bar_index]
+            if piece == player_num
+        ]
+        if len(player_pieces_on_bar) == 0:
             return False
 
         # Calculate entry point
+        # REGLA BACKGAMMON: Las fichas RE-ENTRAN por la HOME del OPONENTE
+        # Blancas (1) re-entran en puntos 0-5 (home de negras)
+        # Negras (2) re-entran en puntos 19-24 (home de blancas)
         if player_num == 1:
-            entry_point = 24 - dice_value
+            entry_point = dice_value - 1  # Blancas entran en 0-5
         else:
-            entry_point = dice_value - 1
+            entry_point = 24 - dice_value  # Negras entran en 19-24
 
         # Validate entry point
         if entry_point < 0 or entry_point >= 24:
@@ -604,13 +614,21 @@ class BackgammonGame:
                         pip_count = pip_count + (point_idx + 1)
 
         # Count pips for pieces on bar
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
         if player_num == 1:
-            player_bar_index = 0
-            bar_pieces = len(self.board.checker_bar[player_bar_index])
+            player_bar_index = 1
+            # Contar solo las fichas blancas en la barra
+            bar_pieces = sum(
+                1 for piece in self.board.checker_bar[player_bar_index] if piece == 1
+            )
             pip_count = pip_count + (bar_pieces * 25)
         else:
-            player_bar_index = 1
-            bar_pieces = len(self.board.checker_bar[player_bar_index])
+            player_bar_index = 0
+            # Contar solo las fichas negras en la barra
+            bar_pieces = sum(
+                1 for piece in self.board.checker_bar[player_bar_index] if piece == 2
+            )
             pip_count = pip_count + (bar_pieces * 24)
 
         return pip_count

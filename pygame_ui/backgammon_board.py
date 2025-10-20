@@ -5,7 +5,7 @@ This module provides the main coordinator class for the visual
 representation of a backgammon board using Pygame.
 """
 
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pygame  # pylint: disable=import-error
 from core.backgammon import BackgammonGame
@@ -258,9 +258,9 @@ class BackgammonBoard:
                 )
 
         # Draw checkers on the bar
-        if "checker_bar" in self.board_state:
-            player1_bar = self.board_state["checker_bar"][0]
-            player2_bar = self.board_state["checker_bar"][1]
+        if "bar" in self.board_state:
+            player1_bar = self.board_state["bar"][0]
+            player2_bar = self.board_state["bar"][1]
             bar_center_x = (
                 self.play_area_x + self.half_width + self.center_gap_width // 2
             )
@@ -300,10 +300,13 @@ class BackgammonBoard:
         if self.interaction.selected_point is None:
             return
 
-        # Highlight selected point
-        self._highlight_point(
-            self.interaction.selected_point, self.colors["selected_highlight"]
-        )
+        # Highlight selected point or bar
+        if self.interaction.selected_point == "bar":
+            self._highlight_bar(self.colors["selected_highlight"])
+        else:
+            self._highlight_point(
+                self.interaction.selected_point, self.colors["selected_highlight"]
+            )
 
         # Highlight valid destination points
         if self.interaction.valid_destinations:
@@ -354,6 +357,28 @@ class BackgammonBoard:
             self.screen, center_x, int(point_y), self.checker_radius + 5, color
         )
 
+    def _highlight_bar(self, color: Tuple[int, int, int]) -> None:
+        """
+        Draw a highlight on the bar area.
+
+        Args:
+            color: RGB color tuple for highlight
+        """
+        bar_center_x = self.play_area_x + self.half_width + self.center_gap_width // 2
+
+        # Draw highlight rectangle on the bar
+        pygame.draw.rect(
+            self.screen,
+            color,
+            (
+                bar_center_x - self.center_gap_width // 2 + 5,
+                self.play_area_y + 10,
+                self.center_gap_width - 10,
+                self.play_area_height - 20,
+            ),
+            3,
+        )
+
     def _draw_current_player_indicator(self) -> None:
         """Draw the current player indicator."""
         try:
@@ -388,3 +413,37 @@ class BackgammonBoard:
         )
         # Update board state after interaction
         self.update_from_game()
+
+    def get_point_from_mouse(self, mouse_pos) -> Optional[int]:
+        """
+        Get point index from mouse coordinates.
+
+        Args:
+            mouse_pos: Tuple of (x, y) mouse coordinates
+
+        Returns:
+            Point index (0-23) or None if not on a valid point
+        """
+        x, y = mouse_pos
+        return self.interaction.get_point_from_coordinates(
+            x,
+            y,
+            self.play_area_x,
+            self.play_area_y,
+            self.play_area_width,
+            self.play_area_height,
+            self.point_width,
+            self.half_width,
+            self.center_gap_width,
+        )
+
+    def set_selected_point(self, point: Optional[int]) -> None:
+        """Set the selected point for highlighting."""
+        if point is not None:
+            self.interaction.selected_point = point
+        else:
+            self.interaction.selected_point = None
+
+    def set_possible_destinations(self, destinations: list) -> None:
+        """Set the possible destinations for highlighting."""
+        self.interaction.valid_destinations = destinations
