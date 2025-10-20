@@ -208,16 +208,9 @@ class CheckerRenderer:
     ) -> None:
         """
         Draw checkers on the bar (captured pieces).
-
-        Args:
-            surface: Surface to draw on
-            player1_bar: List of player 1 checkers on bar
-            player2_bar: List of player 2 checkers on bar
-            bar_center_x: X coordinate of bar center
-            play_area_y: Y position of play area
-            play_area_height: Height of play area
         """
-        # Draw player 1 checkers (bottom half of bar)
+        # Draw pieces on white side (bottom half of bar)
+        # These are pieces that must re-enter from white side (captured black pieces)
         for i, player in enumerate(player1_bar):
             checker_y = (
                 play_area_y
@@ -227,7 +220,8 @@ class CheckerRenderer:
             )
             self.draw_checker(surface, bar_center_x, checker_y, player)
 
-        # Draw player 2 checkers (top half of bar)
+        # Draw pieces on black side (top half of bar)
+        # These are pieces that must re-enter from black side (captured white pieces)
         for i, player in enumerate(player2_bar):
             checker_y = (
                 play_area_y

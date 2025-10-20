@@ -100,7 +100,8 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(board.points[0], [])
         self.assertEqual(board.points[5], [1])
-        self.assertEqual(board.checker_bar[1], [2])
+        # Ficha negra (2) capturada va al lado BLANCO (index 0)
+        self.assertEqual(board.checker_bar[0], [2])
 
     def test_move_piece_invalid_move(self):
         board = Board()
@@ -178,13 +179,15 @@ class TestBoard(unittest.TestCase):
     def test_is_all_pieces_in_home_with_bar(self):
         board = Board()
         board.points[18] = [1]
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
 
         self.assertFalse(board.is_all_pieces_in_home(1))
 
     def test_has_pieces_on_bar_true(self):
         board = Board()
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
         self.assertTrue(board.has_pieces_on_bar(1))
 
     def test_has_pieces_on_bar_false(self):
@@ -193,16 +196,18 @@ class TestBoard(unittest.TestCase):
 
     def test_enter_from_bar_success(self):
         board = Board()
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
 
         result = board.enter_from_bar(18, 1)
         self.assertTrue(result)
-        self.assertEqual(board.checker_bar[0], [])
+        self.assertEqual(board.checker_bar[1], [])
         self.assertEqual(board.points[18], [1])
 
     def test_enter_from_bar_blocked(self):
         board = Board()
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
         board.points[18] = [2, 2]
 
         result = board.enter_from_bar(18, 1)
@@ -224,7 +229,8 @@ class TestBoard(unittest.TestCase):
 
     def test_get_possible_moves_with_bar(self):
         board = Board()
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
         board.points[0] = [1]
 
         moves = board.get_possible_moves(1, [1, 2])
@@ -274,7 +280,8 @@ class TestBoard(unittest.TestCase):
         board = Board()
         board.points[0] = [1, 1]
         board.points[5] = [1]
-        board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        board.checker_bar[1] = [1]
         board.off_board[0] = [1, 1]
 
         count = board.count_pieces_for_player(1)
@@ -484,6 +491,54 @@ class TestBoard(unittest.TestCase):
         # Should have bear off moves
         bear_off_moves = [m for m in moves if m["to"] == "off"]
         self.assertGreater(len(bear_off_moves), 0)
+
+    def test_move_piece_capture_white_to_black_bar(self):
+        """Test that a captured white checker goes to black side (opponent's side)"""
+        board = Board()
+        board.points[5] = [2]  # Player 2 (black) piece
+        board.points[0] = [1]  # Player 1 (white) piece (single, can be captured)
+
+        # Player 2 (black) captures player 1 (white) checker
+        result = board.move_piece(5, 0, 2)
+
+        self.assertTrue(result)
+        self.assertEqual(board.points[5], [])  # Origin empty
+        self.assertEqual(board.points[0], [2])  # Black checker at destination
+        # Ficha BLANCA (1) capturada va al lado NEGRO (index 1)
+        self.assertEqual(board.checker_bar[1], [1])  # White checker on black side
+        self.assertEqual(board.checker_bar[0], [])  # White side should be empty
+
+    def test_enter_from_bar_with_capture_white_to_black_bar(self):
+        """Test bar entry with capture-white checker captured goes to black side(opponent's side)"""
+        board = Board()
+        board.checker_bar[0] = [2]  # Ficha negra en lado blanco (capturada)
+        board.points[5] = [1]  # Single white checker at point 5
+
+        # Black checker enters from bar and captures white checker
+        result = board.enter_from_bar(5, 2)
+
+        self.assertTrue(result)
+        self.assertEqual(board.checker_bar[0], [])  # Black checker gone from white side
+        self.assertEqual(
+            board.checker_bar[1], [1]
+        )  # Ficha blanca capturada va al lado negro
+        self.assertEqual(board.points[5], [2])  # Black checker at destination
+
+    def test_enter_from_bar_with_capture_black_to_white_bar(self):
+        """Test bar entry with capture-black checker captured goes to white side(opponent's side)"""
+        board = Board()
+        board.checker_bar[1] = [1]  # Ficha blanca en lado negro (capturada)
+        board.points[18] = [2]  # Single black checker at point 18
+
+        # White checker enters from bar and captures black checker
+        result = board.enter_from_bar(18, 1)
+
+        self.assertTrue(result)
+        self.assertEqual(board.checker_bar[1], [])  # White checker gone from black side
+        self.assertEqual(
+            board.checker_bar[0], [2]
+        )  # Ficha negra capturada va al lado blanco
+        self.assertEqual(board.points[18], [1])  # White checker at destination
 
     def test_copy_preserves_independence(self):
         """Test that copy creates independent board"""

@@ -92,7 +92,8 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_enter_success(self):
         """Entering from bar should succeed on a legal entry point."""
         # Prepare bar and open entry for player1 using die=1 -> entry point index 23
-        self.cli.game.board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.cli.game.board.checker_bar[1] = [1]
         self.cli.game.board.points[23] = []
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1, 2]
@@ -101,9 +102,11 @@ class TestBackgammonCLI(unittest.TestCase):
 
     def test_enter_blocked(self):
         """Entering from bar should fail if the point is blocked."""
+        # Blancas re-entran en puntos 0-5: con dado 1 → punto 0 (1-1=0)
         # Block entry with two opponent pieces
-        self.cli.game.board.checker_bar[0] = [1]
-        self.cli.game.board.points[23] = [2, 2]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.cli.game.board.checker_bar[1] = [1]
+        self.cli.game.board.points[0] = [2, 2]  # Bloquear punto 0
         self.cli.game.last_roll = (1, 2)
         self.cli.game.available_moves = [1, 2]
         output = self._run_commands(["enter", "1", "quit"])
@@ -126,7 +129,8 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_moves_requires_enter_from_bar(self):
         """Moves command should require entering from bar when needed."""
         # Put a checker on bar for player1, roll so command is allowed
-        self.cli.game.board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.cli.game.board.checker_bar[1] = [1]
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "moves", "quit"])
         self.assertIn("You have checkers on the bar", output)

@@ -357,7 +357,8 @@ class TestBackgammonGame(unittest.TestCase):
 
     def test_must_enter_from_bar_true(self):
         """Test must_enter_from_bar when player has pieces on bar."""
-        self.game.board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.game.board.checker_bar[1] = [1]
         self.game.current_player = self.game.player1
         must_enter = self.game.must_enter_from_bar()
         self.assertTrue(must_enter)
@@ -484,10 +485,11 @@ class TestBackgammonGame(unittest.TestCase):
         """Test successful move from bar without capture."""
         self.game.setup_initial_position()
         self.game.current_player = self.game.player1
-        self.game.board.checker_bar[0] = [1]
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.game.board.checker_bar[1] = [1]
         self.game.available_moves = [6]
-        # Ensure entry point 18 is free or friendly
-        self.game.board.points[18] = []
+        # Blancas re-entran en puntos 0-5: con dado 6 → punto 5 (6-1=5)
+        self.game.board.points[5] = []  # Ensure entry point 5 is free
         self.assertTrue(self.game.move_from_bar(6))
         self.assertNotIn(6, self.game.available_moves)
 
@@ -744,7 +746,8 @@ class TestBackgammonGame(unittest.TestCase):
         result = self.game.make_move(0, 1)
         self.assertTrue(result)
         # Check that the piece was captured (sent to bar)
-        self.assertGreater(len(self.game.board.checker_bar[1]), 0)  # Player 2's bar
+        # Ficha negra (2) capturada va al lado blanco (index 0)
+        self.assertGreater(len(self.game.board.checker_bar[0]), 0)
 
     def test_move_from_bar_invalid_dice(self):
         """Test move_from_bar with invalid dice value."""
@@ -834,13 +837,15 @@ class TestBackgammonGame(unittest.TestCase):
         self.game.setup_initial_position()
         self.game.current_player = self.game.player1
         self.game.available_moves = [1]
-        self.game.board.checker_bar[0] = [1]  # Player 1 on bar
+        # Ficha blanca (1) capturada está en el lado negro (index 1)
+        self.game.board.checker_bar[1] = [1]  # Player 1 on bar
+        # Blancas re-entran en puntos 0-5: con dado 1 → punto 0 (1-1=0)
         # Place single opponent piece at entry point
-        self.game.board.points[23] = [2]  # Single black piece at point 24
+        self.game.board.points[0] = [2]  # Single black piece at point 0
         result = self.game.move_from_bar(1)
         self.assertTrue(result)
-        # Check that opponent was captured
-        self.assertGreater(len(self.game.board.checker_bar[1]), 0)
+        # Check that opponent was captured - Ficha negra va al lado blanco (index 0)
+        self.assertGreater(len(self.game.board.checker_bar[0]), 0)
 
     def test_bear_off_checker_empty_available_moves_with_last_roll(self):
         """Test bear_off_checker when available_moves is empty but last_roll exists."""
@@ -914,7 +919,8 @@ class TestBackgammonGame(unittest.TestCase):
         self.game.setup_initial_position()
         self.game.current_player = self.game.player2
         self.game.available_moves = [2]
-        self.game.board.checker_bar[1] = [2]  # Player 2 on bar
+        # Ficha negra (2) capturada está en el lado blanco (index 0)
+        self.game.board.checker_bar[0] = [2]  # Player 2 on bar
         # Clear the entry point to ensure it's not blocked
         self.game.board.points[1] = []  # Clear point 2 (0-indexed as 1)
         # Player 2 should enter at point 2 (dice_value - 1 = 1 for dice_value 2)
