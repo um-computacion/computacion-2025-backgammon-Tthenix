@@ -104,9 +104,7 @@ class BoardInteraction:
         # Bottom-right: points 5-0
         return 5 - point_index_in_quadrant
 
-    def can_select_checker(
-        self, point
-    ) -> bool:  # pylint: disable=too-many-return-statements
+    def can_select_checker(self, point) -> bool:
         """
         Check if a checker at the given point can be selected.
 
@@ -116,39 +114,46 @@ class BoardInteraction:
         Returns:
             True if checker can be selected, False otherwise
         """
-        if not self.game or not self.board_state:
-            return False
-
-        # Must have dice rolled
-        if not self.game.last_roll:
-            return False
-
-        # Verificar si el jugador tiene movimientos válidos
-        if not self.game.has_valid_moves():
+        # Early validation checks
+        if not self._can_select_checker_basic_validation():
             return False
 
         # Handle bar selection
         if point == "bar":
             return self.can_select_from_bar()
 
-        # REGLA IMPORTANTE: Si tienes fichas en la barra, NO puedes mover otras fichas
+        # Check if player has pieces on bar (prevents moving other pieces)
+        if self._player_has_pieces_on_bar():
+            return False
+
+        # Validate point selection
+        return self._can_select_point_checker(point)
+
+    def _can_select_checker_basic_validation(self) -> bool:
+        """Check basic validation for checker selection."""
+        if not self.game or not self.board_state:
+            return False
+        if not self.game.last_roll:
+            return False
+        return self.game.has_valid_moves()
+
+    def _player_has_pieces_on_bar(self) -> bool:
+        """Check if current player has pieces on bar."""
         current_player_num = 1 if self.game.current_player == self.game.player1 else 2
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
         player_bar_index = 1 if current_player_num == 1 else 0
 
-        # Verificar si el jugador tiene sus propias fichas en la barra
-        if "bar" in self.board_state:
-            player_pieces_on_bar = [
-                piece
-                for piece in self.board_state["bar"][player_bar_index]
-                if piece == current_player_num
-            ]
-            if len(player_pieces_on_bar) > 0:
-                # Tienes fichas en la barra, no puedes seleccionar fichas del tablero
-                return False
+        if "bar" not in self.board_state:
+            return False
 
-        # Check if point has checkers
+        player_pieces_on_bar = [
+            piece
+            for piece in self.board_state["bar"][player_bar_index]
+            if piece == current_player_num
+        ]
+        return len(player_pieces_on_bar) > 0
+
+    def _can_select_point_checker(self, point) -> bool:
+        """Check if a point checker can be selected."""
         if point >= len(self.board_state["points"]):
             return False
 
@@ -156,7 +161,7 @@ class BoardInteraction:
         if not checkers:
             return False
 
-        # Check if checker belongs to current player
+        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
         return checkers[0] == current_player_num
 
     def can_select_from_bar(self) -> bool:
