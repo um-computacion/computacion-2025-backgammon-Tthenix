@@ -123,6 +123,10 @@ class BoardInteraction:
         if not self.game.last_roll:
             return False
 
+        # Verificar si el jugador tiene movimientos válidos
+        if not self.game.has_valid_moves():
+            return False
+
         # Handle bar selection
         if point == "bar":
             return self.can_select_from_bar()
@@ -207,13 +211,11 @@ class BoardInteraction:
 
             # Check if entry point is valid and not blocked
             if 0 <= entry_point < 24:
+                destination_pieces = self.game.board.points[entry_point]
                 if (
-                    self.game.board.can_move(
-                        entry_point, entry_point, current_player_num
-                    )
-                    or len(self.game.board.points[entry_point]) == 0
-                    or len(self.game.board.points[entry_point]) == 1
-                    or self.game.board.points[entry_point][0] == current_player_num
+                    len(destination_pieces) == 0
+                    or len(destination_pieces) < 2
+                    or destination_pieces[0] == current_player_num
                 ):
                     destinations.append(entry_point)
 
@@ -356,6 +358,12 @@ class BoardInteraction:
             half_width: Width of half board
             center_gap_width: Width of center gap
         """
+        # Verificar si el jugador tiene movimientos válidos
+        if self.game and self.game.last_roll and not self.game.has_valid_moves():
+            # Si no hay movimientos válidos, cambiar turno automáticamente
+            self.game.switch_current_player()
+            return
+
         point = self.get_point_from_coordinates(
             x,
             y,

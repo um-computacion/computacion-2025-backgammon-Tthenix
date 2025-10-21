@@ -37,6 +37,10 @@ def main() -> None:
                     # Presiona espacio para tirar dados (si corresponde)
                     if game.last_roll is None or not game.available_moves:
                         game.roll_dice()
+                        # Verificar si el jugador tiene movimientos válidos
+                        if not game.has_valid_moves():
+                            # Si no hay movimientos válidos, cambiar turno automáticamente
+                            game.switch_current_player()
                         board.update_from_game()
                 elif event.key == pygame.K_r:  # pylint: disable=no-member
                     # Press 'r' to reset game
@@ -53,6 +57,10 @@ def main() -> None:
                 # Tirar dados desde botón (si corresponde)
                 if game.last_roll is None or not game.available_moves:
                     game.roll_dice()
+                    # Verificar si el jugador tiene movimientos válidos
+                    if not game.has_valid_moves():
+                        # Si no hay movimientos válidos, cambiar turno automáticamente
+                        game.switch_current_player()
                     board.update_from_game()
 
         # Clear screen with a neutral background

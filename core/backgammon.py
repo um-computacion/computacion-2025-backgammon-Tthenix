@@ -555,7 +555,10 @@ class BackgammonGame:
     def _can_enter_from_bar(self, player_num):
         """Return True if the player can legally enter from the bar with any die."""
         for dice_value in self.available_moves:
-            entry_point = 24 - dice_value if player_num == 1 else dice_value - 1
+            if player_num == 1:
+                entry_point = dice_value - 1  # Blancas entran en 0-5
+            else:
+                entry_point = 24 - dice_value  # Negras entran en 19-24
             if 0 <= entry_point < 24:
                 point = self.board.points[entry_point]
                 if len(point) == 0:

@@ -2358,3 +2358,142 @@ test\test_pygame_ui_interaction.py
 CHANGELOG.md
 
 ---
+
+## Prompt 16
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+i need to fix the moves on pygame, on backgammon when i roll dice and i got a dice with a numner lik 6 i cant move my checker so the player have invalid moves to do so next to the next player@pygame_ui.py dont forget to use the logic that exist dont create new logic @core/
+
+### Answer:
+
+I analyzed the issue with invalid moves in the pygame UI. The problem was that when a player rolls dice and has no valid moves available, the game wasn't automatically switching to the next player. I fixed this by implementing proper move validation and automatic turn switching.
+
+**Changes Made:**
+
+1. **pygame_ui/pygame_ui.py**: Added logic to check for valid moves after rolling dice and automatically switch players when no valid moves are available.
+
+2. **pygame_ui/board_interaction.py**: Enhanced the move validation logic to prevent checker selection when no valid moves exist and added automatic turn switching when clicking on the board with no valid moves.
+
+**Key Fixes:**
+
+- After rolling dice, the game now checks if the current player has valid moves using `game.has_valid_moves()`
+- If no valid moves are available, the turn automatically switches to the next player
+- The UI prevents checker selection when no valid moves exist
+- Board clicks with no valid moves automatically switch turns
+
+**Implementation Details:**
+
+```python
+# In pygame_ui.py - after rolling dice
+if not game.has_valid_moves():
+    # Si no hay movimientos válidos, cambiar turno automáticamente
+    game.switch_current_player()
+
+# In board_interaction.py - before allowing checker selection
+if not self.game.has_valid_moves():
+    return False
+
+# In board_interaction.py - handle clicks when no valid moves
+if self.game and self.game.last_roll and not self.game.has_valid_moves():
+    # Si no hay movimientos válidos, cambiar turno automáticamente
+    self.game.switch_current_player()
+    return
+```
+
+**Testing:**
+
+- Created and ran a test script to verify move validation works correctly
+- All existing functionality is preserved
+- No new game logic was created - only used existing core logic
+- Linting passes with no errors
+
+The fix ensures that when a player rolls dice and cannot make any valid moves (like rolling a 6 when blocked), the game automatically switches to the next player, following proper Backgammon rules.
+
+### What i do with the answer?
+
+I implemented the complete solution to fix the invalid moves issue in the pygame UI. The changes ensure that when a player has no valid moves after rolling dice, the game automatically switches to the next player. I tested the implementation and verified that all existing functionality works correctly. The solution uses only existing core logic without creating new game rules.
+
+### reference:
+
+pygame_ui/pygame_ui.py
+pygame_ui/board_interaction.py
+core/backgammon.py
+core/board.py
+
+---
+
+## Prompt 17
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+i got a two dice and i cant pull over mi checker so i dont have any posible move and nothinh happend look the image
+
+### Answer:
+
+I identified and fixed the bar entry issue that was preventing white checkers from re-entering the game from the bar. The problem was in two places:
+
+**Issues Found:**
+
+1. **In `pygame_ui/board_interaction.py`**: The `get_valid_destinations_from_bar` method was incorrectly using `self.game.board.can_move(entry_point, entry_point, current_player_num)` - you can't move from a point to itself.
+
+2. **In `core/backgammon.py`**: The `_can_enter_from_bar` method had the wrong entry point calculation for white players.
+
+**Fixes Applied:**
+
+1. **Fixed bar entry validation in board_interaction.py**:
+
+```python
+# Before (incorrect):
+if (
+    self.game.board.can_move(entry_point, entry_point, current_player_num)
+    or len(self.game.board.points[entry_point]) == 0
+    or len(self.game.board.points[entry_point]) == 1
+    or self.game.board.points[entry_point][0] == current_player_num
+):
+
+# After (correct):
+destination_pieces = self.game.board.points[entry_point]
+if (
+    len(destination_pieces) == 0
+    or len(destination_pieces) < 2
+    or destination_pieces[0] == current_player_num
+):
+```
+
+2. **Fixed entry point calculation in core/backgammon.py**:
+
+```python
+# Before (incorrect):
+entry_point = 24 - dice_value if player_num == 1 else dice_value - 1
+
+# After (correct):
+if player_num == 1:
+    entry_point = dice_value - 1  # Blancas entran en 0-5
+else:
+    entry_point = 24 - dice_value  # Negras entran en 19-24
+```
+
+**Testing:**
+
+- Created and ran a test script that successfully verified bar entry now works correctly
+- White checkers can now properly re-enter from the bar using available dice values
+- The game correctly detects when a player has valid moves from the bar
+
+**Result:**
+The bar entry mechanic now works correctly according to Backgammon rules. White checkers on the bar can re-enter the game using their available dice values, and the game properly validates these moves.
+
+### What i do with the answer?
+
+I implemented the complete fix for the bar entry issue. The changes ensure that white checkers on the bar can properly re-enter the game using available dice values. I tested the implementation and verified that bar entry now works correctly. The solution fixes both the validation logic and the entry point calculation.
+
+### reference:
+
+pygame_ui/board_interaction.py
+core/backgammon.py
+
+---
