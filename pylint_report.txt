@@ -1,4 +1,8 @@
+************* Module computacion-2025-backgammon-Tthenix.test.test_bearing_off
+test/test_bearing_off.py:12:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
+test/test_bearing_off.py:12:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
+test/test_bearing_off.py:20:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
 
-------------------------------------
-Your code has been rated at 10.00/10
+-----------------------------------
+Your code has been rated at 9.96/10
 
