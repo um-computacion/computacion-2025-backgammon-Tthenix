@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Changed
 
 - Resolve invalid moves and bar entry issues in Backgammon UI
+- Bear off checkers
 
 ### [0.0.21] - 2025-10-20
 
