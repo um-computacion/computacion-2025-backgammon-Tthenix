@@ -6,14 +6,14 @@ Name                                      Stmts   Miss  Cover   Missing
 cli/__init__.py                               1      0   100%
 cli/cli.py                                  244     27    89%   83, 166-167, 216-217, 237, 244-245, 251-252, 254-256, 262-263, 276-277, 284, 293, 297-298, 301, 303-304, 313, 344, 348
 core/__init__.py                              2      0   100%
-core/backgammon.py                          439     53    88%   130, 265, 338, 372, 383, 404, 434, 473, 476, 500, 505, 509, 513, 520, 535, 540, 544, 557-570, 577-590, 597, 681, 691-693, 697-702, 709-715
-core/board.py                               195      6    97%   117-118, 155-156, 187, 212
+core/backgammon.py                          439     51    88%   130, 265, 338, 372, 434, 473, 476, 500, 505, 509, 513, 520, 535, 540, 544, 557-570, 577-590, 597, 681, 691-693, 697-702, 709-715
+core/board.py                               195      4    98%   155-156, 187, 212
 core/checker.py                              73      3    96%   67, 94, 189
 core/dice.py                                 13      0   100%
 core/player.py                               43      0   100%
 pygame_ui/__init__.py                         0      0   100%
-pygame_ui/backgammon_board.py               147     21    86%   168, 241, 305, 334-350, 367-370, 392-393, 427-428, 442-445, 449
-pygame_ui/board_interaction.py              146     56    62%   96, 103, 123, 127, 135, 146, 158, 174-192, 201-227, 244, 277, 281, 309-338, 369-370, 398-403
+pygame_ui/backgammon_board.py               154     25    84%   168, 241, 305, 316, 330, 342-358, 376-382, 391-394, 416-417, 455-456, 470-473, 477
+pygame_ui/board_interaction.py              183     63    66%   183, 187, 195, 206, 219, 222, 238-256, 265-291, 308, 330, 343, 373, 377, 381, 409-438, 451, 460-462, 465, 500-501, 533-538
 pygame_ui/button.py                          29     17    41%   55-71, 83-88
 pygame_ui/pygame_ui.py                       59     48    19%   25-33, 38-44, 49-53, 58-60, 65-66, 71-75, 80-109, 113
 pygame_ui/renderers/__init__.py               4      0   100%
@@ -23,23 +23,28 @@ pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 test/__init__.py                              0      0   100%
 test/base_pygame_test.py                     12      0   100%
 test/test_backgammon.py                     651      3    99%   173, 914-915
+test/test_bearing_off.py                    132      4    97%   131, 174-175, 278
 test/test_board.py                          372      4    99%   323, 334, 480, 564
 test/test_checker.py                        214      1    99%   311
 test/test_cli.py                            146      1    99%   239
 test/test_dice.py                           102      1    99%   178
 test/test_player.py                         126      1    99%   181
 test/test_pygame_ui_dice_and_turn.py         35      0   100%
-test/test_pygame_ui_interaction.py          113      5    96%   191-192, 214-215, 271
+test/test_pygame_ui_interaction.py          113      3    97%   191-192, 271
 test/test_pygame_ui_rendering.py             73      0   100%
 -----------------------------------------------------------------------
-TOTAL                                      3453    254    93%
+TOTAL                                      3629    263    93%
 
 ```
 ## Pylint Report
 ```text
+************* Module computacion-2025-backgammon-Tthenix.test.test_bearing_off
+test/test_bearing_off.py:12:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
+test/test_bearing_off.py:12:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
+test/test_bearing_off.py:20:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
 
-------------------------------------
-Your code has been rated at 10.00/10
+-----------------------------------
+Your code has been rated at 9.96/10
 
 
 ```
