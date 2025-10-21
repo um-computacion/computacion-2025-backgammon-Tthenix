@@ -71,7 +71,41 @@ class BoardInteraction:
         Returns:
             Point index (0-23) or None if not on a valid point
         """
-        # Check if click is in bear-off area first
+        # Check bear-off area first
+        bear_off_result = self._check_bear_off_area(
+            x, y, bear_off_x, bear_off_y, bear_off_width, bear_off_height
+        )
+        if bear_off_result is not None:
+            return bear_off_result
+
+        # Check if click is within play area
+        if not self._is_within_play_area(
+            x, y, play_area_x, play_area_y, play_area_width, play_area_height
+        ):
+            return None
+
+        # Calculate point from coordinates
+        return self._calculate_point_from_position(
+            x,
+            y,
+            play_area_x,
+            play_area_y,
+            play_area_height,
+            point_width,
+            half_width,
+            center_gap_width,
+        )
+
+    def _check_bear_off_area(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        bear_off_x: int,
+        bear_off_y: int,
+        bear_off_width: int,
+        bear_off_height: int,
+    ) -> Optional[str]:
+        """Check if click is in bear-off area."""
         if (
             bear_off_x is not None
             and bear_off_y is not None
@@ -82,44 +116,53 @@ class BoardInteraction:
                 bear_off_x <= x <= bear_off_x + bear_off_width
                 and bear_off_y <= y <= bear_off_y + bear_off_height
             ):
-                return "off"  # Click in bear-off area
+                return "off"
+        return None
 
-        # Check if click is within play area
-        if not (
+    def _is_within_play_area(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_width: int,
+        play_area_height: int,
+    ) -> bool:
+        """Check if coordinates are within play area."""
+        return (
             play_area_x <= x <= play_area_x + play_area_width
             and play_area_y <= y <= play_area_y + play_area_height
-        ):
-            return None
+        )
 
-        # Determine if click is in top or bottom half
+    def _calculate_point_from_position(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_height: int,
+        point_width: int,
+        half_width: int,
+        center_gap_width: int,
+    ) -> Optional[int]:
+        """Calculate point index from position."""
         mid_y = play_area_y + play_area_height // 2
         is_top_half = y < mid_y
-
-        # Calculate relative x position
         rel_x = x - play_area_x
 
-        # Check if in center gap (bar area)
+        # Check center gap (bar area)
         if half_width <= rel_x <= half_width + center_gap_width:
-            return "bar"  # Click in center gap (bar area)
+            return "bar"
 
-        # Determine which side (left or right of center gap)
+        # Left side
         if rel_x < half_width:
-            # Left side
-            point_index_in_quadrant = int(rel_x / point_width)
-            if is_top_half:
-                # Top-left: points 12-17
-                return 12 + point_index_in_quadrant
-            # Bottom-left: points 11-6
-            return 11 - point_index_in_quadrant
+            point_index = int(rel_x / point_width)
+            return 12 + point_index if is_top_half else 11 - point_index
 
         # Right side
         rel_x_right = rel_x - half_width - center_gap_width
-        point_index_in_quadrant = int(rel_x_right / point_width)
-        if is_top_half:
-            # Top-right: points 18-23
-            return 18 + point_index_in_quadrant
-        # Bottom-right: points 5-0
-        return 5 - point_index_in_quadrant
+        point_index = int(rel_x_right / point_width)
+        return 18 + point_index if is_top_half else 5 - point_index
 
     def can_select_checker(self, point) -> bool:
         """
