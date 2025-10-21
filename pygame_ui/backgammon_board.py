@@ -311,16 +311,24 @@ class BackgammonBoard:
         # Highlight valid destination points
         if self.interaction.valid_destinations:
             for dest in self.interaction.valid_destinations:
-                self._highlight_point(dest, self.colors["valid_move_highlight"])
+                if dest == "off":
+                    # Highlight bear-off area
+                    self._highlight_bear_off_area(self.colors["valid_move_highlight"])
+                else:
+                    self._highlight_point(dest, self.colors["valid_move_highlight"])
 
-    def _highlight_point(self, point: int, color: Tuple[int, int, int]) -> None:
+    def _highlight_point(self, point, color: Tuple[int, int, int]) -> None:
         """
         Draw a highlight circle on a specific point.
 
         Args:
-            point: Point index to highlight
+            point: Point index to highlight (or "off" for bear-off area)
             color: RGB color tuple for highlight
         """
+        # Handle special cases like "off" for bear-off area
+        if not isinstance(point, int):
+            return
+
         # Calculate point position
         if point < 6:
             # Right side, bottom
@@ -356,6 +364,22 @@ class BackgammonBoard:
         self.board_renderer.draw_highlight(
             self.screen, center_x, int(point_y), self.checker_radius + 5, color
         )
+
+    def _highlight_bear_off_area(self, color: Tuple[int, int, int]) -> None:
+        """
+        Highlight the bear-off area.
+
+        Args:
+            color: RGB color tuple for highlight
+        """
+        # Draw a border around the bear-off area
+        border_rect = pygame.Rect(
+            self.bear_off_x - 5,
+            self.bear_off_y - 5,
+            self.bear_off_width + 10,
+            self.board_height + 10,
+        )
+        pygame.draw.rect(self.screen, color, border_rect, 5)
 
     def _highlight_bar(self, color: Tuple[int, int, int]) -> None:
         """
@@ -410,6 +434,10 @@ class BackgammonBoard:
             self.point_width,
             self.half_width,
             self.center_gap_width,
+            bear_off_x=self.bear_off_x,
+            bear_off_y=self.bear_off_y,
+            bear_off_width=self.bear_off_width,
+            bear_off_height=self.board_height,
         )
         # Update board state after interaction
         self.update_from_game()
