@@ -23,7 +23,7 @@ pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 test/__init__.py                              0      0   100%
 test/base_pygame_test.py                     12      0   100%
 test/test_backgammon.py                     651      3    99%   173, 914-915
-test/test_bearing_off.py                    132      4    97%   131, 174-175, 278
+test/test_bearing_off.py                    132      4    97%   133, 176-177, 280
 test/test_board.py                          372      4    99%   323, 334, 480, 564
 test/test_checker.py                        214      1    99%   311
 test/test_cli.py                            146      1    99%   239
@@ -38,12 +38,9 @@ TOTAL                                      3644    265    93%
 ```
 ## Pylint Report
 ```text
-************* Module computacion-2025-backgammon-Tthenix.test.test_bearing_off
-test/test_bearing_off.py:12:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
-test/test_bearing_off.py:12:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
 
------------------------------------
-Your code has been rated at 9.96/10
+------------------------------------
+Your code has been rated at 10.00/10
 
 
 ```
