@@ -17,7 +17,7 @@ from pygame_ui.board_interaction import BoardInteraction
 class TestBearingOff(BasePygameTest):
     """Test bearing off functionality."""
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=invalid-name
         """Set up test environment."""
         self._init_board_and_game()
         self.interaction = BoardInteraction()
@@ -210,7 +210,7 @@ class TestBearingOff(BasePygameTest):
 class TestBearingOffEdgeCases(unittest.TestCase):
     """Test edge cases for bearing off functionality."""
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=invalid-name
         """Set up test environment."""
         self.game = BackgammonGame()
         self.game.setup_initial_position()
