@@ -6,7 +6,7 @@ Name                                      Stmts   Miss  Cover   Missing
 cli/__init__.py                               1      0   100%
 cli/cli.py                                  244     27    89%   83, 166-167, 216-217, 237, 244-245, 251-252, 254-256, 262-263, 276-277, 284, 293, 297-298, 301, 303-304, 313, 344, 348
 core/__init__.py                              2      0   100%
-core/backgammon.py                          439     50    89%   130, 265, 338, 372, 434, 473, 476, 500, 505, 509, 520, 535, 540, 544, 557-570, 577-590, 597, 681, 691-693, 697-702, 709-715
+core/backgammon.py                          439     51    88%   130, 265, 338, 372, 434, 473, 476, 500, 505, 509, 513, 520, 535, 540, 544, 557-570, 577-590, 597, 681, 691-693, 697-702, 709-715
 core/board.py                               195      4    98%   155-156, 187, 212
 core/checker.py                              73      3    96%   67, 94, 189
 core/dice.py                                 13      0   100%
@@ -33,7 +33,7 @@ test/test_pygame_ui_dice_and_turn.py         35      0   100%
 test/test_pygame_ui_interaction.py          113      1    99%   271
 test/test_pygame_ui_rendering.py             73      0   100%
 -----------------------------------------------------------------------
-TOTAL                                      3644    264    93%
+TOTAL                                      3644    265    93%
 
 ```
 ## Pylint Report
@@ -41,7 +41,6 @@ TOTAL                                      3644    264    93%
 ************* Module computacion-2025-backgammon-Tthenix.test.test_bearing_off
 test/test_bearing_off.py:12:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
 test/test_bearing_off.py:12:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
-test/test_bearing_off.py:20:4: C0103: Method name "setUp" doesn't conform to snake_case naming style (invalid-name)
 
 -----------------------------------
 Your code has been rated at 9.96/10
