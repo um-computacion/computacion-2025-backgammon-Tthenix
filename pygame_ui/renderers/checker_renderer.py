@@ -251,24 +251,41 @@ class CheckerRenderer:
             bear_off_y: Y position of bear-off area
             board_height: Total board height
         """
-        # Draw player 1 (white) checkers in bottom half
-        for i, player in enumerate(player1_off):
-            row = i // 3  # 3 checkers per row
-            col = i % 3
-            col_offset = (col - 1) * (self.checker_radius * 2 + 4)
-            checker_x = bear_off_center_x + col_offset - self.checker_radius
-            checker_y = (
-                bear_off_y + 3 * board_height // 4 + row * (self.checker_radius * 2 + 2)
-            )
-            self.draw_checker(surface, checker_x, checker_y, player)
+        # Visual specification: center up to 5 checkers per zone; if more, show count
+        max_visible = 5
+        spacing = self.checker_radius * 2 + 4
 
-        # Draw player 2 (black) checkers in top half
-        for i, player in enumerate(player2_off):
-            row = i // 3  # 3 checkers per row
-            col = i % 3
-            col_offset = (col - 1) * (self.checker_radius * 2 + 4)
-            checker_x = bear_off_center_x + col_offset - self.checker_radius
-            checker_y = (
-                bear_off_y + board_height // 4 + row * (self.checker_radius * 2 + 2)
-            )
-            self.draw_checker(surface, checker_x, checker_y, player)
+        def draw_zone_checkers(
+            start_y: int, pieces: List[int], is_top_zone: bool = False
+        ) -> None:
+            visible = pieces[:max_visible]
+            n = len(visible)
+            if n == 0:
+                return
+            # Calculate vertical start so the stack is vertically centered in half-area
+            half_height = board_height // 2
+            total_height = (n - 1) * spacing
+            center_y = start_y + half_height // 2
+            top_y = center_y - total_height // 2
+            for i, p in enumerate(visible):
+                y = top_y + i * spacing
+                self.draw_checker(surface, bear_off_center_x, y, p)
+
+            # If more than visible, draw count
+            if len(pieces) > max_visible:
+                if is_top_zone:
+                    # For top zone (white), put count at the top to avoid button overlap
+                    count_y = start_y + 16
+                else:
+                    # For bottom zone (black), put count at the bottom
+                    count_y = start_y + half_height - 16
+                self._draw_checker_count(
+                    surface, bear_off_center_x, count_y, len(pieces)
+                )
+
+        # Top zone: WHITE
+        draw_zone_checkers(bear_off_y, player1_off, is_top_zone=True)
+        # Bottom zone: BLACK
+        draw_zone_checkers(
+            bear_off_y + board_height // 2, player2_off, is_top_zone=False
+        )

@@ -9,16 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 5
 
+### [0.0.21] - 2025-10-22
+
+#### Added
+
+- Bear off better design
+
 ### [0.0.21] - 2025-10-21
 
-#### Changed
+#### Added
 
 - Resolve invalid moves and bar entry issues in Backgammon UI
 - Bear off checkers
 
 ### [0.0.21] - 2025-10-20
 
-#### Changed
+#### Added
 
 - Take checker and come back to board
 
