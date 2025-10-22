@@ -9,7 +9,9 @@ This module tests the bearing off mechanics including:
 """
 
 import unittest
-from test.base_pygame_test import BasePygameTest
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
+    BasePygameTest,
+)
 from core.backgammon import BackgammonGame
 from pygame_ui.board_interaction import BoardInteraction
 
