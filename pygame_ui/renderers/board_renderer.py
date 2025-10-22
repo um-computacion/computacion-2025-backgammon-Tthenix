@@ -50,6 +50,41 @@ class BoardRenderer:
 
         return surface
 
+    def _add_wood_texture(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        surface: pygame.Surface,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        base_color: Tuple[int, int, int],
+    ) -> None:
+        """
+        Add wood grain texture to a rectangular area.
+
+        Args:
+            surface: Surface to draw on
+            x: X position of area
+            y: Y position of area
+            width: Width of area
+            height: Height of area
+            base_color: Base color for texture
+        """
+        # Add wood grain texture
+        for i in range(0, width, 8):
+            line_color = (
+                max(0, base_color[0] - 15),
+                max(0, base_color[1] - 15),
+                max(0, base_color[2] - 15),
+            )
+            pygame.draw.line(
+                surface,
+                line_color,
+                (x + i, y),
+                (x + i, y + height),
+                1,
+            )
+
     def draw_triangular_point(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         surface: pygame.Surface,
@@ -173,32 +208,54 @@ class BoardRenderer:
             bear_off_width: Width of bear-off area
             bear_off_height: Height of bear-off area
         """
+        # Calculate zone dimensions
+        zone_height = bear_off_height // 2
+
+        # Draw WHITE zone (top) - light wood
+        white_zone_rect = pygame.Rect(
+            bear_off_x, bear_off_y, bear_off_width, zone_height
+        )
+        pygame.draw.rect(surface, self.colors["bear_off_bg"], white_zone_rect)
+
+        # Add wood grain texture to white zone
+        self._add_wood_texture(
+            surface,
+            bear_off_x,
+            bear_off_y,
+            bear_off_width,
+            zone_height,
+            self.colors["bear_off_bg"],
+        )
+
+        # Draw BLACK zone (bottom) - dark wood
+        black_zone_rect = pygame.Rect(
+            bear_off_x, bear_off_y + zone_height, bear_off_width, zone_height
+        )
+        # Use darker wood color for black zone
+        dark_wood = (
+            max(0, self.colors["bear_off_bg"][0] - 40),
+            max(0, self.colors["bear_off_bg"][1] - 40),
+            max(0, self.colors["bear_off_bg"][2] - 40),
+        )
+        pygame.draw.rect(surface, dark_wood, black_zone_rect)
+
+        # Add wood grain texture to black zone
+        self._add_wood_texture(
+            surface,
+            bear_off_x,
+            bear_off_y + zone_height,
+            bear_off_width,
+            zone_height,
+            dark_wood,
+        )
+
+        # Draw border around entire bear off area
         bear_off_rect = pygame.Rect(
             bear_off_x, bear_off_y, bear_off_width, bear_off_height
         )
-
-        # Fill with light brown background
-        pygame.draw.rect(surface, self.colors["bear_off_bg"], bear_off_rect)
-
-        # Add wood grain texture
-        for i in range(0, bear_off_width, 8):
-            line_color = (
-                max(0, self.colors["bear_off_bg"][0] - 15),
-                max(0, self.colors["bear_off_bg"][1] - 15),
-                max(0, self.colors["bear_off_bg"][2] - 15),
-            )
-            pygame.draw.line(
-                surface,
-                line_color,
-                (bear_off_x + i, bear_off_y),
-                (bear_off_x + i, bear_off_y + bear_off_height),
-                1,
-            )
-
-        # Draw border around bear off area
         pygame.draw.rect(surface, self.colors["bear_off_border"], bear_off_rect, 3)
 
-        # Draw dividing line in the middle
+        # Draw dividing line between zones
         middle_y = bear_off_y + bear_off_height // 2
         pygame.draw.line(
             surface,
@@ -212,6 +269,7 @@ class BoardRenderer:
         self._draw_bear_off_labels(
             surface, bear_off_x, bear_off_y, bear_off_width, bear_off_height
         )
+        # Slots removed per nueva especificación visual: solo fichas centradas
 
     def _draw_bear_off_labels(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
@@ -274,6 +332,8 @@ class BoardRenderer:
                 ),
                 8,
             )
+
+    # Slots removed per nueva especificación visual: solo fichas centradas
 
     def draw_points(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
         self,
