@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 
 - Win and lose condition
+- Refactor CLI to follow solid principies
 
 ### [0.0.21] - 2025-10-22
 

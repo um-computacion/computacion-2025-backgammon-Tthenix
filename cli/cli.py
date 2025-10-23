@@ -1,96 +1,43 @@
-"""Command-line interface skeleton for Backgammon.
+"""Command-line interface for Backgammon.
 
-Provides a minimal interactive loop and a board renderer that prints
-an ASCII layout. This is a skeleton; game actions will be added later.
+Refactored to follow SOLID principles with proper separation of concerns.
 """
 
 from typing import Optional
 from core import BackgammonGame
+from cli.board_renderer import BoardRenderer
+from cli.command_parser import CommandParser
+from cli.input_validator import InputValidator
+from cli.game_controller import GameController
+from cli.user_interface import UserInterface
 
 
 class BackgammonCLI:
-    """Minimal CLI wrapper for the Backgammon game."""
+    """Main CLI coordinator following SOLID principles.
+
+    This class now acts as a coordinator, delegating responsibilities
+    to specialized classes, following the Single Responsibility Principle.
+    """
 
     def __init__(self, game: Optional[BackgammonGame] = None) -> None:
-        """Create the CLI with an existing game or a new one."""
+        """Create the CLI with proper dependency injection."""
         self.game = game or BackgammonGame()
-        self.game.setup_initial_position()  # Initialize the board
+        self.game.setup_initial_position()
         self._running = False
 
-    def render_board(self) -> None:
-        """Render the board skeleton to stdout with current counts."""
-        board = self.game.board
+        # Initialize components following Dependency Inversion Principle
+        self.board_renderer = BoardRenderer()
+        self.command_parser = CommandParser()
+        self.input_validator = InputValidator()
+        self.game_controller = GameController(self.game)
+        self.user_interface = UserInterface()
 
-        # Display current turn prominently
-        current_player = self.game.current_player
-        print("\n" + "=" * 60)
-        print(f"  CURRENT TURN: {current_player.name} ({current_player.color})")
-        print("=" * 60)
+        # Register command handlers
+        self._register_commands()
 
-        # Helpers to format a point as owner initial + count or blanks
-        def fmt_point(idx: int) -> str:
-            pieces = board.points[idx]
-            if not pieces:
-                return "  "
-            owner = "W" if pieces[0] == 1 else "B"
-            count = len(pieces)
-            return f"{owner}{count}" if count < 10 else f"{owner}+"  # cap at +
-
-        # Top half (points 13-24)
-        print("\n  13 14 15 16 17 18    BAR    19 20 21 22 23 24")
-        print(" +--------------------+     +--------------------+")
-
-        left_top = [fmt_point(i) for i in range(12, 18)]  # 13..18
-        right_top = [fmt_point(i) for i in range(18, 24)]  # 19..24
-        bar_w = len(board.checker_bar[0])
-        bar_b = len(board.checker_bar[1])
-        print(f"  {' '.join(left_top)}    W:{bar_w}|B:{bar_b}    {' '.join(right_top)}")
-
-        print(" +--------------------+     +--------------------+")
-
-        # Bottom half (points 12-1)
-        # Insert a line showing bottom points counts before labels
-        left_bot = [fmt_point(i) for i in range(11, 5, -1)]  # 12..7
-        right_bot = [fmt_point(i) for i in range(5, -1, -1)]  # 6..1
-        print(f"  {' '.join(left_bot)}               {' '.join(right_bot)}")
-        print("  12 11 10  9  8  7           6  5  4  3  2  1")
-
-        # Display borne off checkers
-        white_off = len(board.off_board[0])
-        black_off = len(board.off_board[1])
-        print(f"\n  Bearing off - White: {white_off} | Black: {black_off}")
-        print("=" * 60 + "\n")
-
-    def run(self) -> None:
-        """Start the interactive CLI loop."""
-        self._running = True
-        print("\n" + "=" * 60)
-        print("  BACKGAMMON GAME")
-        print("=" * 60)
-        print("  Type 'help' or 'h' for available commands")
-        print("=" * 60)
-        self.render_board()
-        while self._running:
-            try:
-                # Show current player in prompt
-                current_player = self.game.current_player
-                prompt = f"[{current_player.name} - {current_player.color}] > "
-                command = input(prompt).strip()
-            except (EOFError, KeyboardInterrupt):
-                print("\n\nExiting game. Thanks for playing!")
-                break
-            if not command:
-                continue
-            self._handle_command(command)
-        self._running = False
-
-    def _handle_command(self, command: str) -> None:
-        """Parse and execute a single command."""
-        parts = command.split()
-        cmd = parts[0].lower()
-
-        # Command dispatch table to reduce return statements
-        command_handlers = {
+    def _register_commands(self) -> None:
+        """Register all command handlers following Open/Closed Principle."""
+        commands = {
             "q": self._cmd_quit,
             "quit": self._cmd_quit,
             "exit": self._cmd_quit,
@@ -116,39 +63,92 @@ class BackgammonCLI:
             "end": self._cmd_end_turn,
         }
 
-        handler = command_handlers.get(cmd)
+        for cmd, handler in commands.items():
+            self.command_parser.register_handler(cmd, handler)
+
+    def render_board(self) -> None:
+        """Render the board using the BoardRenderer component."""
+        self.board_renderer.render_board(self.game)
+
+    def run(self) -> None:
+        """Start the interactive CLI loop."""
+        self._running = True
+        self.user_interface.display_header("BACKGAMMON GAME")
+        self.user_interface.display_message(
+            "  Type 'help' or 'h' for available commands"
+        )
+        self.user_interface.display_separator("=")
+        self.render_board()
+
+        while self._running:
+            try:
+                current_player = self.game_controller.get_current_player()
+                prompt = f"[{current_player.name} - {current_player.color}] > "
+                command = self.user_interface.prompt_string(prompt)
+            except (EOFError, KeyboardInterrupt):
+                self.user_interface.display_message(
+                    "\n\nExiting game. Thanks for playing!"
+                )
+                break
+            if not command:
+                continue
+            self._handle_command(command)
+        self._running = False
+
+    def _handle_command(self, command: str) -> None:
+        """Parse and execute a single command using CommandParser."""
+        cmd, _ = self.command_parser.parse_command(command)
+        handler = self.command_parser.get_handler(cmd)
+
         if handler:
             handler()
         else:
-            print("Unknown command. Type 'help'.")
+            self.user_interface.display_error("Unknown command. Type 'help'.")
 
     def _print_help(self) -> None:
-        """Print available commands."""
-        print("\n" + "-" * 60)
-        print("  AVAILABLE COMMANDS")
-        print("-" * 60)
-        print("  help (h)      - Show this help menu")
-        print("  board (b)     - Display the game board")
-        print("  turn (t)      - Show current player information")
-        print("  roll (r)      - Roll dice for current player")
-        print("  status (s)    - Show last roll and remaining moves")
-        print("  moves (mvs)   - Show possible moves (context-aware)")
-        print("  move (mv)     - Make a move (interactive prompts)")
-        print("  enter (ent)   - Enter a checker from the bar")
-        print("  bearoff (bo)  - Bear off a checker (if allowed)")
-        print("  end (e)       - End current player's turn")
-        print("  quit (q)      - Exit the game")
-        print("-" * 60 + "\n")
+        """Print available commands using UserInterface."""
+        self.user_interface.display_separator()
+        self.user_interface.display_message("  AVAILABLE COMMANDS")
+        self.user_interface.display_separator()
+        self.user_interface.display_message("  help (h)      - Show this help menu")
+        self.user_interface.display_message("  board (b)     - Display the game board")
+        self.user_interface.display_message(
+            "  turn (t)      - Show current player information"
+        )
+        self.user_interface.display_message(
+            "  roll (r)      - Roll dice for current player"
+        )
+        self.user_interface.display_message(
+            "  status (s)    - Show last roll and remaining moves"
+        )
+        self.user_interface.display_message(
+            "  moves (mvs)   - Show possible moves (context-aware)"
+        )
+        self.user_interface.display_message(
+            "  move (mv)     - Make a move (interactive prompts)"
+        )
+        self.user_interface.display_message(
+            "  enter (ent)   - Enter a checker from the bar"
+        )
+        self.user_interface.display_message(
+            "  bearoff (bo)  - Bear off a checker (if allowed)"
+        )
+        self.user_interface.display_message(
+            "  end (e)       - End current player's turn"
+        )
+        self.user_interface.display_message("  quit (q)      - Exit the game")
+        self.user_interface.display_separator()
 
     # ----- Individual command handlers -----
     def _cmd_quit(self) -> None:
         """Handle quit command."""
         self._running = False
-        print("\nThanks for playing Backgammon! Goodbye.")
+        self.user_interface.display_message("\nThanks for playing Backgammon! Goodbye.")
 
     def _cmd_help(self) -> None:
         """Handle help command."""
         self._print_help()
+        self.board_renderer.render_help()
 
     def _cmd_board(self) -> None:
         """Handle board command."""
@@ -156,187 +156,228 @@ class BackgammonCLI:
 
     def _cmd_turn(self) -> None:
         """Handle turn command."""
-        current_player = self.game.current_player
-        print("\n" + "-" * 60)
-        print(f"  CURRENT TURN: {current_player.name} ({current_player.color})")
-        print("-" * 60)
+        current_player = self.game_controller.get_current_player()
+        self.user_interface.display_turn_info(current_player)
 
         # Show additional turn status
-        if self.game.last_roll:
-            print(f"  Last roll: {self.game.last_roll}")
-            print(f"  Available moves: {self.game.available_moves}")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"]:
+            self.user_interface.display_message(
+                f"  Last roll: {game_state['last_roll']}"
+            )
+            self.user_interface.display_message(
+                f"  Available moves: {game_state['available_moves']}"
+            )
         else:
-            print("  No dice rolled yet")
-            print("  Use 'roll' command to start your turn")
-        print("-" * 60 + "\n")
+            self.user_interface.display_message("  No dice rolled yet")
+            self.user_interface.display_message(
+                "  Use 'roll' command to start your turn"
+            )
+        self.user_interface.display_separator()
 
     def _cmd_roll(self) -> None:
         """Handle roll command."""
-        if self.game.last_roll is not None and self.game.available_moves:
-            print("\n[!] You still have moves left.")
-            print("    Use your remaining moves or type 'end' to finish your turn.\n")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"] is not None and game_state["available_moves"]:
+            self.user_interface.display_warning("You still have moves left.")
+            self.user_interface.display_message(
+                "    Use your remaining moves or type 'end' to finish your turn."
+            )
             return
-        roll = self.game.roll_dice()
-        print(f"\n[DICE] Rolled: {roll[0]} and {roll[1]}")
-        print(f"[INFO] Available moves: {self.game.available_moves}\n")
+
+        roll = self.game_controller.roll_dice()
+        self.user_interface.display_message(f"\n[DICE] Rolled: {roll[0]} and {roll[1]}")
+        self.user_interface.display_info(
+            f"Available moves: {self.game_controller.get_game_state()['available_moves']}"
+        )
 
     def _cmd_status(self) -> None:
         """Handle status command."""
-        print("\n" + "-" * 60)
-        print("  GAME STATUS")
-        print("-" * 60)
-        print(f"  Last roll: {self.game.last_roll if self.game.last_roll else 'None'}")
-        print(f"  Remaining moves: {self.game.available_moves}")
-        print("-" * 60 + "\n")
+        self.board_renderer.render_game_status(self.game)
 
     def _check_game_over(self) -> None:
         """Check and announce game over if a player has won."""
-        if self.game.is_game_over():
-            winner = self.game.get_winner()
+        if self.game_controller.is_game_over():
+            winner = self.game_controller.get_winner()
             if winner is not None:
-                print("\n" + "=" * 60)
-                print("  GAME OVER!")
-                print("=" * 60)
-                print(f"  WINNER: {winner.name} ({winner.color})")
-                print("=" * 60)
-                print("  Type 'quit' to exit")
-                print("=" * 60 + "\n")
+                self.user_interface.display_game_over(winner)
 
     # ----- Command handlers -----
-    def _prompt_int(self, message: str) -> int | None:
-        try:
-            value = int(input(message).strip())
-            return value
-        except ValueError:
-            print("[ERROR] Invalid input. Please enter a valid number.")
-            return None
 
     def _cmd_moves(self) -> None:
-        if self.game.last_roll is None:
-            print("\n[!] You must roll the dice first.\n")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"] is None:
+            self.user_interface.display_warning("You must roll the dice first.")
             return
-        if self.game.must_enter_from_bar():
-            print("\n[!] You have checkers on the bar.")
-            print("    Use 'enter' command to enter them first.\n")
+
+        if self.game_controller.must_enter_from_bar():
+            self.user_interface.display_warning("You have checkers on the bar.")
+            self.user_interface.display_message(
+                "    Use 'enter' command to enter them first."
+            )
             return
 
         # Show available points with pieces
-        player_num = 1 if self.game.current_player == self.game.player1 else 2
-        available_points = []
-        for i in range(24):
-            if self.game.board.points[i] and self.game.board.points[i][0] == player_num:
-                available_points.append(i + 1)  # Convert to 1-based
+        current_player = self.game_controller.get_current_player()
+        player_num = 1 if current_player == self.game.player1 else 2
+        available_points = self.game_controller.get_available_points_with_pieces(
+            player_num
+        )
 
         if not available_points:
-            print("\n[INFO] No pieces available to move.\n")
+            self.user_interface.display_info("No pieces available to move.")
             return
 
-        print(f"\n[INFO] Points with your pieces: {available_points}")
-        point_1b = self._prompt_int("Enter point number (1-24): ")
+        self.user_interface.display_info(
+            f"Points with your pieces: {[p + 1 for p in available_points]}"
+        )
+        point_1b = self.user_interface.prompt_int("Enter point number (1-24): ")
+
         if point_1b is None:
             return
-        if not 1 <= point_1b <= 24:
-            print("[ERROR] Point must be between 1 and 24.\n")
+
+        if not self.input_validator.validate_point(point_1b):
+            self.user_interface.display_error(
+                self.input_validator.get_validation_error_message("point")
+            )
             return
+
         from_point = point_1b - 1
-        dests = self.game.get_possible_destinations(from_point)
+        dests = self.game_controller.get_possible_destinations(from_point)
+
         if not dests:
-            print("[INFO] No valid destinations from this point.\n")
+            self.user_interface.display_info("No valid destinations from this point.")
             return
+
         # Display as 1-based
-        print(f"[INFO] Possible destinations: {[d + 1 for d in dests]}\n")
+        self.user_interface.display_info(
+            f"Possible destinations: {[d + 1 for d in dests]}"
+        )
 
     def _cmd_move(self) -> None:
-        if self.game.last_roll is None:
-            print("\n[!] You must roll the dice first.\n")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"] is None:
+            self.user_interface.display_warning("You must roll the dice first.")
             return
-        if self.game.must_enter_from_bar():
-            print("\n[!] You have checkers on the bar.")
-            print("    Use 'enter' command to enter them first.\n")
+
+        if self.game_controller.must_enter_from_bar():
+            self.user_interface.display_warning("You have checkers on the bar.")
+            self.user_interface.display_message(
+                "    Use 'enter' command to enter them first."
+            )
             return
-        from_1b = self._prompt_int("Move from point (1-24): ")
-        to_1b = self._prompt_int("Move to point (1-24): ")
+
+        from_1b = self.user_interface.prompt_int("Move from point (1-24): ")
+        to_1b = self.user_interface.prompt_int("Move to point (1-24): ")
+
         if from_1b is None or to_1b is None:
             return
-        if not 1 <= from_1b <= 24 and 1 <= to_1b <= 24:
-            print("[ERROR] Points must be between 1 and 24.\n")
+
+        if not self.input_validator.validate_move_points(from_1b, to_1b):
+            self.user_interface.display_error(
+                self.input_validator.get_validation_error_message("move")
+            )
             return
-        ok = self.game.make_move(from_1b - 1, to_1b - 1)
-        if not ok:
-            print("\n[ERROR] Illegal move. Please try again.\n")
+
+        success = self.game_controller.make_move(from_1b - 1, to_1b - 1)
+        if not success:
+            self.user_interface.display_error("Illegal move. Please try again.")
             return
-        print("\n[SUCCESS] Move completed.")
+
+        self.user_interface.display_success("Move completed.")
         self.render_board()
         self._check_game_over()
-        if not self.game.available_moves:
-            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
+
+        if not self.game_controller.get_game_state()["available_moves"]:
+            self.user_interface.display_info(
+                "No moves remaining. Type 'end' to finish your turn."
+            )
 
     def _cmd_enter(self) -> None:
-        if self.game.last_roll is None:
-            print("\n[!] You must roll the dice first.\n")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"] is None:
+            self.user_interface.display_warning("You must roll the dice first.")
             return
-        if not self.game.must_enter_from_bar():
-            print("\n[INFO] You have no checkers on the bar.\n")
+
+        if not self.game_controller.must_enter_from_bar():
+            self.user_interface.display_info("You have no checkers on the bar.")
             return
-        print(f"[INFO] Available dice: {self.game.available_moves}")
-        die = self._prompt_int("Enter die value to use: ")
+
+        self.user_interface.display_info(
+            f"Available dice: {game_state['available_moves']}"
+        )
+        die = self.user_interface.prompt_int("Enter die value to use: ")
+
         if die is None:
             return
-        ok = self.game.move_from_bar(die)
-        if not ok:
-            print("\n[ERROR] Cannot enter with that die value.\n")
+
+        if not self.input_validator.validate_die_value(die):
+            self.user_interface.display_error(
+                self.input_validator.get_validation_error_message("die")
+            )
             return
-        print("\n[SUCCESS] Checker entered from bar.")
+
+        success = self.game_controller.move_from_bar(die)
+        if not success:
+            self.user_interface.display_error("Cannot enter with that die value.")
+            return
+
+        self.user_interface.display_success("Checker entered from bar.")
         self.render_board()
         self._check_game_over()
-        if not self.game.available_moves:
-            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
+
+        if not self.game_controller.get_game_state()["available_moves"]:
+            self.user_interface.display_info(
+                "No moves remaining. Type 'end' to finish your turn."
+            )
 
     def _cmd_bearoff(self) -> None:
-        if self.game.last_roll is None:
-            print("\n[!] You must roll the dice first.\n")
+        game_state = self.game_controller.get_game_state()
+        if game_state["last_roll"] is None:
+            self.user_interface.display_warning("You must roll the dice first.")
             return
-        point_1b = self._prompt_int("Bear off from point (1-24): ")
+
+        point_1b = self.user_interface.prompt_int("Bear off from point (1-24): ")
         if point_1b is None:
             return
-        if not 1 <= point_1b <= 24:
-            print("[ERROR] Point must be between 1 and 24.\n")
+
+        if not self.input_validator.validate_point(point_1b):
+            self.user_interface.display_error(
+                self.input_validator.get_validation_error_message("point")
+            )
             return
-        ok = self.game.bear_off_checker(point_1b - 1)
-        if not ok:
-            print("\n[ERROR] Cannot bear off from that point.\n")
+
+        success = self.game_controller.bear_off_checker(point_1b - 1)
+        if not success:
+            self.user_interface.display_error("Cannot bear off from that point.")
             return
-        print("\n[SUCCESS] Checker borne off.")
+
+        self.user_interface.display_success("Checker borne off.")
         self.render_board()
         self._check_game_over()
-        if not self.game.available_moves:
-            print("[INFO] No moves remaining. Type 'end' to finish your turn.\n")
+
+        if not self.game_controller.get_game_state()["available_moves"]:
+            self.user_interface.display_info(
+                "No moves remaining. Type 'end' to finish your turn."
+            )
 
     def _cmd_end_turn(self) -> None:
         """Handle end turn command."""
         # If game is over, announce and do not switch
-        if self.game.is_game_over():
+        if self.game_controller.is_game_over():
             self._check_game_over()
             return
 
         # Show turn ending message
-        ending_player = self.game.current_player
-        print("\n" + "-" * 60)
-        print(f"  {ending_player.name}'s turn has ended")
-        print("-" * 60)
+        ending_player = self.game_controller.get_current_player()
+        self.user_interface.display_turn_ending(ending_player)
 
         # Reset dice for next player and switch
-        self.game.last_roll = None
-        self.game.available_moves = []
-        self.game.switch_current_player()
+        self.game_controller.end_turn()
 
         # Show new turn with visual separator
-        new_player = self.game.current_player
-        print("\n" + "=" * 60)
-        print(f"  {new_player.name} ({new_player.color})'s turn begins")
-        print("=" * 60)
-        print("  Type 'roll' to roll the dice")
-        print("=" * 60 + "\n")
+        new_player = self.game_controller.get_current_player()
+        self.user_interface.display_new_turn(new_player)
 
 
 def run_cli() -> None:
