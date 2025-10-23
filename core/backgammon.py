@@ -286,7 +286,7 @@ class BackgammonGame:
         success = self.board.move_piece(from_point, to_point, player_num)
 
         if success:
-            # Remove used dice value
+            # Remove used dice value - find and remove the first matching distance
             for i, move in enumerate(self.available_moves):
                 if move == distance:
                     self.available_moves.pop(i)
@@ -351,7 +351,7 @@ class BackgammonGame:
         success = self.board.enter_from_bar(entry_point, player_num)
 
         if success:
-            # Remove used dice value
+            # Remove used dice value - find and remove the first matching dice value
             for i, move in enumerate(self.available_moves):
                 if move == dice_value:
                     self.available_moves.pop(i)
@@ -397,6 +397,7 @@ class BackgammonGame:
 
                 success = self.board.bear_off_piece(point, player_num)
                 if success:
+                    # Remove the used dice value
                     self.available_moves.pop(i)
                     self.move_history.append(move_info)
                     return True
@@ -409,6 +410,10 @@ class BackgammonGame:
             self.current_player = self.player2
         else:
             self.current_player = self.player1
+
+        # Clear dice state when switching players
+        self.last_roll = None
+        self.available_moves = []
 
     def is_game_over(self):
         """Check if the game is over."""

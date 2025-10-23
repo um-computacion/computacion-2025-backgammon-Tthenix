@@ -409,7 +409,7 @@ class BackgammonBoard:
             font = pygame.font.Font(None, 28)
             if self.game and self.game.current_player:
                 jugador = self.game.current_player
-                texto = f"Turno: {jugador.name} ({jugador.color})"
+                texto = f"Turn: {jugador.name} ({jugador.color})"
                 color = self.colors["white"]
                 texto_surface = font.render(texto, True, color)
                 self.screen.blit(texto_surface, (self.board_margin, 5))
