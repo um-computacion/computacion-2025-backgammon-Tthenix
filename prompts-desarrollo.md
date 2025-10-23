@@ -2881,3 +2881,101 @@ core/backgammon.py
 core/board.py
 
 ---
+
+## Prompt 21
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+Fix dice: when you eat one and there are invalid moves, the dice that came out are kept. Sometimes the same dice come out and that's weird because it happens many times and there's low probability.
+
+### Answer:
+
+I'll fix the dice issues you mentioned. The problems were:
+
+1. **Dice persistence when player has invalid moves**: Dice were kept instead of being cleared when switching players
+2. **Dice consumption logic**: Issues with properly removing used dice values
+3. **State management**: Game didn't properly reset dice state when switching players
+
+**Changes Made:**
+
+1. **Fixed `switch_current_player()` method in `core/backgammon.py`:**
+
+   - Added dice state clearing when switching players
+   - Now properly resets `last_roll` and `available_moves` to None and []
+
+2. **Enhanced dice consumption logic:**
+
+   - Improved comments in `make_move()`, `move_from_bar()`, and `bear_off_checker()` methods
+   - Ensured proper removal of used dice values from available_moves list
+
+3. **Updated pygame UI logic in `pygame_ui/pygame_ui.py`:**
+   - Enhanced `_handle_roll_dice()` and `_handle_roll_button_click()` functions
+   - Added explicit dice state clearing when no valid moves are available
+   - Prevents dice persistence across player switches
+
+**Implementation Details:**
+
+```python
+# In core/backgammon.py - switch_current_player method
+def switch_current_player(self):
+    """Switch to the other player."""
+    if self.current_player == self.player1:
+        self.current_player = self.player2
+    else:
+        self.current_player = self.player1
+
+    # Clear dice state when switching players
+    self.last_roll = None
+    self.available_moves = []
+
+# In pygame_ui/pygame_ui.py - _handle_roll_dice function
+def _handle_roll_dice(game, board) -> None:
+    """Handle rolling dice."""
+    if game.last_roll is None or not game.available_moves:
+        game.roll_dice()
+        if not game.has_valid_moves():
+            # Clear dice state and switch player when no valid moves
+            game.last_roll = None
+            game.available_moves = []
+            game.switch_current_player()
+        board.update_from_game()
+```
+
+**Key Fixes:**
+
+- **Dice State Clearing**: When switching players, dice state is now properly cleared
+- **Invalid Moves Handling**: When a player has no valid moves, dice are cleared before switching
+- **Proper Consumption**: Used dice values are correctly removed from available_moves
+- **State Consistency**: Game state is now consistent across player switches
+
+**Testing:**
+
+- ✅ Created and ran comprehensive test script
+- ✅ Verified dice consumption works correctly
+- ✅ Confirmed dice clearing on player switch
+- ✅ Tested invalid moves handling
+- ✅ All tests pass successfully
+- ✅ No linting errors introduced
+
+**Result:**
+
+The dice system now works correctly:
+
+- Dice are properly consumed when moves are made
+- Dice state is cleared when switching players
+- No dice persistence when players have invalid moves
+- Proper state management throughout the game
+- Eliminates the "weird" behavior of repeated dice values
+
+### What i do with the answer?
+
+I implemented the complete fix for the dice issues. The changes ensure that dice are properly consumed when moves are made, dice state is cleared when switching players, and there's no dice persistence when players have invalid moves. I tested the implementation and verified that all dice behavior now works correctly according to Backgammon rules.
+
+### reference:
+
+core/backgammon.py
+pygame_ui/pygame_ui.py
+
+---
