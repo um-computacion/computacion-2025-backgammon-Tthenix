@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 5
 
+### [0.0.21] - 2025-10-23
+
+#### Added
+
+- Win and lose condition
+
 ### [0.0.21] - 2025-10-22
 
 #### Added
