@@ -12,7 +12,7 @@ pygame_ui/__init__.py                         0      0   100%
 pygame_ui/backgammon_board.py               154     25    84%   168, 241, 305, 316, 330, 342-358, 376-382, 391-394, 416-417, 455-456, 470-473, 477
 pygame_ui/board_interaction.py              183     63    66%   183, 187, 195, 206, 219, 222, 238-256, 265-291, 308, 330, 343, 373, 377, 381, 409-438, 451, 460-462, 465, 500-501, 533-538
 pygame_ui/button.py                          29     17    41%   55-71, 83-88
-pygame_ui/pygame_ui.py                       59     48    19%   25-33, 38-44, 49-53, 58-60, 65-66, 71-75, 80-109, 113
+pygame_ui/pygame_ui.py                       87     75    14%   25-43, 48-54, 59-63, 68-70, 75-76, 81-85, 96-127, 132-164, 168
 pygame_ui/renderers/__init__.py               4      0   100%
 pygame_ui/renderers/board_renderer.py        82      4    95%   304-326
 pygame_ui/renderers/checker_renderer.py      84      6    93%   197-198, 276-282
@@ -20,7 +20,7 @@ pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 test/__init__.py                              0      0   100%
 test/base_pygame_test.py                     12      0   100%
 test/test_backgammon.py                     651      3    99%   173, 914-915
-test/test_bearing_off.py                    132      4    97%   133, 176-177, 280
+test/test_bearing_off.py                    132      3    98%   133, 182, 280
 test/test_board.py                          372      4    99%   323, 334, 480, 564
 test/test_checker.py                        214      1    99%   311
 test/test_cli.py                            146      1    99%   239
@@ -30,4 +30,4 @@ test/test_pygame_ui_dice_and_turn.py         35      0   100%
 test/test_pygame_ui_interaction.py          113      1    99%   271
 test/test_pygame_ui_rendering.py             73      0   100%
 -----------------------------------------------------------------------
-TOTAL                                      3644    265    93%
+TOTAL                                      3672    291    92%
