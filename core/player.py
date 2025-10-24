@@ -37,7 +37,11 @@ class Player:
         self.__bear_off_count__ = 0
 
     def capture_checker(self):
-        """Capture a checker (send it to the bar)."""
+        """Capture a checker (send it to the bar).
+
+        Returns:
+            None
+        """
         self.__captured_checkers__ += 1
         if self.__checkers_count__ > 0:
             self.__checkers_count__ -= 1
@@ -89,7 +93,11 @@ class Player:
         return self.__bear_off_count__ == self.TOTAL_CHECKERS
 
     def reset(self):
-        """Reset player state to initial values."""
+        """Reset player state to initial values.
+
+        Returns:
+            None
+        """
         self.__checkers_count__ = self.TOTAL_CHECKERS
         self.__captured_checkers__ = 0
         self.__bear_off_count__ = 0

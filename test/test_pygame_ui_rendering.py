@@ -46,7 +46,11 @@ class TestPygameUIRendering(BasePygameTest):
     """General rendering tests for the UI."""
 
     def setUp(self) -> None:  # pylint: disable=invalid-name
-        """Configura el entorno de pruebas con mocks para pygame."""
+        """Set up test environment with mocks for pygame.
+
+        Returns:
+            None
+        """
         _mock_pygame_graphics()
 
         # Deferred import after mocks
@@ -75,7 +79,11 @@ class TestPygameUIRendering(BasePygameTest):
         self.__board__.screen = MagicMock()
 
     def tearDown(self) -> None:  # pylint: disable=invalid-name
-        """Limpia los patches de pygame después de cada prueba."""
+        """Clean up pygame patches after each test.
+
+        Returns:
+            None
+        """
         # Stop patches
         self._p_rect.stop()
         self._p_polygon.stop()
@@ -83,12 +91,20 @@ class TestPygameUIRendering(BasePygameTest):
         self._p_line.stop()
 
     def test_create_wood_texture_surface(self) -> None:
-        """It should create a Surface and draw grain lines."""
+        """It should create a Surface and draw grain lines.
+
+        Returns:
+            None
+        """
         surf = self.__board__.__board_renderer__.create_wood_texture_surface(100, 50)
         self.assertIsNotNone(surf)
 
     def test_draw_triangular_point_variants(self) -> None:
-        """Draws up and down triangles without errors."""
+        """Draws up and down triangles without errors.
+
+        Returns:
+            None
+        """
         self.__board__.__board_renderer__.draw_triangular_point(
             self.__board__.screen, 10, 10, 20, 30, (1, 2, 3), pointing_up=True
         )
@@ -97,7 +113,11 @@ class TestPygameUIRendering(BasePygameTest):
         )
 
     def test_draw_center_gap_and_bear_off(self) -> None:
-        """Draws center gap and bear-off, including labels."""
+        """Draws center gap and bear-off, including labels.
+
+        Returns:
+            None
+        """
         gap_x = self.__board__.play_area_x + self.__board__.half_width
         gap_y = self.__board__.play_area_y
         self.__board__.__board_renderer__.draw_center_gap(
@@ -116,10 +136,18 @@ class TestPygameUIRendering(BasePygameTest):
         )
 
     def test_draw_checker_and_stack(self) -> None:
-        """Draws a checker and a stack (normal/condensed)."""
+        """Draws a checker and a stack (normal/condensed).
+
+        Returns:
+            None
+        """
         # Un checker blanco y uno negro
-        self.__board__.__checker_renderer__.draw_checker(self.__board__.screen, 50, 50, 1)
-        self.__board__.__checker_renderer__.draw_checker(self.__board__.screen, 80, 50, 2)
+        self.__board__.__checker_renderer__.draw_checker(
+            self.__board__.screen, 50, 50, 1
+        )
+        self.__board__.__checker_renderer__.draw_checker(
+            self.__board__.screen, 80, 50, 2
+        )
 
         # Pila pequeña
         self.__board__.__checker_renderer__.draw_checkers_on_point(
@@ -163,7 +191,9 @@ class TestPygameUIRendering(BasePygameTest):
             self.__board__.play_area_y,
             self.__board__.play_area_height,
         )
-        bear_off_center_x = self.__board__.bear_off_x + self.__board__.__bear_off_width__ // 2
+        bear_off_center_x = (
+            self.__board__.bear_off_x + self.__board__.__bear_off_width__ // 2
+        )
         self.__board__.__checker_renderer__.draw_borne_off_checkers(
             self.__board__.screen,
             [1, 1, 1],

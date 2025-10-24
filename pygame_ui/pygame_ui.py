@@ -43,7 +43,16 @@ def _handle_event(event, game, board) -> bool:
 
 
 def _handle_keydown(event, game, board) -> bool:
-    """Handle keydown events."""
+    """Handle keydown events.
+
+    Args:
+        event: Pygame event
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+
+    Returns:
+        True to continue running, False to quit
+    """
     if event.key == pygame.K_ESCAPE:  # pylint: disable=no-member
         return False
     if event.key == pygame.K_SPACE:  # pylint: disable=no-member
@@ -54,7 +63,15 @@ def _handle_keydown(event, game, board) -> bool:
 
 
 def _handle_roll_dice(game, board) -> None:
-    """Handle rolling dice."""
+    """Handle rolling dice.
+
+    Args:
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+
+    Returns:
+        None
+    """
     if game.__last_roll__ is None or not game.__available_moves__:
         game.roll_dice()
         if not game.has_valid_moves():
@@ -66,20 +83,44 @@ def _handle_roll_dice(game, board) -> None:
 
 
 def _handle_reset_game(game, board) -> None:
-    """Handle game reset."""
+    """Handle game reset.
+
+    Args:
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+
+    Returns:
+        None
+    """
     game.reset_game()
     game.setup_initial_position()
     board.update_from_game()
 
 
 def _handle_mouse_click(event, board) -> None:
-    """Handle mouse click events."""
+    """Handle mouse click events.
+
+    Args:
+        event: Pygame event
+        board: BackgammonBoard instance
+
+    Returns:
+        None
+    """
     mouse_x, mouse_y = event.pos
     board.handle_board_click(mouse_x, mouse_y)
 
 
 def _handle_roll_button_click(game, board) -> None:
-    """Handle roll button click."""
+    """Handle roll button click.
+
+    Args:
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+
+    Returns:
+        None
+    """
     if game.__last_roll__ is None or not game.__available_moves__:
         game.roll_dice()
         if not game.has_valid_moves():
@@ -93,6 +134,13 @@ def _handle_roll_button_click(game, board) -> None:
 def _draw_win_message(screen, game) -> None:
     """
     Draw win message when the game ends.
+
+    Args:
+        screen: Pygame screen surface
+        game: BackgammonGame instance
+
+    Returns:
+        None
     """
     if not game.is_game_over():
         return
@@ -125,7 +173,11 @@ def _draw_win_message(screen, game) -> None:
 
 
 def main() -> None:
-    """Main function to run the backgammon board display."""
+    """Main function to run the backgammon board display.
+
+    Returns:
+        None
+    """
     board = BackgammonBoard()
     clock = pygame.time.Clock()
     running = True

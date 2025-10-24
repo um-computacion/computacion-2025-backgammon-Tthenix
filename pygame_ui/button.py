@@ -36,6 +36,9 @@ class Button:
             color: Normal button color
             hover_color: Button color when hovered
             text_color: Text color
+
+        Returns:
+            None
         """
         self.__rect__ = pygame.Rect(x, y, width, height)
         self.__text__ = text
@@ -50,6 +53,9 @@ class Button:
 
         Args:
             surface: Surface to draw on
+
+        Returns:
+            None
         """
         # Choose color based on hover state
         current_color = self.__hover_color__ if self.__is_hovered__ else self.__color__

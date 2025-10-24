@@ -14,7 +14,11 @@ class BoardInteraction:
     """Handles mouse interactions and game state management for the board."""
 
     def __init__(self) -> None:
-        """Initialize the board interaction handler."""
+        """Initialize the board interaction handler.
+
+        Returns:
+            None
+        """
         self.__selected_point__: Optional[int] = None
         self.__valid_destinations__: Optional[List[int]] = None
         self.__game__: Optional[BackgammonGame] = None
@@ -26,6 +30,9 @@ class BoardInteraction:
 
         Args:
             game: BackgammonGame instance
+
+        Returns:
+            None
         """
         self.__game__ = game
 
@@ -35,6 +42,9 @@ class BoardInteraction:
 
         Args:
             board_state: Dictionary containing board state
+
+        Returns:
+            None
         """
         self.__board_state__ = board_state
 
@@ -105,7 +115,19 @@ class BoardInteraction:
         bear_off_width: int,
         bear_off_height: int,
     ) -> Optional[str]:
-        """Check if click is in bear-off area."""
+        """Check if click is in bear-off area.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+            bear_off_x: X position of bear-off area
+            bear_off_y: Y position of bear-off area
+            bear_off_width: Width of bear-off area
+            bear_off_height: Height of bear-off area
+
+        Returns:
+            "off" if in bear-off area, None otherwise
+        """
         if (
             bear_off_x is not None
             and bear_off_y is not None
@@ -128,7 +150,19 @@ class BoardInteraction:
         play_area_width: int,
         play_area_height: int,
     ) -> bool:
-        """Check if coordinates are within play area."""
+        """Check if coordinates are within play area.
+
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_width: Width of play area
+            play_area_height: Height of play area
+
+        Returns:
+            True if coordinates are within play area, False otherwise
+        """
         return (
             play_area_x <= x <= play_area_x + play_area_width
             and play_area_y <= y <= play_area_y + play_area_height
@@ -145,7 +179,21 @@ class BoardInteraction:
         half_width: int,
         center_gap_width: int,
     ) -> Optional[int]:
-        """Calculate point index from position."""
+        """Calculate point index from position.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_height: Height of play area
+            point_width: Width of each point
+            half_width: Width of half board
+            center_gap_width: Width of center gap
+
+        Returns:
+            Point index (0-23) or None if not on a valid point
+        """
         mid_y = play_area_y + play_area_height // 2
         is_top_half = y < mid_y
         rel_x = x - play_area_x
@@ -190,7 +238,11 @@ class BoardInteraction:
         return self._can_select_point_checker(point)
 
     def _can_select_checker_basic_validation(self) -> bool:
-        """Check basic validation for checker selection."""
+        """Check basic validation for checker selection.
+
+        Returns:
+            True if basic validation passes, False otherwise
+        """
         if not self.__game__ or not self.__board_state__:
             return False
         if not self.__game__.__last_roll__:
@@ -198,7 +250,11 @@ class BoardInteraction:
         return self.__game__.has_valid_moves()
 
     def _player_has_pieces_on_bar(self) -> bool:
-        """Check if current player has pieces on bar."""
+        """Check if current player has pieces on bar.
+
+        Returns:
+            True if current player has pieces on bar, False otherwise
+        """
         current_player_num = (
             1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
         )
@@ -215,7 +271,14 @@ class BoardInteraction:
         return len(player_pieces_on_bar) > 0
 
     def _can_select_point_checker(self, point) -> bool:
-        """Check if a point checker can be selected."""
+        """Check if a point checker can be selected.
+
+        Args:
+            point: Point index to check
+
+        Returns:
+            True if checker can be selected, False otherwise
+        """
         # Handle special cases like "off" or "bar"
         if not isinstance(point, int):
             return False
@@ -360,13 +423,20 @@ class BoardInteraction:
 
         Args:
             point: Point index to select or "bar"
+
+        Returns:
+            None
         """
         if self.can_select_checker(point):
             self.__selected_point__ = point
             self.__valid_destinations__ = self.get_valid_destinations(point)
 
     def deselect_checker(self) -> None:
-        """Deselect the currently selected checker."""
+        """Deselect the currently selected checker.
+
+        Returns:
+            None
+        """
         self.__selected_point__ = None
         self.__valid_destinations__ = None
 
@@ -507,6 +577,13 @@ class BoardInteraction:
             point_width: Width of each point
             half_width: Width of half board
             center_gap_width: Width of center gap
+            bear_off_x: X position of bear-off area
+            bear_off_y: Y position of bear-off area
+            bear_off_width: Width of bear-off area
+            bear_off_height: Height of bear-off area
+
+        Returns:
+            None
         """
         # Verificar si el jugador tiene movimientos válidos
         if (

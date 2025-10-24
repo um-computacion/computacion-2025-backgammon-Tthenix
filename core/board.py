@@ -11,16 +11,21 @@ class Board:
     """Represents a backgammon board with points, bar, and off-board areas."""
 
     def __init__(self):
-        """Initialize an empty backgammon board."""
+        """Initialize an empty backgammon board.
+
+        Returns:
+            None
+        """
         self.__points__ = [[] for _ in range(24)]
-        # BARRA: Fichas capturadas van al lado del OPONENTE
-        # Index 0 = lado blanco (fichas negras capturadas entran aquí)
-        # Index 1 = lado negro (fichas blancas capturadas entran aquí)
         self.__checker_bar__ = [[], []]
         self.__off_board__ = [[], []]  # Index 0 for player 1, index 1 for player 2
 
     def setup_initial_position(self):
-        """Set up the standard backgammon starting position."""
+        """Set up the standard backgammon starting position.
+
+        Returns:
+            None
+        """
         # Clear the board first
         self.__points__ = [[] for _ in range(24)]
         self.__checker_bar__ = [[], []]
@@ -39,7 +44,17 @@ class Board:
         self.__points__[5] = [2, 2, 2, 2, 2]
 
     def get_point(self, index):
-        """Get information about a specific point on the board."""
+        """Get information about a specific point on the board.
+
+        Args:
+            index (int): Point index (0-23)
+
+        Returns:
+            dict: Dictionary with pieces, count, and player information
+
+        Raises:
+            IndexError: If index is out of range
+        """
         if index < 0 or index >= 24:
             raise IndexError("Point index must be between 0 and 23")
 
@@ -50,7 +65,16 @@ class Board:
         return {"pieces": pieces.copy(), "count": count, "player": player}
 
     def can_move(self, from_point, to_point, player):
-        """Check if a move from one point to another is valid."""
+        """Check if a move from one point to another is valid.
+
+        Args:
+            from_point (int): Source point index (0-23)
+            to_point (int): Destination point index (0-23)
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if the move is valid, False otherwise
+        """
         # Can't move to the same position
         if from_point == to_point:
             return False
@@ -78,7 +102,16 @@ class Board:
         return True
 
     def move_piece(self, from_point, to_point, player):
-        """Move a piece from one point to another."""
+        """Move a piece from one point to another.
+
+        Args:
+            from_point (int): Source point index (0-23)
+            to_point (int): Destination point index (0-23)
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if the move was successful, False otherwise
+        """
         if not self.can_move(from_point, to_point, player):
             return False
 
@@ -89,9 +122,6 @@ class Board:
         destination_pieces = self.__points__[to_point]
         if len(destination_pieces) == 1 and destination_pieces[0] != player:
             captured_piece = self.__points__[to_point].pop()
-            # CORRECTO: La ficha capturada va al lado del OPONENTE (para reentrar desde allí):
-            # - Ficha blanca (1) capturada va al lado negro (index 1)
-            # - Ficha negra (2) capturada va al lado blanco (index 0)
             captured_piece_bar_index = 1 if captured_piece == 1 else 0
             self.__checker_bar__[captured_piece_bar_index].append(captured_piece)
 
@@ -101,10 +131,15 @@ class Board:
         return True
 
     def is_all_pieces_in_home(self, player):
-        """Check if all player's pieces are in their home board."""
+        """Check if all player's pieces are in their home board.
+
+        Args:
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if all pieces are in home, False otherwise
+        """
         # Check if any pieces on bar
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
         player_bar_index = 1 if player == 1 else 0
         if self.__checker_bar__[player_bar_index]:
             return False
@@ -136,7 +171,16 @@ class Board:
         return has_pieces
 
     def can_bear_off(self, point, player, dice_value=None):
-        """Check if a player can bear off a piece from a specific point."""
+        """Check if a player can bear off a piece from a specific point.
+
+        Args:
+            point (int): Point index (0-23)
+            player (int): Player number (1 or 2)
+            dice_value (int, optional): Dice value to use for bearing off
+
+        Returns:
+            bool: True if bearing off is allowed, False otherwise
+        """
         # Must have all pieces in home and own a piece at the point
         if not self.is_all_pieces_in_home(player):
             return False
@@ -173,7 +217,15 @@ class Board:
         return allowed
 
     def bear_off_piece(self, point, player):
-        """Bear off a piece from the board."""
+        """Bear off a piece from the board.
+
+        Args:
+            point (int): Point index (0-23)
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if the bear off was successful, False otherwise
+        """
         if not self.can_bear_off(point, player):
             return False
 
@@ -187,17 +239,27 @@ class Board:
         return False
 
     def has_pieces_on_bar(self, player):
-        """Check if a player has pieces on the bar."""
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        """Check if a player has pieces on the bar.
+
+        Args:
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if player has pieces on bar, False otherwise
+        """
         player_bar_index = 1 if player == 1 else 0
         return len(self.__checker_bar__[player_bar_index]) > 0
 
     def enter_from_bar(self, to_point, player):
-        """Move a piece from the bar to a point on the board."""
-        # Con lógica corregida: las fichas capturadas están en el lado del OPONENTE
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        """Move a piece from the bar to a point on the board.
+
+        Args:
+            to_point (int): Destination point index (0-23)
+            player (int): Player number (1 or 2)
+
+        Returns:
+            bool: True if the entry was successful, False otherwise
+        """
         player_bar_index = 1 if player == 1 else 0
 
         # Check if player has their own pieces on opponent's side
@@ -230,9 +292,6 @@ class Board:
         # Handle capture (after removing our piece from bar)
         if len(destination_pieces) == 1 and destination_pieces[0] != player:
             captured_piece = self.__points__[to_point].pop()
-            # CORRECTO: La ficha capturada va al lado del OPONENTE (para reentrar desde allí):
-            # - Ficha blanca (1) capturada va al lado negro (index 1)
-            # - Ficha negra (2) capturada va al lado blanco (index 0)
             captured_piece_bar_index = 1 if captured_piece == 1 else 0
             self.__checker_bar__[captured_piece_bar_index].append(captured_piece)
 
@@ -242,9 +301,15 @@ class Board:
         return True
 
     def get_possible_moves(self, player, dice_values):
-        """Get all possible moves for a player given dice values."""
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        """Get all possible moves for a player given dice values.
+
+        Args:
+            player (int): Player number (1 or 2)
+            dice_values (list): List of dice values to use
+
+        Returns:
+            list: List of possible moves
+        """
         player_bar_index = 1 if player == 1 else 0
         if self.__checker_bar__[player_bar_index]:
             # Must enter from bar first
@@ -256,10 +321,16 @@ class Board:
         return moves
 
     def _get_bar_entry_moves(self, player, dice_values):
-        """Generate legal bar entry moves for a player and dice values."""
+        """Generate legal bar entry moves for a player and dice values.
+
+        Args:
+            player (int): Player number (1 or 2)
+            dice_values (list): List of dice values to use
+
+        Returns:
+            list: List of legal bar entry moves
+        """
         # REGLA BACKGAMMON: Las fichas RE-ENTRAN por la HOME del OPONENTE
-        # Blancas (1) re-entran en puntos 0-5 (home de negras)
-        # Negras (2) re-entran en puntos 19-24 (home de blancas)
         moves = []
         for dice in dice_values:
             entry_point = dice - 1 if player == 1 else 24 - dice
@@ -274,7 +345,15 @@ class Board:
         return moves
 
     def _get_bear_off_moves(self, player, dice_values):
-        """Generate legal bearing-off moves for a player and dice values."""
+        """Generate legal bearing-off moves for a player and dice values.
+
+        Args:
+            player (int): Player number (1 or 2)
+            dice_values (list): List of dice values to use
+
+        Returns:
+            list: List of legal bearing-off moves
+        """
         moves = []
         if not self.is_all_pieces_in_home(player):
             return moves
@@ -287,7 +366,15 @@ class Board:
         return moves
 
     def _get_regular_moves(self, player, dice_values):
-        """Generate legal on-board moves (non-bar, non-bear-off)."""
+        """Generate legal on-board moves (non-bar, non-bear-off).
+
+        Args:
+            player (int): Player number (1 or 2)
+            dice_values (list): List of dice values to use
+
+        Returns:
+            list: List of legal regular moves
+        """
         moves = []
         for from_point in range(24):
             if self.__points__[from_point] and self.__points__[from_point][0] == player:
@@ -300,11 +387,19 @@ class Board:
         return moves
 
     def is_game_over(self):
-        """Check if the game is over (all pieces of a player are off the board)."""
+        """Check if the game is over (all pieces of a player are off the board).
+
+        Returns:
+            bool: True if the game is over, False otherwise
+        """
         return len(self.__off_board__[0]) == 15 or len(self.__off_board__[1]) == 15
 
     def get_winner(self):
-        """Get the winner of the game."""
+        """Get the winner of the game.
+
+        Returns:
+            int: Winner player number (1 or 2), or None if no winner yet
+        """
         if len(self.__off_board__[0]) == 15:
             return 1
         if len(self.__off_board__[1]) == 15:
@@ -312,9 +407,14 @@ class Board:
         return None
 
     def count_pieces_for_player(self, player):
-        """Count pieces for a player across the board."""
-        # Fichas blancas (1) capturadas están en el lado negro (index 1)
-        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        """Count pieces for a player across the board.
+
+        Args:
+            player (int): Player number (1 or 2)
+
+        Returns:
+            int: Total number of pieces for the player
+        """
         player_bar_index = 1 if player == 1 else 0
         count = 0
 
@@ -325,20 +425,22 @@ class Board:
                     count += 1
 
         # Count pieces on bar
-        # Contar SOLO las fichas del jugador en la barra
         for piece in self.__checker_bar__[player_bar_index]:
             if piece == player:
                 count += 1
 
         # Count pieces off board
-        # El off_board usa el índice basado en el jugador (0 para jugador 1, 1 para jugador 2)
         player_off_index = 0 if player == 1 else 1
         count += len(self.__off_board__[player_off_index])
 
         return count
 
     def get_board_state(self):
-        """Get the complete state of the board."""
+        """Get the complete state of the board.
+
+        Returns:
+            dict: Dictionary containing the complete board state
+        """
         return {
             "points": [point.copy() for point in self.__points__],
             "bar": [checker_bar.copy() for checker_bar in self.__checker_bar__],
@@ -346,7 +448,11 @@ class Board:
         }
 
     def copy(self):
-        """Create a deep copy of the board."""
+        """Create a deep copy of the board.
+
+        Returns:
+            Board: A new Board instance with the same state
+        """
         new_board = Board()
         new_board.__points__ = copy.deepcopy(self.__points__)
         new_board.__checker_bar__ = copy.deepcopy(self.__checker_bar__)

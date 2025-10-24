@@ -10,10 +10,20 @@ class TestChecker(unittest.TestCase):
     """Test suite for core Checker behavior and edge cases."""
 
     def setUp(self):
+        """Set up test fixtures before each test method.
+
+        Returns:
+            None
+        """
         self.__white_checker__ = Checker("white")
         self.__black_checker__ = Checker("black")
 
     def test_checker_initialization_with_white_color(self):
+        """Test checker initialization with white color.
+
+        Returns:
+            None
+        """
         checker = Checker("white")
 
         self.assertEqual(checker.__color__, "white")
@@ -22,6 +32,11 @@ class TestChecker(unittest.TestCase):
         self.assertFalse(checker.__is_borne_off__)
 
     def test_checker_initialization_with_black_color(self):
+        """Test checker initialization with black color.
+
+        Returns:
+            None
+        """
         checker = Checker("black")
 
         self.assertEqual(checker.__color__, "black")
@@ -30,12 +45,28 @@ class TestChecker(unittest.TestCase):
         self.assertFalse(checker.__is_borne_off__)
 
     def test_invalid_color_raises_exception(self):
+        """Test that invalid color raises ValueError.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: When invalid color is provided
+        """
         with self.assertRaises(ValueError) as context:
             Checker("red")
 
         self.assertIn("Color must be 'white' or 'black'", str(context.exception))
 
     def test_none_color_raises_exception(self):
+        """Test that None color raises ValueError.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: When None color is provided
+        """
         with self.assertRaises(ValueError) as context:
             Checker(None)
 

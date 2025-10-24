@@ -14,9 +14,19 @@ class TestBoard(unittest.TestCase):
     """Test suite covering core Board behaviors and edge cases."""
 
     def setUp(self):
+        """Set up test fixtures before each test method.
+
+        Returns:
+            None
+        """
         self.__board__ = Board()
 
     def test_board_initialization(self):
+        """Test board initialization with correct structure.
+
+        Returns:
+            None
+        """
         board = Board()
         self.assertIsInstance(board, Board)
         self.assertEqual(len(board.__points__), 24)
@@ -24,6 +34,11 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(len(board.__off_board__), 2)
 
     def test_initial_board_setup(self):
+        """Test initial board setup with correct piece placement.
+
+        Returns:
+            None
+        """
         board = Board()
         board.setup_initial_position()
         self.assertEqual(board.__points__[0], [1, 1])
@@ -36,6 +51,11 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(board.__points__[5], [2, 2, 2, 2, 2])
 
     def test_get_point_empty(self):
+        """Test getting point information for empty point.
+
+        Returns:
+            None
+        """
         board = Board()
         point_info = board.get_point(0)
         self.assertEqual(point_info["pieces"], [])
@@ -43,6 +63,11 @@ class TestBoard(unittest.TestCase):
         self.assertIsNone(point_info["player"])
 
     def test_get_point_with_pieces(self):
+        """Test getting point information for point with pieces.
+
+        Returns:
+            None
+        """
         board = Board()
         board.__points__[0] = [1, 1, 1]
         point_info = board.get_point(0)
