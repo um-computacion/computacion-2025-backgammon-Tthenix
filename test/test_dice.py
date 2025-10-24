@@ -11,6 +11,7 @@ from core.dice import Dice
 
 # pylint: disable=C0116  # many simple test methods without individual docstrings
 
+
 class TestDice(unittest.TestCase):
     """Test suite for core Dice behavior and edge cases."""
 
@@ -66,27 +67,27 @@ class TestDice(unittest.TestCase):
         self.assertEqual(mock_randint.call_count, 4)
 
     def test_is_double_true(self):
-        """Test is_double method with double values"""
+        """Test __is_double__ method with double values"""
         dice = Dice()
 
         double_test_cases = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6)]
 
         for roll_result in double_test_cases:
             with self.subTest(roll_result=roll_result):
-                self.assertTrue(dice.is_double(roll_result))
+                self.assertTrue(dice.__is_double__(roll_result))
 
     def test_is_double_false(self):
-        """Test is_double method with non-double values"""
+        """Test __is_double__ method with non-double values"""
         dice = Dice()
 
         non_double_test_cases = [(1, 2), (3, 4), (2, 6), (5, 1), (6, 3), (4, 1)]
 
         for roll_result in non_double_test_cases:
             with self.subTest(roll_result=roll_result):
-                self.assertFalse(dice.is_double(roll_result))
+                self.assertFalse(dice.__is_double__(roll_result))
 
     def test_get_moves_regular_roll(self):
-        """Test get_moves method with regular (non-double) rolls"""
+        """Test __get_moves__ method with regular (non-double) rolls"""
         dice = Dice()
 
         test_cases = [
@@ -99,18 +100,18 @@ class TestDice(unittest.TestCase):
 
         for roll_result, expected_moves in test_cases:
             with self.subTest(roll_result=roll_result):
-                moves = dice.get_moves(roll_result)
+                moves = dice.__get_moves__(roll_result)
                 self.assertEqual(sorted(moves), sorted(expected_moves))
                 self.assertEqual(len(moves), 2)
 
     def test_get_moves_double_roll(self):
-        """Test get_moves method with double rolls"""
+        """Test __get_moves__ method with double rolls"""
         dice = Dice()
 
         for value in range(1, 7):
             with self.subTest(value=value):
                 double_result = (value, value)
-                moves = dice.get_moves(double_result)
+                moves = dice.__get_moves__(double_result)
 
                 self.assertEqual(len(moves), 4)
                 self.assertTrue(all(move == value for move in moves))
@@ -126,11 +127,11 @@ class TestDice(unittest.TestCase):
         self.assertEqual(result, (4, 4))
 
         # Check if it's a double
-        is_double = dice.is_double(result)
+        is_double = dice.__is_double__(result)
         self.assertTrue(is_double)
 
         # Get moves
-        moves = dice.get_moves(result)
+        moves = dice.__get_moves__(result)
         self.assertEqual(moves, [4, 4, 4, 4])
         self.assertEqual(len(moves), 4)
 
@@ -146,11 +147,11 @@ class TestDice(unittest.TestCase):
         self.assertEqual(result, (2, 5))
 
         # Check if it's a double
-        is_double = dice.is_double(result)
+        is_double = dice.__is_double__(result)
         self.assertFalse(is_double)
 
         # Get moves
-        moves = dice.get_moves(result)
+        moves = dice.__get_moves__(result)
         self.assertEqual(sorted(moves), sorted([2, 5]))
         self.assertEqual(len(moves), 2)
 

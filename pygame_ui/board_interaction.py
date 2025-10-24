@@ -15,10 +15,10 @@ class BoardInteraction:
 
     def __init__(self) -> None:
         """Initialize the board interaction handler."""
-        self.selected_point: Optional[int] = None
-        self.valid_destinations: Optional[List[int]] = None
-        self.game: Optional[BackgammonGame] = None
-        self.board_state: Optional[dict] = None
+        self.__selected_point__: Optional[int] = None
+        self.__valid_destinations__: Optional[List[int]] = None
+        self.__game__: Optional[BackgammonGame] = None
+        self.__board_state__: Optional[dict] = None
 
     def set_game(self, game: BackgammonGame) -> None:
         """
@@ -27,7 +27,7 @@ class BoardInteraction:
         Args:
             game: BackgammonGame instance
         """
-        self.game = game
+        self.__game__ = game
 
     def set_board_state(self, board_state: dict) -> None:
         """
@@ -36,7 +36,7 @@ class BoardInteraction:
         Args:
             board_state: Dictionary containing board state
         """
-        self.board_state = board_state
+        self.__board_state__ = board_state
 
     def get_point_from_coordinates(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
@@ -191,23 +191,25 @@ class BoardInteraction:
 
     def _can_select_checker_basic_validation(self) -> bool:
         """Check basic validation for checker selection."""
-        if not self.game or not self.board_state:
+        if not self.__game__ or not self.__board_state__:
             return False
-        if not self.game.last_roll:
+        if not self.__game__.__last_roll__:
             return False
-        return self.game.has_valid_moves()
+        return self.__game__.has_valid_moves()
 
     def _player_has_pieces_on_bar(self) -> bool:
         """Check if current player has pieces on bar."""
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
         player_bar_index = 1 if current_player_num == 1 else 0
 
-        if "bar" not in self.board_state:
+        if "bar" not in self.__board_state__:
             return False
 
         player_pieces_on_bar = [
             piece
-            for piece in self.board_state["bar"][player_bar_index]
+            for piece in self.__board_state__["bar"][player_bar_index]
             if piece == current_player_num
         ]
         return len(player_pieces_on_bar) > 0
@@ -218,14 +220,16 @@ class BoardInteraction:
         if not isinstance(point, int):
             return False
 
-        if point >= len(self.board_state["points"]):
+        if point >= len(self.__board_state__["points"]):
             return False
 
-        checkers = self.board_state["points"][point]
+        checkers = self.__board_state__["points"][point]
         if not checkers:
             return False
 
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
         return checkers[0] == current_player_num
 
     def can_select_from_bar(self) -> bool:
@@ -235,24 +239,26 @@ class BoardInteraction:
         Returns:
             True if current player has their own pieces on opponent's side, False otherwise
         """
-        if not self.game or not self.board_state:
+        if not self.__game__ or not self.__board_state__:
             return False
 
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
 
         # Check if current player has THEIR pieces on opponent's side
         # Fichas blancas (1) capturadas están en el lado negro (index 1)
         # Fichas negras (2) capturadas están en el lado blanco (index 0)
-        if "bar" not in self.board_state:
+        if "bar" not in self.__board_state__:
             return False
 
         if current_player_num == 1:
             # Jugador blanco verifica el lado negro (index 1) para sus fichas blancas
-            bar_pieces = self.board_state["bar"][1]
+            bar_pieces = self.__board_state__["bar"][1]
             return any(piece == 1 for piece in bar_pieces)
 
         # Jugador negro verifica el lado blanco (index 0) para sus fichas negras
-        bar_pieces = self.board_state["bar"][0]
+        bar_pieces = self.__board_state__["bar"][0]
         return any(piece == 2 for piece in bar_pieces)
 
     def get_valid_destinations_from_bar(self) -> List[int]:
@@ -262,15 +268,17 @@ class BoardInteraction:
         Returns:
             List of valid destination point indices
         """
-        if not self.game:
+        if not self.__game__:
             return []
 
         destinations = []
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
 
         # Check each available dice value
 
-        for dice_value in self.game.available_moves:
+        for dice_value in self.__game__.__available_moves__:
             if current_player_num == 1:
 
                 entry_point = dice_value - 1
@@ -280,7 +288,7 @@ class BoardInteraction:
 
             # Check if entry point is valid and not blocked
             if 0 <= entry_point < 24:
-                destination_pieces = self.game.board.points[entry_point]
+                destination_pieces = self.__game__.__board__.points[entry_point]
                 if (
                     len(destination_pieces) == 0
                     or len(destination_pieces) < 2
@@ -300,7 +308,7 @@ class BoardInteraction:
         Returns:
             List of valid destination point indices or "off" for bearing off
         """
-        if not self.game:
+        if not self.__game__:
             return []
 
         # Handle bar destinations
@@ -308,7 +316,7 @@ class BoardInteraction:
             return self.get_valid_destinations_from_bar()
 
         # Get regular destinations
-        destinations = self.game.get_possible_destinations(from_point)
+        destinations = self.__game__.get_possible_destinations(from_point)
 
         # Check if bearing off is possible
         if self._can_bear_off_from_point(from_point):
@@ -326,18 +334,22 @@ class BoardInteraction:
         Returns:
             True if bearing off is possible, False otherwise
         """
-        if not self.game:
+        if not self.__game__:
             return False
 
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
 
         # Check if player can bear off at all
-        if not self.game.can_bear_off(current_player_num):
+        if not self.__game__.can_bear_off(current_player_num):
             return False
 
         # Check if the specific point can bear off with available dice
-        for dice_value in self.game.available_moves:
-            if self.game.board.can_bear_off(from_point, current_player_num, dice_value):
+        for dice_value in self.__game__.__available_moves__:
+            if self.__game__.__board__.can_bear_off(
+                from_point, current_player_num, dice_value
+            ):
                 return True
 
         return False
@@ -350,13 +362,13 @@ class BoardInteraction:
             point: Point index to select or "bar"
         """
         if self.can_select_checker(point):
-            self.selected_point = point
-            self.valid_destinations = self.get_valid_destinations(point)
+            self.__selected_point__ = point
+            self.__valid_destinations__ = self.get_valid_destinations(point)
 
     def deselect_checker(self) -> None:
         """Deselect the currently selected checker."""
-        self.selected_point = None
-        self.valid_destinations = None
+        self.__selected_point__ = None
+        self.__valid_destinations__ = None
 
     def execute_checker_move(self, from_point, to_point) -> bool:
         """
@@ -369,7 +381,7 @@ class BoardInteraction:
         Returns:
             True if move was successful, False otherwise
         """
-        if not self.game:
+        if not self.__game__:
             return False
 
         # Handle move from bar
@@ -381,17 +393,17 @@ class BoardInteraction:
             return self.execute_bearing_off(from_point)
 
         # Validate and execute regular move
-        if self.game.validate_move(from_point, to_point):
-            success = self.game.make_move(from_point, to_point)
+        if self.__game__.validate_move(from_point, to_point):
+            success = self.__game__.make_move(from_point, to_point)
             if success:
                 # Deseleccionar ficha
                 self.deselect_checker()
                 # Si no quedan movimientos disponibles, finalizar turno automáticamente
-                if not self.game.available_moves:
+                if not self.__game__.__available_moves__:
                     # Reiniciar dados y movimientos y cambiar turno
-                    self.game.last_roll = None
-                    self.game.available_moves = []
-                    self.game.switch_current_player()
+                    self.__game__.__last_roll__ = None
+                    self.__game__.__available_moves__ = []
+                    self.__game__.switch_current_player()
                 return True
 
         return False
@@ -406,10 +418,12 @@ class BoardInteraction:
         Returns:
             True if move was successful, False otherwise
         """
-        if not self.game:
+        if not self.__game__:
             return False
 
-        current_player_num = 1 if self.game.current_player == self.game.player1 else 2
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
 
         # Calculate required dice value
 
@@ -421,19 +435,19 @@ class BoardInteraction:
             required_dice = 24 - to_point
 
         # Check if we have the required dice value
-        if required_dice not in self.game.available_moves:
+        if required_dice not in self.__game__.__available_moves__:
             return False
 
         # Use the game's move_from_bar method
-        success = self.game.move_from_bar(required_dice)
+        success = self.__game__.move_from_bar(required_dice)
 
         if success:
             self.deselect_checker()
 
-            if not self.game.available_moves:
-                self.game.last_roll = None
-                self.game.available_moves = []
-                self.game.switch_current_player()
+            if not self.__game__.__available_moves__:
+                self.__game__.__last_roll__ = None
+                self.__game__.__available_moves__ = []
+                self.__game__.switch_current_player()
             return True
         return False
 
@@ -447,19 +461,19 @@ class BoardInteraction:
         Returns:
             True if bearing off was successful, False otherwise
         """
-        if not self.game:
+        if not self.__game__:
             return False
 
         # Execute bearing off using game logic
-        success = self.game.bear_off_checker(from_point)
+        success = self.__game__.bear_off_checker(from_point)
         if success:
             self.deselect_checker()
             # Si no quedan movimientos disponibles, finalizar turno automáticamente
-            if not self.game.available_moves:
+            if not self.__game__.__available_moves__:
                 # Reiniciar dados y movimientos y cambiar turno
-                self.game.last_roll = None
-                self.game.available_moves = []
-                self.game.switch_current_player()
+                self.__game__.__last_roll__ = None
+                self.__game__.__available_moves__ = []
+                self.__game__.switch_current_player()
             return True
 
         return False
@@ -495,9 +509,13 @@ class BoardInteraction:
             center_gap_width: Width of center gap
         """
         # Verificar si el jugador tiene movimientos válidos
-        if self.game and self.game.last_roll and not self.game.has_valid_moves():
+        if (
+            self.__game__
+            and self.__game__.__last_roll__
+            and not self.__game__.has_valid_moves()
+        ):
             # Si no hay movimientos válidos, cambiar turno automáticamente
-            self.game.switch_current_player()
+            self.__game__.switch_current_player()
             return
 
         point = self.get_point_from_coordinates(
@@ -523,15 +541,15 @@ class BoardInteraction:
             return
 
         # If no checker selected, try to select one
-        if self.selected_point is None:
+        if self.__selected_point__ is None:
             self.select_checker(point)
         else:
             # If clicked on selected point again, deselect
-            if point == self.selected_point:
+            if point == self.__selected_point__:
                 self.deselect_checker()
             # If clicked on valid destination, execute move
-            elif self.valid_destinations and point in self.valid_destinations:
-                self.execute_checker_move(self.selected_point, point)
+            elif self.__valid_destinations__ and point in self.__valid_destinations__:
+                self.execute_checker_move(self.__selected_point__, point)
             # Otherwise, try to select new checker
             else:
                 self.deselect_checker()

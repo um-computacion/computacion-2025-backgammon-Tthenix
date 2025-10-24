@@ -25,10 +25,10 @@ class Checker:
         """
         if color not in ("white", "black"):
             raise ValueError("Color must be 'white' or 'black'")
-        self.color: str = color
-        self.position: int | None = None
-        self.is_on_bar: bool = False
-        self.is_borne_off: bool = False
+        self.__color__: str = color
+        self.__position__: int | None = None
+        self.__is_on_bar__: bool = False
+        self.__is_borne_off__: bool = False
 
     def place_on_point(self, position: int) -> None:
         """Place the checker on a specific point on the board.
@@ -42,9 +42,9 @@ class Checker:
         if position < 1 or position > self.TOTAL_POINTS:
             raise ValueError("Position must be between 1 and 24")
 
-        self.position = position
-        self.is_on_bar = False
-        self.is_borne_off = False
+        self.__position__ = position
+        self.__is_on_bar__ = False
+        self.__is_borne_off__ = False
 
     def move_to_point(self, position: int) -> None:
         """Move the checker to a specific point.
@@ -55,14 +55,14 @@ class Checker:
         Raises:
             ValueError: If checker cannot be moved or position is invalid.
         """
-        if self.is_borne_off:
+        if self.__is_borne_off__:
             raise ValueError("Checker has already been removed from board")
-        if self.is_on_bar:
+        if self.__is_on_bar__:
             raise ValueError("Checker on bar cannot move directly")
-        if self.position is None:
+        if self.__position__ is None:
             raise ValueError("Checker must be placed before moving")
         if 1 <= position <= self.TOTAL_POINTS:
-            self.position = position
+            self.__position__ = position
         else:
             raise ValueError("Position must be between 1 and 24")
 
@@ -72,12 +72,12 @@ class Checker:
         Raises:
             ValueError: If checker is already on the bar.
         """
-        if self.is_on_bar:
+        if self.__is_on_bar__:
             raise ValueError("Checker is already on bar")
 
-        self.position = None
-        self.is_on_bar = True
-        self.is_borne_off = False
+        self.__position__ = None
+        self.__is_on_bar__ = True
+        self.__is_borne_off__ = False
 
     def return_from_bar(self, position: int) -> None:
         """Return the checker from the bar to a specific point.
@@ -88,14 +88,14 @@ class Checker:
         Raises:
             ValueError: If checker is not on bar or position is invalid.
         """
-        if not self.is_on_bar:
+        if not self.__is_on_bar__:
             raise ValueError("Checker is not on bar")
         if position < 1 or position > self.TOTAL_POINTS:
             raise ValueError("Position must be between 1 and 24")
 
-        self.position = position
-        self.is_on_bar = False
-        self.is_borne_off = False
+        self.__position__ = position
+        self.__is_on_bar__ = False
+        self.__is_borne_off__ = False
 
     def bear_off(self) -> None:
         """Remove the checker from the board (bear off).
@@ -103,16 +103,16 @@ class Checker:
         Raises:
             ValueError: If checker cannot be borne off.
         """
-        if self.is_borne_off:
+        if self.__is_borne_off__:
             raise ValueError("Checker has already been removed from board")
-        if self.is_on_bar:
+        if self.__is_on_bar__:
             raise ValueError("Checker on bar cannot be borne off")
-        if self.position is None:
+        if self.__position__ is None:
             raise ValueError("Checker must be placed before bearing off")
 
-        self.position = None
-        self.is_on_bar = False
-        self.is_borne_off = True
+        self.__position__ = None
+        self.__is_on_bar__ = False
+        self.__is_borne_off__ = True
 
     def can_move(self) -> bool:
         """Check if the checker can move.
@@ -121,7 +121,9 @@ class Checker:
             bool: True if checker can move, False otherwise.
         """
         return (
-            self.position is not None and not self.is_on_bar and not self.is_borne_off
+            self.__position__ is not None
+            and not self.__is_on_bar__
+            and not self.__is_borne_off__
         )
 
     def can_be_captured(self) -> bool:
@@ -131,14 +133,16 @@ class Checker:
             bool: True if checker can be captured, False otherwise.
         """
         return (
-            self.position is not None and not self.is_on_bar and not self.is_borne_off
+            self.__position__ is not None
+            and not self.__is_on_bar__
+            and not self.__is_borne_off__
         )
 
     def reset(self) -> None:
         """Reset the checker to its initial state."""
-        self.position = None
-        self.is_on_bar = False
-        self.is_borne_off = False
+        self.__position__ = None
+        self.__is_on_bar__ = False
+        self.__is_borne_off__ = False
 
     def get_state(self) -> dict:
         """Get the current state of the checker.
@@ -147,10 +151,10 @@ class Checker:
             dict: Dictionary containing checker's current state.
         """
         return {
-            "color": self.color,
-            "position": self.position,
-            "is_on_bar": self.is_on_bar,
-            "is_borne_off": self.is_borne_off,
+            "color": self.__color__,
+            "position": self.__position__,
+            "is_on_bar": self.__is_on_bar__,
+            "is_borne_off": self.__is_borne_off__,
         }
 
     def copy(self) -> "Checker":
@@ -159,10 +163,10 @@ class Checker:
         Returns:
             Checker: A new Checker instance with the same state.
         """
-        new_checker = Checker(self.color)
-        new_checker.position = self.position
-        new_checker.is_on_bar = self.is_on_bar
-        new_checker.is_borne_off = self.is_borne_off
+        new_checker = Checker(self.__color__)
+        new_checker.__position__ = self.__position__
+        new_checker.__is_on_bar__ = self.__is_on_bar__
+        new_checker.__is_borne_off__ = self.__is_borne_off__
         return new_checker
 
     def __str__(self) -> str:
@@ -172,8 +176,8 @@ class Checker:
             str: String representation showing checker state.
         """
         return (
-            f"Checker(color={self.color}, position={self.position}, "
-            f"on_bar={self.is_on_bar}, borne_off={self.is_borne_off})"
+            f"Checker(color={self.__color__}, position={self.__position__}, "
+            f"on_bar={self.__is_on_bar__}, borne_off={self.__is_borne_off__})"
         )
 
     def __eq__(self, other: object) -> bool:
@@ -188,10 +192,10 @@ class Checker:
         if not isinstance(other, Checker):
             return False
         return (
-            self.color == other.color
-            and self.position == other.position
-            and self.is_on_bar == other.is_on_bar
-            and self.is_borne_off == other.is_borne_off
+            self.__color__ == other.__color__
+            and self.__position__ == other.__position__
+            and self.__is_on_bar__ == other.__is_on_bar__
+            and self.__is_borne_off__ == other.__is_borne_off__
         )
 
     def __hash__(self) -> int:
@@ -200,4 +204,11 @@ class Checker:
         Returns:
             int: Hash value based on checker state.
         """
-        return hash((self.color, self.position, self.is_on_bar, self.is_borne_off))
+        return hash(
+            (
+                self.__color__,
+                self.__position__,
+                self.__is_on_bar__,
+                self.__is_borne_off__,
+            )
+        )

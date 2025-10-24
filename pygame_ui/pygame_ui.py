@@ -55,12 +55,12 @@ def _handle_keydown(event, game, board) -> bool:
 
 def _handle_roll_dice(game, board) -> None:
     """Handle rolling dice."""
-    if game.last_roll is None or not game.available_moves:
+    if game.__last_roll__ is None or not game.__available_moves__:
         game.roll_dice()
         if not game.has_valid_moves():
             # Clear dice state and switch player when no valid moves
-            game.last_roll = None
-            game.available_moves = []
+            game.__last_roll__ = None
+            game.__available_moves__ = []
             game.switch_current_player()
         board.update_from_game()
 
@@ -80,12 +80,12 @@ def _handle_mouse_click(event, board) -> None:
 
 def _handle_roll_button_click(game, board) -> None:
     """Handle roll button click."""
-    if game.last_roll is None or not game.available_moves:
+    if game.__last_roll__ is None or not game.__available_moves__:
         game.roll_dice()
         if not game.has_valid_moves():
             # Clear dice state and switch player when no valid moves
-            game.last_roll = None
-            game.available_moves = []
+            game.__last_roll__ = None
+            game.__available_moves__ = []
             game.switch_current_player()
         board.update_from_game()
 
@@ -109,7 +109,7 @@ def _draw_win_message(screen, game) -> None:
     font_large = pygame.font.Font(None, 72)
     font_medium = pygame.font.Font(None, 36)
 
-    win_text = f"¡{winner.name} WINS!"
+    win_text = f"¡{winner.__name__} WINS!"
     win_surface = font_large.render(win_text, True, (255, 215, 0))  # Dorado
     win_rect = win_surface.get_rect(
         center=(screen.get_width() // 2, screen.get_height() // 2 - 50)
@@ -146,13 +146,13 @@ def main() -> None:
                 running = False
 
         # Clear screen with a neutral background
-        board.screen.fill((50, 50, 50))  # Dark gray background
+        board.__screen__.fill((50, 50, 50))  # Dark gray background
 
         # Draw the board
         board.draw_board()
 
-        # Dibujar mensaje de victoria si el juego ha terminado
-        _draw_win_message(board.screen, game)
+        # draw win message
+        _draw_win_message(board.__screen__, game)
 
         # Update display
         pygame.display.flip()

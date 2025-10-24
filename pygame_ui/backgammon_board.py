@@ -33,13 +33,13 @@ class BackgammonBoard:
             height: Screen height in pixels
         """
         pygame.init()  # pylint: disable=no-member
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode((width, height))
+        self.__width__ = width
+        self.__height__ = height
+        self.__screen__ = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Backgammon Board")
 
         # Color definitions
-        self.colors = {
+        self.__colors__ = {
             "wood_light": (210, 180, 140),
             "wood_dark": (139, 119, 101),
             "border_dark": (101, 67, 33),
@@ -66,41 +66,43 @@ class BackgammonBoard:
         }
 
         # Board layout dimensions
-        self.board_margin = 30
-        self.border_width = 20
-        self.center_gap_width = 40
-        self.bear_off_width = 80
+        self.__board_margin__ = 30
+        self.__border_width__ = 20
+        self.__center_gap_width__ = 40
+        self.__bear_off_width__ = 80
 
         # Calculate main board area
         self._calculate_dimensions()
 
         # Checker properties
-        self.checker_radius = min(self.point_width // 2 - 4, 20)
+        self.__checker_radius__ = min(self.__point_width__ // 2 - 4, 20)
 
         # Dice properties
-        self.dice_size = 40
-        self.dice_dot_radius = 4
+        self.__dice_size__ = 40
+        self.__dice_dot_radius__ = 4
 
         # Initialize renderers
-        self.board_renderer = BoardRenderer(self.colors)
-        self.checker_renderer = CheckerRenderer(self.colors, self.checker_radius)
-        self.dice_renderer = DiceRenderer(
-            self.colors, self.dice_size, self.dice_dot_radius
+        self.__board_renderer__ = BoardRenderer(self.__colors__)
+        self.__checker_renderer__ = CheckerRenderer(
+            self.__colors__, self.__checker_radius__
+        )
+        self.__dice_renderer__ = DiceRenderer(
+            self.__colors__, self.__dice_size__, self.__dice_dot_radius__
         )
 
         # Initialize interaction handler
-        self.interaction = BoardInteraction()
+        self.__interaction__ = BoardInteraction()
 
         # Game state
-        self.board_state = None
-        self.dice_values = None
-        self.game = None
+        self.__board_state__ = None
+        self.__dice_values__ = None
+        self.__game__ = None
 
         # Create roll dice button
         button_width = 100
         button_height = 50
-        self.roll_button = Button(
-            x=self.bear_off_x + (self.bear_off_width - button_width) // 2,
+        self.__roll_button__ = Button(
+            x=self.bear_off_x + (self.__bear_off_width__ - button_width) // 2,
             y=self.bear_off_y + self.board_height // 2 - button_height // 2,
             width=button_width,
             height=button_height,
@@ -112,21 +114,23 @@ class BackgammonBoard:
 
     def _calculate_dimensions(self) -> None:
         """Calculate all board dimensions and positions."""
-        self.board_width = self.width - 2 * self.board_margin - self.bear_off_width
-        self.board_height = self.height - 2 * self.board_margin
-        self.board_x = self.board_margin
-        self.board_y = self.board_margin
+        self.board_width = (
+            self.__width__ - 2 * self.__board_margin__ - self.__bear_off_width__
+        )
+        self.board_height = self.__height__ - 2 * self.__board_margin__
+        self.board_x = self.__board_margin__
+        self.board_y = self.__board_margin__
 
         # Calculate playing area (inside borders)
-        self.play_area_x = self.board_x + self.border_width
-        self.play_area_y = self.board_y + self.border_width
-        self.play_area_width = self.board_width - 2 * self.border_width
-        self.play_area_height = self.board_height - 2 * self.border_width
+        self.play_area_x = self.board_x + self.__border_width__
+        self.play_area_y = self.board_y + self.__border_width__
+        self.play_area_width = self.board_width - 2 * self.__border_width__
+        self.play_area_height = self.board_height - 2 * self.__border_width__
 
         # Calculate half areas
-        self.half_width = (self.play_area_width - self.center_gap_width) // 2
-        self.point_width = self.half_width // 6
-        self.point_height = (self.play_area_height - 40) // 2
+        self.half_width = (self.play_area_width - self.__center_gap_width__) // 2
+        self.__point_width__ = self.half_width // 6
+        self.__point_height__ = (self.play_area_height - 40) // 2
 
         # Bear off area dimensions
         self.bear_off_x = self.board_x + self.board_width
@@ -139,8 +143,8 @@ class BackgammonBoard:
         Args:
             game: BackgammonGame instance
         """
-        self.game = game
-        self.interaction.set_game(game)
+        self.__game__ = game
+        self.__interaction__.set_game(game)
 
     def set_board_state(self, board_state: dict) -> None:
         """
@@ -149,8 +153,8 @@ class BackgammonBoard:
         Args:
             board_state: Dictionary containing board state
         """
-        self.board_state = board_state
-        self.interaction.set_board_state(board_state)
+        self.__board_state__ = board_state
+        self.__interaction__.set_board_state(board_state)
 
     def set_dice_values(self, die1: int, die2: int) -> None:
         """
@@ -160,67 +164,76 @@ class BackgammonBoard:
             die1: First die value (1-6)
             die2: Second die value (1-6)
         """
-        self.dice_values = (die1, die2)
+        self.__dice_values__ = (die1, die2)
 
     def update_from_game(self) -> None:
         """Update the visual board state from the game instance."""
-        if not self.game:
+        if not self.__game__:
             return
 
         # Get board state from game
-        board_state = self.game.board.get_board_state()
+        board_state = self.__game__.__board__.get_board_state()
         self.set_board_state(board_state)
 
         # Update dice values if available
-        if self.game.last_roll:
-            self.set_dice_values(self.game.last_roll[0], self.game.last_roll[1])
+        if self.__game__.__last_roll__:
+            self.set_dice_values(
+                self.__game__.__last_roll__[0], self.__game__.__last_roll__[1]
+            )
 
     def draw_board(self) -> None:
         """Draw the complete backgammon board."""
         # Create wood textured background
-        wood_surface = self.board_renderer.create_wood_texture_surface(
+        wood_surface = self.__board_renderer__.create_wood_texture_surface(
             self.board_width, self.board_height
         )
-        self.screen.blit(wood_surface, (self.board_x, self.board_y))
+        self.__screen__.blit(wood_surface, (self.board_x, self.board_y))
 
         # Draw dark border around the entire board
         border_rect = pygame.Rect(
             self.board_x, self.board_y, self.board_width, self.board_height
         )
         pygame.draw.rect(
-            self.screen, self.colors["border_dark"], border_rect, self.border_width
+            self.__screen__,
+            self.__colors__["border_dark"],
+            border_rect,
+            self.__border_width__,
         )
 
         # Draw triangular points
-        self.board_renderer.draw_points(
-            self.screen,
+        self.__board_renderer__.draw_points(
+            self.__screen__,
             self.play_area_x,
             self.play_area_y,
             self.play_area_height,
-            self.point_width,
-            self.point_height,
+            self.__point_width__,
+            self.__point_height__,
             self.half_width,
-            self.center_gap_width,
+            self.__center_gap_width__,
         )
 
         # Draw center gap
         gap_x = self.play_area_x + self.half_width
         gap_y = self.play_area_y
-        self.board_renderer.draw_center_gap(
-            self.screen, gap_x, gap_y, self.center_gap_width, self.play_area_height
+        self.__board_renderer__.draw_center_gap(
+            self.__screen__,
+            gap_x,
+            gap_y,
+            self.__center_gap_width__,
+            self.play_area_height,
         )
 
         # Draw bear off area
-        self.board_renderer.draw_bear_off_area(
-            self.screen,
+        self.__board_renderer__.draw_bear_off_area(
+            self.__screen__,
             self.bear_off_x,
             self.bear_off_y,
-            self.bear_off_width,
+            self.__bear_off_width__,
             self.board_height,
         )
 
         # Draw checkers if board state is set
-        if self.board_state:
+        if self.__board_state__:
             self.draw_all_checkers()
 
         # Draw selection highlights
@@ -230,42 +243,42 @@ class BackgammonBoard:
         self.draw_dice()
 
         # Draw roll dice button
-        self.roll_button.draw(self.screen)
+        self.__roll_button__.draw(self.__screen__)
 
         # Draw current player indicator
         self._draw_current_player_indicator()
 
     def draw_all_checkers(self) -> None:
         """Draw all checkers on the board based on current game state."""
-        if not self.board_state:
+        if not self.__board_state__:
             return
 
         # Draw checkers on each point
         for point_index in range(24):
-            if point_index < len(self.board_state["points"]):
-                checkers = self.board_state["points"][point_index]
-                self.checker_renderer.draw_checkers_on_point(
-                    self.screen,
+            if point_index < len(self.__board_state__["points"]):
+                checkers = self.__board_state__["points"][point_index]
+                self.__checker_renderer__.draw_checkers_on_point(
+                    self.__screen__,
                     point_index,
                     checkers,
                     self.play_area_x,
                     self.play_area_y,
                     self.play_area_height,
-                    self.point_width,
-                    self.point_height,
+                    self.__point_width__,
+                    self.__point_height__,
                     self.half_width,
-                    self.center_gap_width,
+                    self.__center_gap_width__,
                 )
 
         # Draw checkers on the bar
-        if "bar" in self.board_state:
-            player1_bar = self.board_state["bar"][0]
-            player2_bar = self.board_state["bar"][1]
+        if "bar" in self.__board_state__:
+            player1_bar = self.__board_state__["bar"][0]
+            player2_bar = self.__board_state__["bar"][1]
             bar_center_x = (
-                self.play_area_x + self.half_width + self.center_gap_width // 2
+                self.play_area_x + self.half_width + self.__center_gap_width__ // 2
             )
-            self.checker_renderer.draw_checkers_on_bar(
-                self.screen,
+            self.__checker_renderer__.draw_checkers_on_bar(
+                self.__screen__,
                 player1_bar,
                 player2_bar,
                 bar_center_x,
@@ -274,12 +287,12 @@ class BackgammonBoard:
             )
 
         # Draw borne-off checkers
-        if "off_board" in self.board_state:
-            player1_off = self.board_state["off_board"][0]
-            player2_off = self.board_state["off_board"][1]
-            bear_off_center_x = self.bear_off_x + self.bear_off_width // 2
-            self.checker_renderer.draw_borne_off_checkers(
-                self.screen,
+        if "off_board" in self.__board_state__:
+            player1_off = self.__board_state__["off_board"][0]
+            player2_off = self.__board_state__["off_board"][1]
+            bear_off_center_x = self.bear_off_x + self.__bear_off_width__ // 2
+            self.__checker_renderer__.draw_borne_off_checkers(
+                self.__screen__,
                 player1_off,
                 player2_off,
                 bear_off_center_x,
@@ -290,32 +303,37 @@ class BackgammonBoard:
     def draw_dice(self) -> None:
         """Draw the dice on the board if dice values are set."""
         # Position for dice (right of center gap)
-        dice_x = self.play_area_x + self.half_width + self.center_gap_width + 20
-        dice_y = self.play_area_y + self.play_area_height // 2 - self.dice_size
+        dice_x = self.play_area_x + self.half_width + self.__center_gap_width__ + 20
+        dice_y = self.play_area_y + self.play_area_height // 2 - self.__dice_size__
 
-        self.dice_renderer.draw_dice(self.screen, self.dice_values, dice_x, dice_y)
+        self.__dice_renderer__.draw_dice(
+            self.__screen__, self.__dice_values__, dice_x, dice_y
+        )
 
     def draw_selection_highlights(self) -> None:
         """Draw visual highlights for selected checker and valid moves."""
-        if self.interaction.selected_point is None:
+        if self.__interaction__.__selected_point__ is None:
             return
 
         # Highlight selected point or bar
-        if self.interaction.selected_point == "bar":
-            self._highlight_bar(self.colors["selected_highlight"])
+        if self.__interaction__.__selected_point__ == "bar":
+            self._highlight_bar(self.__colors__["selected_highlight"])
         else:
             self._highlight_point(
-                self.interaction.selected_point, self.colors["selected_highlight"]
+                self.__interaction__.__selected_point__,
+                self.__colors__["selected_highlight"],
             )
 
         # Highlight valid destination points
-        if self.interaction.valid_destinations:
-            for dest in self.interaction.valid_destinations:
+        if self.__interaction__.__valid_destinations__:
+            for dest in self.__interaction__.__valid_destinations__:
                 if dest == "off":
                     # Highlight bear-off area
-                    self._highlight_bear_off_area(self.colors["valid_move_highlight"])
+                    self._highlight_bear_off_area(
+                        self.__colors__["valid_move_highlight"]
+                    )
                 else:
-                    self._highlight_point(dest, self.colors["valid_move_highlight"])
+                    self._highlight_point(dest, self.__colors__["valid_move_highlight"])
 
     def _highlight_point(self, point, color: Tuple[int, int, int]) -> None:
         """
@@ -335,34 +353,38 @@ class BackgammonBoard:
             point_x = (
                 self.play_area_x
                 + self.half_width
-                + self.center_gap_width
-                + (5 - point) * self.point_width
+                + self.__center_gap_width__
+                + (5 - point) * self.__point_width__
             )
-            point_y = self.play_area_y + self.play_area_height - self.point_height // 2
+            point_y = (
+                self.play_area_y + self.play_area_height - self.__point_height__ // 2
+            )
         elif point < 12:
             # Left side, bottom
-            point_x = self.play_area_x + (11 - point) * self.point_width
-            point_y = self.play_area_y + self.play_area_height - self.point_height // 2
+            point_x = self.play_area_x + (11 - point) * self.__point_width__
+            point_y = (
+                self.play_area_y + self.play_area_height - self.__point_height__ // 2
+            )
         elif point < 18:
             # Left side, top
-            point_x = self.play_area_x + (point - 12) * self.point_width
-            point_y = self.play_area_y + self.point_height // 2
+            point_x = self.play_area_x + (point - 12) * self.__point_width__
+            point_y = self.play_area_y + self.__point_height__ // 2
         else:
             # Right side, top
             point_x = (
                 self.play_area_x
                 + self.half_width
-                + self.center_gap_width
-                + (point - 18) * self.point_width
+                + self.__center_gap_width__
+                + (point - 18) * self.__point_width__
             )
-            point_y = self.play_area_y + self.point_height // 2
+            point_y = self.play_area_y + self.__point_height__ // 2
 
         # Center of the point
-        center_x = point_x + self.point_width // 2
+        center_x = point_x + self.__point_width__ // 2
 
         # Draw highlight using board renderer
-        self.board_renderer.draw_highlight(
-            self.screen, center_x, int(point_y), self.checker_radius + 5, color
+        self.__board_renderer__.draw_highlight(
+            self.__screen__, center_x, int(point_y), self.__checker_radius__ + 5, color
         )
 
     def _highlight_bear_off_area(self, color: Tuple[int, int, int]) -> None:
@@ -376,10 +398,10 @@ class BackgammonBoard:
         border_rect = pygame.Rect(
             self.bear_off_x - 5,
             self.bear_off_y - 5,
-            self.bear_off_width + 10,
+            self.__bear_off_width__ + 10,
             self.board_height + 10,
         )
-        pygame.draw.rect(self.screen, color, border_rect, 5)
+        pygame.draw.rect(self.__screen__, color, border_rect, 5)
 
     def _highlight_bar(self, color: Tuple[int, int, int]) -> None:
         """
@@ -388,16 +410,18 @@ class BackgammonBoard:
         Args:
             color: RGB color tuple for highlight
         """
-        bar_center_x = self.play_area_x + self.half_width + self.center_gap_width // 2
+        bar_center_x = (
+            self.play_area_x + self.half_width + self.__center_gap_width__ // 2
+        )
 
         # Draw highlight rectangle on the bar
         pygame.draw.rect(
-            self.screen,
+            self.__screen__,
             color,
             (
-                bar_center_x - self.center_gap_width // 2 + 5,
+                bar_center_x - self.__center_gap_width__ // 2 + 5,
                 self.play_area_y + 10,
-                self.center_gap_width - 10,
+                self.__center_gap_width__ - 10,
                 self.play_area_height - 20,
             ),
             3,
@@ -407,12 +431,12 @@ class BackgammonBoard:
         """Draw the current player indicator."""
         try:
             font = pygame.font.Font(None, 28)
-            if self.game and self.game.current_player:
-                jugador = self.game.current_player
-                texto = f"Turn: {jugador.name} ({jugador.color})"
-                color = self.colors["white"]
+            if self.__game__ and self.__game__.__current_player__:
+                jugador = self.__game__.__current_player__
+                texto = f"Turn: {jugador.__name__} ({jugador.__color__})"
+                color = self.__colors__["white"]
                 texto_surface = font.render(texto, True, color)
-                self.screen.blit(texto_surface, (self.board_margin, 5))
+                self.__screen__.blit(texto_surface, (self.__board_margin__, 5))
         except pygame.error:  # pylint: disable=no-member
             pass
 
@@ -424,19 +448,19 @@ class BackgammonBoard:
             x: X coordinate of click
             y: Y coordinate of click
         """
-        self.interaction.handle_board_click(
+        self.__interaction__.handle_board_click(
             x,
             y,
             self.play_area_x,
             self.play_area_y,
             self.play_area_width,
             self.play_area_height,
-            self.point_width,
+            self.__point_width__,
             self.half_width,
-            self.center_gap_width,
+            self.__center_gap_width__,
             bear_off_x=self.bear_off_x,
             bear_off_y=self.bear_off_y,
-            bear_off_width=self.bear_off_width,
+            bear_off_width=self.__bear_off_width__,
             bear_off_height=self.board_height,
         )
         # Update board state after interaction
@@ -453,25 +477,25 @@ class BackgammonBoard:
             Point index (0-23) or None if not on a valid point
         """
         x, y = mouse_pos
-        return self.interaction.get_point_from_coordinates(
+        return self.__interaction__.get_point_from_coordinates(
             x,
             y,
             self.play_area_x,
             self.play_area_y,
             self.play_area_width,
             self.play_area_height,
-            self.point_width,
+            self.__point_width__,
             self.half_width,
-            self.center_gap_width,
+            self.__center_gap_width__,
         )
 
     def set_selected_point(self, point: Optional[int]) -> None:
         """Set the selected point for highlighting."""
         if point is not None:
-            self.interaction.selected_point = point
+            self.__interaction__.selected_point = point
         else:
-            self.interaction.selected_point = None
+            self.__interaction__.selected_point = None
 
     def set_possible_destinations(self, destinations: list) -> None:
         """Set the possible destinations for highlighting."""
-        self.interaction.valid_destinations = destinations
+        self.__interaction__.valid_destinations = destinations

@@ -26,7 +26,19 @@ class Dice:
         die2 = random.randint(1, 6)
         return (die1, die2)
 
-    def is_double(self, roll_result):
+    def get_available_moves(self, roll_result):
+        """Get available moves based on the dice roll.
+
+        Args:
+            roll_result (tuple): The result of a dice roll.
+
+        Returns:
+            list: List of available move distances. For doubles, returns 4 moves
+                 of the same value. For non-doubles, returns 2 moves.
+        """
+        return self.__get_moves__(roll_result)
+
+    def __is_double__(self, roll_result):
         """Check if the roll is a double (both dice show the same value).
 
         Args:
@@ -37,7 +49,7 @@ class Dice:
         """
         return roll_result[0] == roll_result[1]
 
-    def get_moves(self, roll_result):
+    def __get_moves__(self, roll_result):
         """Get available moves based on the dice roll.
 
         Args:
@@ -47,6 +59,6 @@ class Dice:
             list: List of available move distances. For doubles, returns 4 moves
                  of the same value. For non-doubles, returns 2 moves.
         """
-        if self.is_double(roll_result):
+        if self.__is_double__(roll_result):
             return [roll_result[0]] * 4
         return [roll_result[0], roll_result[1]]

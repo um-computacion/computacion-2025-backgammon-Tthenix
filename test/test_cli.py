@@ -16,14 +16,14 @@ class TestBackgammonCLI(unittest.TestCase):
 
     def setUp(self):
         """Initialize a fresh CLI instance before each test."""
-        self.cli = BackgammonCLI()
+        self.__cli__ = BackgammonCLI()
 
     def _run_commands(self, commands):
         """Run a sequence of commands through the CLI loop and capture output."""
         buf = io.StringIO()
         with redirect_stdout(buf):
             with patch("builtins.input", side_effect=commands):
-                self.cli.run()
+                self.__cli__.run()
         return buf.getvalue()
 
     def test_help_and_quit(self):
@@ -56,7 +56,7 @@ class TestBackgammonCLI(unittest.TestCase):
         """It should announce game over when a player has won."""
         # Force a game-over state and then end turn
         # Player1 wins
-        self.cli.game.board.off_board[0] = [1] * 15
+        self.__cli__.__game__.__board__.__off_board__[0] = [1] * 15
         output = self._run_commands(["end", "quit"])
         self.assertIn("GAME OVER!", output)
 
@@ -70,8 +70,8 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_reroll_blocked_when_moves_remain(self):
         """Re-rolling should be blocked while moves remain."""
         # Simulate existing roll with remaining moves
-        self.cli.game.last_roll = (2, 3)
-        self.cli.game.available_moves = [2, 3]
+        self.__cli__.__game__.__last_roll__ = (2, 3)
+        self.__cli__.__game__.__available_moves__ = [2, 3]
         output = self._run_commands(["roll", "quit"])
         self.assertIn("You still have moves left.", output)
 
@@ -93,10 +93,10 @@ class TestBackgammonCLI(unittest.TestCase):
         """Entering from bar should succeed on a legal entry point."""
         # Prepare bar and open entry for player1 using die=1 -> entry point index 23
         # Ficha blanca (1) capturada está en el lado negro (index 1)
-        self.cli.game.board.checker_bar[1] = [1]
-        self.cli.game.board.points[23] = []
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1, 2]
+        self.__cli__.__game__.__board__.__checker_bar__[1] = [1]
+        self.__cli__.__game__.__board__.__points__[23] = []
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1, 2]
         output = self._run_commands(["enter", "1", "quit"])
         self.assertIn("Checker entered from bar", output)
 
@@ -105,10 +105,10 @@ class TestBackgammonCLI(unittest.TestCase):
         # Blancas re-entran en puntos 0-5: con dado 1 → punto 0 (1-1=0)
         # Block entry with two opponent pieces
         # Ficha blanca (1) capturada está en el lado negro (index 1)
-        self.cli.game.board.checker_bar[1] = [1]
-        self.cli.game.board.points[0] = [2, 2]  # Bloquear punto 0
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1, 2]
+        self.__cli__.__game__.__board__.__checker_bar__[1] = [1]
+        self.__cli__.__game__.__board__.__points__[0] = [2, 2]  # Bloquear punto 0
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1, 2]
         output = self._run_commands(["enter", "1", "quit"])
         self.assertIn("Cannot enter with that die value", output)
 
@@ -130,7 +130,7 @@ class TestBackgammonCLI(unittest.TestCase):
         """Moves command should require entering from bar when needed."""
         # Put a checker on bar for player1, roll so command is allowed
         # Ficha blanca (1) capturada está en el lado negro (index 1)
-        self.cli.game.board.checker_bar[1] = [1]
+        self.__cli__.__game__.__board__.__checker_bar__[1] = [1]
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "moves", "quit"])
         self.assertIn("You have checkers on the bar", output)
@@ -138,7 +138,7 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_moves_no_own_pieces(self):
         """Moves should inform when no movable own pieces are on board."""
         # Clear all points so no available_points are found
-        self.cli.game.board.points = [[] for _ in range(24)]
+        self.__cli__.__game__.__board__.__points__ = [[] for _ in range(24)]
         with patch("core.dice.Dice.roll", return_value=(2, 3)):
             output = self._run_commands(["roll", "moves", "quit"])
         self.assertIn("No pieces available to move", output)
@@ -153,18 +153,18 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_move_exhausts_moves_message(self):
         """After consuming last move, it should prompt to end the turn."""
         # Prepare exactly one legal move (1->2)
-        self.cli.game.setup_initial_position()
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1]
+        self.__cli__.__game__.setup_initial_position()
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1]
         output = self._run_commands(["move", "1", "2", "quit"])
         self.assertIn("No moves remaining", output)
 
     def test_enter_when_bar_empty(self):
         """Entering should be disallowed when the bar is empty."""
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1, 2]
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1, 2]
         # Ensure bar empty
-        self.cli.game.board.checker_bar[0] = []
+        self.__cli__.__game__.__board__.__checker_bar__[0] = []
         output = self._run_commands(["enter", "1", "quit"])
         self.assertIn("You have no checkers on the bar", output)
 
@@ -173,7 +173,7 @@ class TestBackgammonCLI(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stdout(buf):
             with patch("builtins.input", side_effect=KeyboardInterrupt):
-                self.cli.run()
+                self.__cli__.run()
         output = buf.getvalue()
         self.assertIn("Exiting game", output)
 
@@ -182,7 +182,7 @@ class TestBackgammonCLI(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stdout(buf):
             with patch("builtins.input", side_effect=EOFError):
-                self.cli.run()
+                self.__cli__.run()
         output = buf.getvalue()
         self.assertIn("Exiting game", output)
 
@@ -195,9 +195,9 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_move_when_moves_remain_no_exhaust_message(self):
         """When moves remain after a move, no exhaustion message is shown."""
         # Prepare two moves available and a likely legal small move won't exhaust all
-        self.cli.game.setup_initial_position()
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1, 2]
+        self.__cli__.__game__.setup_initial_position()
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1, 2]
         # Attempt a move that may succeed; even if illegal, it prints message
         # To ensure success, move from point 1 to 2 for player1 at start
         output = self._run_commands(["move", "1", "2", "quit"])
@@ -207,10 +207,10 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_bearoff_valid_path(self):
         """Bearoff should succeed when all pieces are in home and die fits."""
         # Setup all-in-home for player1 with a checker at 24 (index 23)
-        self.cli.game.board.points = [[] for _ in range(24)]
-        self.cli.game.board.points[23] = [1]
-        self.cli.game.last_roll = (1, 2)
-        self.cli.game.available_moves = [1, 2]
+        self.__cli__.__game__.__board__.__points__ = [[] for _ in range(24)]
+        self.__cli__.__game__.__board__.__points__[23] = [1]
+        self.__cli__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game__.__available_moves__ = [1, 2]
         output = self._run_commands(["bearoff", "24", "quit"])
         self.assertIn("Checker borne off", output)
 

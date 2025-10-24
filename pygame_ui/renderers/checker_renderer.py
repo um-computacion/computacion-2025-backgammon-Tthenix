@@ -23,8 +23,8 @@ class CheckerRenderer:
             colors: Dictionary of color definitions
             checker_radius: Radius of checker circles
         """
-        self.colors = colors
-        self.checker_radius = checker_radius
+        self.__colors__ = colors
+        self.__checker_radius__ = checker_radius
 
     def draw_checker(
         self,
@@ -44,13 +44,13 @@ class CheckerRenderer:
         """
         # Determine colors based on player
         if player == 1:
-            main_color = self.colors["checker_white"]
-            highlight_color = self.colors["checker_white_highlight"]
-            shadow_color = self.colors["checker_white_shadow"]
+            main_color = self.__colors__["checker_white"]
+            highlight_color = self.__colors__["checker_white_highlight"]
+            shadow_color = self.__colors__["checker_white_shadow"]
         else:
-            main_color = self.colors["checker_black"]
-            highlight_color = self.colors["checker_black_highlight"]
-            shadow_color = self.colors["checker_black_shadow"]
+            main_color = self.__colors__["checker_black"]
+            highlight_color = self.__colors__["checker_black_highlight"]
+            shadow_color = self.__colors__["checker_black_shadow"]
 
         # Draw shadow (bottom-right offset)
         shadow_offset = 2
@@ -58,16 +58,16 @@ class CheckerRenderer:
             surface,
             shadow_color,
             (x + shadow_offset, y + shadow_offset),
-            self.checker_radius,
+            self.__checker_radius__,
         )
 
         # Draw main checker body
-        pygame.draw.circle(surface, main_color, (x, y), self.checker_radius)
+        pygame.draw.circle(surface, main_color, (x, y), self.__checker_radius__)
 
         # Draw highlight (top-left partial circle for 3D effect)
-        highlight_radius = self.checker_radius // 3
-        highlight_offset_x = -self.checker_radius // 3
-        highlight_offset_y = -self.checker_radius // 3
+        highlight_radius = self.__checker_radius__ // 3
+        highlight_offset_x = -self.__checker_radius__ // 3
+        highlight_offset_y = -self.__checker_radius__ // 3
         pygame.draw.circle(
             surface,
             highlight_color,
@@ -77,7 +77,7 @@ class CheckerRenderer:
 
         # Draw border
         pygame.draw.circle(
-            surface, self.colors["black"], (x, y), self.checker_radius, 2
+            surface, self.__colors__["black"], (x, y), self.__checker_radius__, 2
         )
 
     def draw_checkers_on_point(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
@@ -147,22 +147,22 @@ class CheckerRenderer:
 
         if checker_count <= max_visible_checkers:
             # Normal spacing
-            spacing = self.checker_radius * 2 + 2
+            spacing = self.__checker_radius__ * 2 + 2
         else:
             # Condensed spacing for many checkers
-            spacing = (point_height - self.checker_radius * 2) // (checker_count - 1)
-            spacing = max(spacing, self.checker_radius + 2)
+            spacing = (point_height - self.__checker_radius__ * 2) // (checker_count - 1)
+            spacing = max(spacing, self.__checker_radius__ + 2)
 
         for i, player in enumerate(checkers):
             if is_top_half:
                 # Stack downward from top
-                checker_y = play_area_y + self.checker_radius + 5 + i * spacing
+                checker_y = play_area_y + self.__checker_radius__ + 5 + i * spacing
             else:
                 # Stack upward from bottom
                 checker_y = (
                     play_area_y
                     + play_area_height
-                    - self.checker_radius
+                    - self.__checker_radius__
                     - 5
                     - i * spacing
                 )
@@ -191,7 +191,7 @@ class CheckerRenderer:
         """
         try:
             font = pygame.font.Font(None, 20)
-            text = font.render(str(count), True, self.colors["white"])
+            text = font.render(str(count), True, self.__colors__["white"])
             text_rect = text.get_rect(center=(x, y))
             surface.blit(text, text_rect)
         except pygame.error:  # pylint: disable=no-member
@@ -216,7 +216,7 @@ class CheckerRenderer:
                 play_area_y
                 + play_area_height // 2
                 + 20
-                + i * (self.checker_radius * 2 + 2)
+                + i * (self.__checker_radius__ * 2 + 2)
             )
             self.draw_checker(surface, bar_center_x, checker_y, player)
 
@@ -227,7 +227,7 @@ class CheckerRenderer:
                 play_area_y
                 + play_area_height // 2
                 - 20
-                - i * (self.checker_radius * 2 + 2)
+                - i * (self.__checker_radius__ * 2 + 2)
             )
             self.draw_checker(surface, bar_center_x, checker_y, player)
 
@@ -253,7 +253,7 @@ class CheckerRenderer:
         """
         # Visual specification: center up to 5 checkers per zone; if more, show count
         max_visible = 5
-        spacing = self.checker_radius * 2 + 4
+        spacing = self.__checker_radius__ * 2 + 4
 
         def draw_zone_checkers(
             start_y: int, pieces: List[int], is_top_zone: bool = False
