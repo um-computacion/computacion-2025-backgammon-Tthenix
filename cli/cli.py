@@ -20,7 +20,14 @@ class BackgammonCLI:
     """
 
     def __init__(self, game: Optional[BackgammonGame] = None) -> None:
-        """Create the CLI with proper dependency injection."""
+        """Create the CLI with proper dependency injection.
+
+        Args:
+            game (BackgammonGame, optional): Game instance to use. Defaults to None.
+
+        Returns:
+            None
+        """
         self.__game__ = game or BackgammonGame()
         self.__game__.setup_initial_position()
         self.__running__ = False
@@ -36,7 +43,11 @@ class BackgammonCLI:
         self._register_commands()
 
     def _register_commands(self) -> None:
-        """Register all command handlers following Open/Closed Principle."""
+        """Register all command handlers following Open/Closed Principle.
+
+        Returns:
+            None
+        """
         commands = {
             "q": self._cmd_quit,
             "quit": self._cmd_quit,
@@ -67,11 +78,19 @@ class BackgammonCLI:
             self.__command_parser__.register_handler(cmd, handler)
 
     def render_board(self) -> None:
-        """Render the board using the BoardRenderer component."""
+        """Render the board using the BoardRenderer component.
+
+        Returns:
+            None
+        """
         self.__board_renderer__.render_board(self.__game__)
 
     def run(self) -> None:
-        """Start the interactive CLI loop."""
+        """Start the interactive CLI loop.
+
+        Returns:
+            None
+        """
         self.__running__ = True
         self.__user_interface__.display_header("BACKGAMMON GAME")
         self.__user_interface__.display_message(
@@ -96,7 +115,14 @@ class BackgammonCLI:
         self.__running__ = False
 
     def _handle_command(self, command: str) -> None:
-        """Parse and execute a single command using CommandParser."""
+        """Parse and execute a single command using CommandParser.
+
+        Args:
+            command (str): The command string to parse and execute
+
+        Returns:
+            None
+        """
         cmd, _ = self.__command_parser__.parse_command(command)
         handler = self.__command_parser__.get_handler(cmd)
 
@@ -106,7 +132,11 @@ class BackgammonCLI:
             self.__user_interface__.display_error("Unknown command. Type 'help'.")
 
     def _print_help(self) -> None:
-        """Print available commands using UserInterface."""
+        """Print available commands using UserInterface.
+
+        Returns:
+            None
+        """
         self.__user_interface__.display_separator()
         self.__user_interface__.display_message("  AVAILABLE COMMANDS")
         self.__user_interface__.display_separator()
@@ -143,23 +173,37 @@ class BackgammonCLI:
 
     # ----- Individual command handlers -----
     def _cmd_quit(self) -> None:
-        """Handle quit command."""
+        """Handle quit command.
+
+        Sets the running flag to False and displays a goodbye message.
+        """
         self.__running__ = False
         self.__user_interface__.display_message(
             "\nThanks for playing Backgammon! Goodbye."
         )
 
     def _cmd_help(self) -> None:
-        """Handle help command."""
+        """Handle help command.
+
+        Displays the help menu and board rendering help.
+        """
         self._print_help()
         self.__board_renderer__.render_help()
 
     def _cmd_board(self) -> None:
-        """Handle board command."""
+        """Handle board command.
+
+        Returns:
+            None
+        """
         self.render_board()
 
     def _cmd_turn(self) -> None:
-        """Handle turn command."""
+        """Handle turn command.
+
+        Returns:
+            None
+        """
         current_player = self.__game_controller__.get_current_player()
         self.__user_interface__.display_turn_info(current_player)
 
@@ -180,7 +224,11 @@ class BackgammonCLI:
         self.__user_interface__.display_separator()
 
     def _cmd_roll(self) -> None:
-        """Handle roll command."""
+        """Handle roll command.
+
+        Returns:
+            None
+        """
         game_state = self.__game_controller__.get_game_state()
         if game_state["last_roll"] is not None and game_state["available_moves"]:
             self.__user_interface__.display_warning("You still have moves left.")
@@ -198,11 +246,19 @@ class BackgammonCLI:
         )
 
     def _cmd_status(self) -> None:
-        """Handle status command."""
+        """Handle status command.
+
+        Returns:
+            None
+        """
         self.__board_renderer__.render_game_status(self.__game__)
 
     def _check_game_over(self) -> None:
-        """Check and announce game over if a player has won."""
+        """Check and announce game over if a player has won.
+
+        Returns:
+            None
+        """
         if self.__game_controller__.is_game_over():
             winner = self.__game_controller__.get_winner()
             if winner is not None:
@@ -211,6 +267,11 @@ class BackgammonCLI:
     # ----- Command handlers -----
 
     def _cmd_moves(self) -> None:
+        """Handle moves command.
+
+        Returns:
+            None
+        """
         game_state = self.__game_controller__.get_game_state()
         if game_state["last_roll"] is None:
             self.__user_interface__.display_warning("You must roll the dice first.")
@@ -263,6 +324,11 @@ class BackgammonCLI:
         )
 
     def _cmd_move(self) -> None:
+        """Handle move command.
+
+        Returns:
+            None
+        """
         game_state = self.__game_controller__.get_game_state()
         if game_state["last_roll"] is None:
             self.__user_interface__.display_warning("You must roll the dice first.")
@@ -302,6 +368,11 @@ class BackgammonCLI:
             )
 
     def _cmd_enter(self) -> None:
+        """Handle enter command.
+
+        Returns:
+            None
+        """
         game_state = self.__game_controller__.get_game_state()
         if game_state["last_roll"] is None:
             self.__user_interface__.display_warning("You must roll the dice first.")
@@ -340,6 +411,11 @@ class BackgammonCLI:
             )
 
     def _cmd_bearoff(self) -> None:
+        """Handle bearoff command.
+
+        Returns:
+            None
+        """
         game_state = self.__game_controller__.get_game_state()
         if game_state["last_roll"] is None:
             self.__user_interface__.display_warning("You must roll the dice first.")
@@ -370,7 +446,11 @@ class BackgammonCLI:
             )
 
     def _cmd_end_turn(self) -> None:
-        """Handle end turn command."""
+        """Handle end turn command.
+
+        Returns:
+            None
+        """
         # If game is over, announce and do not switch
         if self.__game_controller__.is_game_over():
             self._check_game_over()
@@ -389,7 +469,11 @@ class BackgammonCLI:
 
 
 def run_cli() -> None:
-    """Convenience function to run the CLI."""
+    """Convenience function to run the CLI.
+
+    Returns:
+        None
+    """
     BackgammonCLI().run()
 
 

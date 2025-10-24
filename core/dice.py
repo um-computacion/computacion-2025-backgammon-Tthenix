@@ -14,7 +14,11 @@ class Dice:
     """
 
     def __init__(self):
-        """Initialize the dice."""
+        """Initialize the dice.
+
+        Returns:
+            None
+        """
 
     def roll(self):
         """Roll two dice and return the result.

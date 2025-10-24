@@ -31,6 +31,9 @@ class BackgammonBoard:
         Args:
             width: Screen width in pixels
             height: Screen height in pixels
+
+        Returns:
+            None
         """
         pygame.init()  # pylint: disable=no-member
         self.__width__ = width
@@ -113,7 +116,11 @@ class BackgammonBoard:
         )
 
     def _calculate_dimensions(self) -> None:
-        """Calculate all board dimensions and positions."""
+        """Calculate all board dimensions and positions.
+
+        Returns:
+            None
+        """
         self.board_width = (
             self.__width__ - 2 * self.__board_margin__ - self.__bear_off_width__
         )
@@ -142,6 +149,9 @@ class BackgammonBoard:
 
         Args:
             game: BackgammonGame instance
+
+        Returns:
+            None
         """
         self.__game__ = game
         self.__interaction__.set_game(game)
@@ -152,6 +162,9 @@ class BackgammonBoard:
 
         Args:
             board_state: Dictionary containing board state
+
+        Returns:
+            None
         """
         self.__board_state__ = board_state
         self.__interaction__.set_board_state(board_state)
@@ -163,11 +176,18 @@ class BackgammonBoard:
         Args:
             die1: First die value (1-6)
             die2: Second die value (1-6)
+
+        Returns:
+            None
         """
         self.__dice_values__ = (die1, die2)
 
     def update_from_game(self) -> None:
-        """Update the visual board state from the game instance."""
+        """Update the visual board state from the game instance.
+
+        Returns:
+            None
+        """
         if not self.__game__:
             return
 
@@ -182,7 +202,11 @@ class BackgammonBoard:
             )
 
     def draw_board(self) -> None:
-        """Draw the complete backgammon board."""
+        """Draw the complete backgammon board.
+
+        Returns:
+            None
+        """
         # Create wood textured background
         wood_surface = self.__board_renderer__.create_wood_texture_surface(
             self.board_width, self.board_height
@@ -249,7 +273,11 @@ class BackgammonBoard:
         self._draw_current_player_indicator()
 
     def draw_all_checkers(self) -> None:
-        """Draw all checkers on the board based on current game state."""
+        """Draw all checkers on the board based on current game state.
+
+        Returns:
+            None
+        """
         if not self.__board_state__:
             return
 
@@ -301,7 +329,11 @@ class BackgammonBoard:
             )
 
     def draw_dice(self) -> None:
-        """Draw the dice on the board if dice values are set."""
+        """Draw the dice on the board if dice values are set.
+
+        Returns:
+            None
+        """
         # Position for dice (right of center gap)
         dice_x = self.play_area_x + self.half_width + self.__center_gap_width__ + 20
         dice_y = self.play_area_y + self.play_area_height // 2 - self.__dice_size__
@@ -311,7 +343,11 @@ class BackgammonBoard:
         )
 
     def draw_selection_highlights(self) -> None:
-        """Draw visual highlights for selected checker and valid moves."""
+        """Draw visual highlights for selected checker and valid moves.
+
+        Returns:
+            None
+        """
         if self.__interaction__.__selected_point__ is None:
             return
 
@@ -342,6 +378,9 @@ class BackgammonBoard:
         Args:
             point: Point index to highlight (or "off" for bear-off area)
             color: RGB color tuple for highlight
+
+        Returns:
+            None
         """
         # Handle special cases like "off" for bear-off area
         if not isinstance(point, int):
@@ -393,6 +432,9 @@ class BackgammonBoard:
 
         Args:
             color: RGB color tuple for highlight
+
+        Returns:
+            None
         """
         # Draw a border around the bear-off area
         border_rect = pygame.Rect(
@@ -409,6 +451,9 @@ class BackgammonBoard:
 
         Args:
             color: RGB color tuple for highlight
+
+        Returns:
+            None
         """
         bar_center_x = (
             self.play_area_x + self.half_width + self.__center_gap_width__ // 2
@@ -428,7 +473,11 @@ class BackgammonBoard:
         )
 
     def _draw_current_player_indicator(self) -> None:
-        """Draw the current player indicator."""
+        """Draw the current player indicator.
+
+        Returns:
+            None
+        """
         try:
             font = pygame.font.Font(None, 28)
             if self.__game__ and self.__game__.__current_player__:
@@ -447,6 +496,9 @@ class BackgammonBoard:
         Args:
             x: X coordinate of click
             y: Y coordinate of click
+
+        Returns:
+            None
         """
         self.__interaction__.handle_board_click(
             x,
@@ -490,12 +542,26 @@ class BackgammonBoard:
         )
 
     def set_selected_point(self, point: Optional[int]) -> None:
-        """Set the selected point for highlighting."""
+        """Set the selected point for highlighting.
+
+        Args:
+            point: Point index to select or None to deselect
+
+        Returns:
+            None
+        """
         if point is not None:
             self.__interaction__.selected_point = point
         else:
             self.__interaction__.selected_point = None
 
     def set_possible_destinations(self, destinations: list) -> None:
-        """Set the possible destinations for highlighting."""
+        """Set the possible destinations for highlighting.
+
+        Args:
+            destinations: List of valid destination points
+
+        Returns:
+            None
+        """
         self.__interaction__.valid_destinations = destinations

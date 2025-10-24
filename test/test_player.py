@@ -15,24 +15,49 @@ class TestPlayer(unittest.TestCase):
     """Test suite for core Player behavior and edge cases."""
 
     def setUp(self):
+        """Set up test fixtures before each test method.
+
+        Returns:
+            None
+        """
         self.__player_white__ = Player("Player1", "white")
         self.__player_black__ = Player("Player2", "black")
 
     def test_player_initialization_with_name_and_color(self):
+        """Test player initialization with name and color.
+
+        Returns:
+            None
+        """
         player = Player("TestPlayer", "white")
         self.assertEqual(player.__name__, "TestPlayer")
         self.assertEqual(player.__color__, "white")
 
     def test_player_initialization_black_color(self):
+        """Test player initialization with black color.
+
+        Returns:
+            None
+        """
         player = Player("BlackPlayer", "black")
         self.assertEqual(player.__name__, "BlackPlayer")
         self.assertEqual(player.__color__, "black")
 
     def test_player_initial_checkers_count(self):
+        """Test initial checkers count for players.
+
+        Returns:
+            None
+        """
         self.assertEqual(self.__player_white__.__checkers_count__, 15)
         self.assertEqual(self.__player_black__.__checkers_count__, 15)
 
     def test_player_initial_captured_checkers_empty(self):
+        """Test initial captured checkers count is zero.
+
+        Returns:
+            None
+        """
         self.assertEqual(self.__player_white__.__captured_checkers__, 0)
         self.assertEqual(self.__player_black__.__captured_checkers__, 0)
 

@@ -15,11 +15,22 @@ class TestBackgammonCLI(unittest.TestCase):
     """Tests for the Backgammon CLI behavior."""
 
     def setUp(self):
-        """Initialize a fresh CLI instance before each test."""
+        """Initialize a fresh CLI instance before each test.
+
+        Returns:
+            None
+        """
         self.__cli__ = BackgammonCLI()
 
     def _run_commands(self, commands):
-        """Run a sequence of commands through the CLI loop and capture output."""
+        """Run a sequence of commands through the CLI loop and capture output.
+
+        Args:
+            commands: List of commands to execute
+
+        Returns:
+            str: Captured output from CLI
+        """
         buf = io.StringIO()
         with redirect_stdout(buf):
             with patch("builtins.input", side_effect=commands):
@@ -27,14 +38,25 @@ class TestBackgammonCLI(unittest.TestCase):
         return buf.getvalue()
 
     def test_help_and_quit(self):
-        """It should show help and exit cleanly on quit."""
+        """It should show help and exit cleanly on quit.
+
+        Returns:
+            None
+        """
         output = self._run_commands(["help", "quit"])
         self.assertIn("AVAILABLE COMMANDS", output)
         self.assertIn("Thanks for playing Backgammon! Goodbye.", output)
 
     @patch("core.dice.Dice.roll", return_value=(2, 4))
     def test_roll_status_end_and_quit(self, _mock_roll):
-        """It should roll, show status, end turn, and quit."""
+        """It should roll, show status, end turn, and quit.
+
+        Args:
+            _mock_roll: Mock for dice roll method
+
+        Returns:
+            None
+        """
         output = self._run_commands(["roll", "status", "end", "quit"])
         self.assertIn("Rolled: 2 and 4", output)
         self.assertIn("Last roll:", output)
@@ -43,7 +65,14 @@ class TestBackgammonCLI(unittest.TestCase):
 
     @patch("core.dice.Dice.roll", return_value=(1, 2))
     def test_moves_prompt_lists_points(self, _mock_roll):
-        """It should list available points and destinations for moves."""
+        """It should list available points and destinations for moves.
+
+        Args:
+            _mock_roll: Mock for dice roll method
+
+        Returns:
+            None
+        """
         # roll so moves are available, then call moves and choose an input, then quit
         # The exact destinations may vary; assert prompts and listing are shown
         output = self._run_commands(["roll", "moves", "1", "quit"])

@@ -19,7 +19,11 @@ class TestPygameUIInteraction(BasePygameTest):
     """Test cases for pygame UI mouse interaction."""
 
     def setUp(self):  # pylint: disable=invalid-name
-        """Set up test fixtures."""
+        """Set up test fixtures.
+
+        Returns:
+            None
+        """
         self.__backgammon_board__ = BackgammonBoard
         self.__backgammon_game__ = BackgammonGame
 
@@ -42,7 +46,11 @@ class TestPygameUIInteraction(BasePygameTest):
     #     self.assertEqual(point, 0)
 
     def test_get_point_from_coordinates_top_left(self):
-        """Test getting point index from coordinates - top left."""
+        """Test getting point index from coordinates - top left.
+
+        Returns:
+            None
+        """
         # Point 12 is top-left first
         x = self.__board__.play_area_x + self.__board__.__point_width__ // 2
         y = self.__board__.play_area_y + 10
@@ -61,7 +69,11 @@ class TestPygameUIInteraction(BasePygameTest):
         self.assertEqual(point, 12)
 
     def test_get_point_from_coordinates_invalid(self):
-        """Test getting point from invalid coordinates returns None."""
+        """Test getting point from invalid coordinates returns None.
+
+        Returns:
+            None
+        """
         # Outside board area
         point = self.__board__.__interaction__.get_point_from_coordinates(
             0,
@@ -77,7 +89,11 @@ class TestPygameUIInteraction(BasePygameTest):
         self.assertIsNone(point)
 
     def test_get_point_from_coordinates_center_gap(self):
-        """Test click in center gap returns 'bar'."""
+        """Test click in center gap returns 'bar'.
+
+        Returns:
+            None
+        """
         # Center gap area (where the bar is located)
         x = (
             self.__board__.play_area_x

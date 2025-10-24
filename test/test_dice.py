@@ -17,7 +17,14 @@ class TestDice(unittest.TestCase):
 
     @patch("random.randint", side_effect=[5, 2])
     def test_roll_different_values(self, mock_randint):
-        """Test rolling dice with different values (5, 2)"""
+        """Test rolling dice with different values (5, 2).
+
+        Args:
+            mock_randint: Mock for random.randint
+
+        Returns:
+            None
+        """
         dice = Dice()
         result = dice.roll()
 
@@ -31,7 +38,14 @@ class TestDice(unittest.TestCase):
 
     @patch("random.randint", side_effect=[3, 3])
     def test_roll_double_values(self, mock_randint):
-        """Test rolling dice with double values (3, 3)"""
+        """Test rolling dice with double values (3, 3).
+
+        Args:
+            mock_randint: Mock for random.randint
+
+        Returns:
+            None
+        """
         dice = Dice()
         result = dice.roll()
 
@@ -43,7 +57,14 @@ class TestDice(unittest.TestCase):
 
     @patch("random.randint", side_effect=[1, 6])
     def test_roll_edge_values(self, mock_randint):
-        """Test rolling dice with edge values (1, 6)"""
+        """Test rolling dice with edge values (1, 6).
+
+        Args:
+            mock_randint: Mock for random.randint
+
+        Returns:
+            None
+        """
         dice = Dice()
         result = dice.roll()
 
@@ -53,7 +74,14 @@ class TestDice(unittest.TestCase):
 
     @patch("random.randint", side_effect=[4, 2, 1, 5])
     def test_roll_multiple_calls(self, mock_randint):
-        """Test multiple dice rolls with mocked values"""
+        """Test multiple dice rolls with mocked values.
+
+        Args:
+            mock_randint: Mock for random.randint
+
+        Returns:
+            None
+        """
         dice = Dice()
 
         # First roll
@@ -67,7 +95,11 @@ class TestDice(unittest.TestCase):
         self.assertEqual(mock_randint.call_count, 4)
 
     def test_is_double_true(self):
-        """Test __is_double__ method with double values"""
+        """Test __is_double__ method with double values.
+
+        Returns:
+            None
+        """
         dice = Dice()
 
         double_test_cases = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6)]

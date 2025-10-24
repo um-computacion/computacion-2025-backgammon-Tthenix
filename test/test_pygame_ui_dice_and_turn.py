@@ -15,7 +15,11 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
     """Dice rendering and auto turn switch tests."""
 
     def setUp(self) -> None:  # pylint: disable=invalid-name
-        """Configura el entorno de pruebas con patches para pygame."""
+        """Set up test environment with patches for pygame.
+
+        Returns:
+            None
+        """
         # Patch real drawing calls inside the renderer modules to avoid real Surface requirement
         self.__patch_draw_rect__ = patch(
             "pygame_ui.renderers.dice_renderer.pygame.draw.rect", MagicMock()
@@ -30,13 +34,21 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
             self._init_board_and_game()
 
     def tearDown(self) -> None:  # pylint: disable=invalid-name
-        """Limpia los patches de pygame después de cada prueba."""
+        """Clean up pygame patches after each test.
+
+        Returns:
+            None
+        """
         # Stop drawing patches
         self.__patch_draw_rect__.stop()
         self.__patch_draw_circle__.stop()
 
     def test_draw_dice_two_and_four_on_doubles(self) -> None:
-        """Verify four dice on doubles and two dice otherwise."""
+        """Verify four dice on doubles and two dice otherwise.
+
+        Returns:
+            None
+        """
         # Prepare mocked screen surface
         self.__board__.screen = MagicMock()
 
@@ -64,7 +76,11 @@ class TestPygameUIDiceAndTurn(BasePygameTest):
             self.assertEqual(draw_face.call_count, 4)
 
     def test_auto_turn_switch_after_moves_exhausted(self) -> None:
-        """When no moves remain, it should automatically switch turns."""
+        """When no moves remain, it should automatically switch turns.
+
+        Returns:
+            None
+        """
         # Configure turn and dice available to a single move of 1
         self.__game__.__current_player__ = self.__game__.__player1__
         self.__game__.__last_roll__ = (1, 1)

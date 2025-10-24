@@ -18,7 +18,11 @@ class BoardRenderer:
     """
 
     def __init__(self):
-        """Initialize the board renderer."""
+        """Initialize the board renderer.
+
+        Returns:
+            None
+        """
         self.__board_width__ = 60
         self.__separator_char__ = "="
 
@@ -27,6 +31,9 @@ class BoardRenderer:
 
         Args:
             game: The BackgammonGame instance to render
+
+        Returns:
+            None
         """
         board = game.__board__
         current_player = game.__current_player__
@@ -45,6 +52,9 @@ class BoardRenderer:
 
         Args:
             current_player: The current player object
+
+        Returns:
+            None
         """
         print("\n" + self.__separator_char__ * self.__board_width__)
         print(f"  CURRENT TURN: {current_player.__name__} ({current_player.__color__})")
@@ -55,6 +65,9 @@ class BoardRenderer:
 
         Args:
             board: The board object to render
+
+        Returns:
+            None
         """
         # Top half (points 13-24)
         print("\n  13 14 15 16 17 18    BAR    19 20 21 22 23 24")
@@ -79,6 +92,9 @@ class BoardRenderer:
 
         Args:
             board: The board object to render
+
+        Returns:
+            None
         """
         white_off = len(board.__off_board__[0])
         black_off = len(board.__off_board__[1])
@@ -107,6 +123,9 @@ class BoardRenderer:
 
         Args:
             game: The BackgammonGame instance to render status for
+
+        Returns:
+            None
         """
         print("\n" + self.__separator_char__ * self.__board_width__)
         print("  GAME STATUS")
@@ -139,7 +158,11 @@ class BoardRenderer:
         print(self.__separator_char__ * self.__board_width__)
 
     def render_help(self) -> None:
-        """Render the help information for the board display."""
+        """Render the help information for the board display.
+
+        Returns:
+            None
+        """
         print("\n" + self.__separator_char__ * self.__board_width__)
         print("  BOARD DISPLAY HELP")
         print(self.__separator_char__ * self.__board_width__)
@@ -160,6 +183,9 @@ class BoardRenderer:
 
         Args:
             width: The width for board display
+
+        Returns:
+            None
         """
         self.__board_width__ = max(40, min(120, width))  # Clamp between 40 and 120
 
@@ -168,5 +194,8 @@ class BoardRenderer:
 
         Args:
             char: The character to use for separators
+
+        Returns:
+            None
         """
         self.__separator_char__ = char if char else "="

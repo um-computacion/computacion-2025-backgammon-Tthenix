@@ -20,12 +20,20 @@ class TestBearingOff(BasePygameTest):
     """Test bearing off functionality."""
 
     def setUp(self):  # pylint: disable=invalid-name
-        """Set up test environment."""
+        """Set up test environment.
+
+        Returns:
+            None
+        """
         self._init_board_and_game()
         self.__interaction__ = BoardInteraction()
 
     def test_can_bear_off_detection(self):
-        """Test detection of when players can bear off."""
+        """Test detection of when players can bear off.
+
+        Returns:
+            None
+        """
         # Set up scenario where player 1 can bear off
         self._setup_bearing_off_scenario()
 
@@ -35,18 +43,30 @@ class TestBearingOff(BasePygameTest):
         self.assertFalse(self.__game__.can_bear_off(2))
 
     def test_bearing_off_validation(self):
-        """Test bearing off move validation."""
+        """Test bearing off move validation.
+
+        Returns:
+            None
+        """
         self._setup_bearing_off_scenario()
 
         # Test specific point bearing off validation
-        self.assertTrue(self.__game__.__board__.can_bear_off(23, 1, 1))  # Exact dice match
-        self.assertTrue(self.__game__.__board__.can_bear_off(23, 1, 6))  # Higher dice value
+        self.assertTrue(
+            self.__game__.__board__.can_bear_off(23, 1, 1)
+        )  # Exact dice match
+        self.assertTrue(
+            self.__game__.__board__.can_bear_off(23, 1, 6)
+        )  # Higher dice value
         self.assertFalse(
             self.__game__.__board__.can_bear_off(22, 1, 1)
         )  # Wrong point for dice value
 
     def test_bearing_off_execution(self):
-        """Test actual bearing off execution."""
+        """Test actual bearing off execution.
+
+        Returns:
+            None
+        """
         self._setup_bearing_off_scenario()
 
         # Roll dice and test bearing off
@@ -57,11 +77,19 @@ class TestBearingOff(BasePygameTest):
         success = self.__game__.bear_off_checker(23)
 
         self.assertTrue(success)
-        self.assertEqual(len(self.__game__.__board__.__off_board__[0]), len(initial_off_board) + 1)
-        self.assertEqual(len(self.__game__.__board__.__points__[23]), 4)  # One less piece
+        self.assertEqual(
+            len(self.__game__.__board__.__off_board__[0]), len(initial_off_board) + 1
+        )
+        self.assertEqual(
+            len(self.__game__.__board__.__points__[23]), 4
+        )  # One less piece
 
     def test_bearing_off_with_dice_consumption(self):
-        """Test that dice values are consumed when bearing off."""
+        """Test that dice values are consumed when bearing off.
+
+        Returns:
+            None
+        """
         self._setup_bearing_off_scenario()
 
         # Roll dice
@@ -127,7 +155,9 @@ class TestBearingOff(BasePygameTest):
         # Bear off with all available moves
         while self.__game__.__available_moves__:
             point = 23  # Use furthest point
-            if self.__game__.__board__.can_bear_off(point, 1, self.__game__.__available_moves__[0]):
+            if self.__game__.__board__.can_bear_off(
+                point, 1, self.__game__.__available_moves__[0]
+            ):
                 self.__game__.bear_off_checker(point)
             else:
                 break
@@ -198,12 +228,48 @@ class TestBearingOff(BasePygameTest):
 
         # Set up player 2 pieces OUTSIDE home board (so they cannot bear off)
         # Player 2's home is points 0-5, so put pieces outside that range
-        self.__game__.__board__.__points__[6] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
-        self.__game__.__board__.__points__[7] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
-        self.__game__.__board__.__points__[8] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
-        self.__game__.__board__.__points__[9] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
-        self.__game__.__board__.__points__[10] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
-        self.__game__.__board__.__points__[11] = [2, 2, 2, 2, 2]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[6] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[7] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[8] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[9] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[10] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
+        self.__game__.__board__.__points__[11] = [
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]  # 5 pieces - outside home
 
         # Set current player to player 1
         self.__game__.__current_player__ = self.__game__.__player1__
@@ -252,7 +318,9 @@ class TestBearingOffEdgeCases(unittest.TestCase):
         self.__game__.roll_dice()
 
         # Try to bear off opponent's piece
-        self.assertFalse(self.__game__.bear_off_checker(0))  # Point 0 has opponent pieces
+        self.assertFalse(
+            self.__game__.bear_off_checker(0)
+        )  # Point 0 has opponent pieces
 
     def _setup_bearing_off_scenario(self):
         """Set up a scenario where player 1 can bear off."""

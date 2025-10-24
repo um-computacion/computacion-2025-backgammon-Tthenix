@@ -12,13 +12,25 @@ class BasePygameTest(TestCase):
     """Clase base con lógica compartida para tests de pygame UI."""
 
     def __init__(self, *args, **kwargs):
-        """Initialize test with board and game attributes."""
+        """Initialize test with board and game attributes.
+
+        Args:
+            *args: Variable length argument list
+            **kwargs: Arbitrary keyword arguments
+
+        Returns:
+            None
+        """
         super().__init__(*args, **kwargs)
         self.__board__: "BackgammonBoard" = None
         self.__game__: "BackgammonGame" = None
 
     def _init_board_and_game(self) -> None:
-        """Crear tablero y juego inicializados y reflejarlos en el tablero."""
+        """Create board and game initialized and reflect them on the board.
+
+        Returns:
+            None
+        """
 
         self.__board__ = BackgammonBoard()
         self.__game__ = BackgammonGame()
