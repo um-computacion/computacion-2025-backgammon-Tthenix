@@ -112,7 +112,7 @@ class UserInterface:
             winner: The winner player object
         """
         self.display_header("GAME OVER!")
-        self.display_message(f"  WINNER: {winner.name} ({winner.color})")
+        self.display_message(f"  WINNER: {winner.__name__} ({winner.__color__})")
         self.display_separator("=")
         self.display_message("  Type 'quit' to exit")
         self.display_separator("=")
@@ -124,7 +124,7 @@ class UserInterface:
             current_player: The current player object
         """
         self.display_header(
-            f"CURRENT TURN: {current_player.name} ({current_player.color})"
+            f"CURRENT TURN: {current_player.__name__} ({current_player.__color__})"
         )
 
     def display_turn_ending(self, ending_player) -> None:
@@ -134,7 +134,7 @@ class UserInterface:
             ending_player: The player whose turn is ending
         """
         self.display_separator()
-        self.display_message(f"  {ending_player.name}'s turn has ended")
+        self.display_message(f"  {ending_player.__name__}'s turn has ended")
         self.display_separator()
 
     def display_new_turn(self, new_player) -> None:
@@ -143,6 +143,6 @@ class UserInterface:
         Args:
             new_player: The player whose turn is starting
         """
-        self.display_header(f"{new_player.name} ({new_player.color})'s turn begins")
+        self.display_header(f"{new_player.__name__} ({new_player.__color__})'s turn begins")
         self.display_message("  Type 'roll' to roll the dice")
         self.display_separator("=")

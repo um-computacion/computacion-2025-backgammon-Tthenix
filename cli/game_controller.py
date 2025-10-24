@@ -23,7 +23,7 @@ class GameController:
         Args:
             game: The BackgammonGame instance to control
         """
-        self.game = game
+        self.__game__ = game
 
     def roll_dice(self) -> tuple[int, int]:
         """Roll dice for the current player.
@@ -31,7 +31,7 @@ class GameController:
         Returns:
             Tuple of dice values
         """
-        return self.game.roll_dice()
+        return self.__game__.roll_dice()
 
     def make_move(self, from_point: int, to_point: int) -> bool:
         """Make a move on the board.
@@ -43,7 +43,7 @@ class GameController:
         Returns:
             True if move was successful, False otherwise
         """
-        return self.game.make_move(from_point, to_point)
+        return self.__game__.make_move(from_point, to_point)
 
     def move_from_bar(self, die_value: int) -> bool:
         """Move a checker from the bar.
@@ -54,7 +54,7 @@ class GameController:
         Returns:
             True if move was successful, False otherwise
         """
-        return self.game.move_from_bar(die_value)
+        return self.__game__.move_from_bar(die_value)
 
     def bear_off_checker(self, point: int) -> bool:
         """Bear off a checker from the board.
@@ -65,13 +65,13 @@ class GameController:
         Returns:
             True if bear off was successful, False otherwise
         """
-        return self.game.bear_off_checker(point)
+        return self.__game__.bear_off_checker(point)
 
     def end_turn(self) -> None:
         """End the current player's turn."""
-        self.game.last_roll = None
-        self.game.available_moves = []
-        self.game.switch_current_player()
+        self.__game__.__last_roll__ = None
+        self.__game__.__available_moves__ = []
+        self.__game__.switch_current_player()
 
     def get_possible_destinations(self, from_point: int) -> list[int]:
         """Get possible destinations from a point.
@@ -82,7 +82,7 @@ class GameController:
         Returns:
             List of possible destination points
         """
-        return self.game.get_possible_destinations(from_point)
+        return self.__game__.get_possible_destinations(from_point)
 
     def get_available_points_with_pieces(self, player_num: int) -> list[int]:
         """Get points that have pieces for a player.
@@ -95,7 +95,10 @@ class GameController:
         """
         available_points = []
         for i in range(24):
-            if self.game.board.points[i] and self.game.board.points[i][0] == player_num:
+            if (
+                self.__game__.__board__.__points__[i]
+                and self.__game__.__board__.__points__[i][0] == player_num
+            ):
                 available_points.append(i)
         return available_points
 
@@ -105,7 +108,7 @@ class GameController:
         Returns:
             True if player has valid moves, False otherwise
         """
-        return self.game.has_valid_moves()
+        return self.__game__.has_valid_moves()
 
     def must_enter_from_bar(self) -> bool:
         """Check if player must enter from bar.
@@ -113,7 +116,7 @@ class GameController:
         Returns:
             True if player must enter from bar, False otherwise
         """
-        return self.game.must_enter_from_bar()
+        return self.__game__.must_enter_from_bar()
 
     def is_game_over(self) -> bool:
         """Check if the game is over.
@@ -121,7 +124,7 @@ class GameController:
         Returns:
             True if game is over, False otherwise
         """
-        return self.game.is_game_over()
+        return self.__game__.is_game_over()
 
     def get_winner(self):
         """Get the winner of the game.
@@ -129,7 +132,7 @@ class GameController:
         Returns:
             The winner player object or None
         """
-        return self.game.get_winner()
+        return self.__game__.get_winner()
 
     def get_current_player(self):
         """Get the current player.
@@ -137,7 +140,7 @@ class GameController:
         Returns:
             The current player object
         """
-        return self.game.current_player
+        return self.__game__.__current_player__
 
     def get_game_state(self) -> dict:
         """Get the current game state.
@@ -146,8 +149,8 @@ class GameController:
             Dictionary containing game state information
         """
         return {
-            "last_roll": self.game.last_roll,
-            "available_moves": self.game.available_moves,
-            "current_player": self.game.current_player,
-            "is_game_over": self.game.is_game_over(),
+            "last_roll": self.__game__.__last_roll__,
+            "available_moves": self.__game__.__available_moves__,
+            "current_player": self.__game__.__current_player__,
+            "is_game_over": self.__game__.is_game_over(),
         }

@@ -30,17 +30,17 @@ class Player:
         if color not in ("white", "black"):
             raise ValueError("Color should be 'white' o 'black'")
 
-        self.name = name
-        self.color = color
-        self.checkers_count = self.TOTAL_CHECKERS
-        self.captured_checkers = 0
-        self.bear_off_count = 0
+        self.__name__ = name
+        self.__color__ = color
+        self.__checkers_count__ = self.TOTAL_CHECKERS
+        self.__captured_checkers__ = 0
+        self.__bear_off_count__ = 0
 
     def capture_checker(self):
         """Capture a checker (send it to the bar)."""
-        self.captured_checkers += 1
-        if self.checkers_count > 0:
-            self.checkers_count -= 1
+        self.__captured_checkers__ += 1
+        if self.__checkers_count__ > 0:
+            self.__checkers_count__ -= 1
 
     def release_captured_checker(self):
         """Release a captured checker (return from bar).
@@ -48,10 +48,10 @@ class Player:
         Raises:
             ValueError: If no captured checkers to release.
         """
-        if self.captured_checkers <= 0:
+        if self.__captured_checkers__ <= 0:
             raise ValueError("No captured checkers to release")
-        self.captured_checkers -= 1
-        self.checkers_count += 1
+        self.__captured_checkers__ -= 1
+        self.__checkers_count__ += 1
 
     def has_captured_checkers(self):
         """Check if player has captured checkers.
@@ -59,7 +59,7 @@ class Player:
         Returns:
             bool: True if player has captured checkers, False otherwise.
         """
-        return self.captured_checkers > 0
+        return self.__captured_checkers__ > 0
 
     def bear_off_checker(self):
         """Bear off a checker (remove from board).
@@ -67,10 +67,10 @@ class Player:
         Raises:
             ValueError: If no checkers available for bear off.
         """
-        if self.checkers_count <= 0:
+        if self.__checkers_count__ <= 0:
             raise ValueError("No checkers available for bear off")
-        self.checkers_count -= 1
-        self.bear_off_count += 1
+        self.__checkers_count__ -= 1
+        self.__bear_off_count__ += 1
 
     def can_bear_off(self):
         """Check if player can bear off checkers.
@@ -78,7 +78,7 @@ class Player:
         Returns:
             bool: True if player has checkers to bear off, False otherwise.
         """
-        return self.checkers_count > 0
+        return self.__checkers_count__ > 0
 
     def is_winner(self):
         """Check if player has won the game.
@@ -86,13 +86,13 @@ class Player:
         Returns:
             bool: True if all checkers are borne off, False otherwise.
         """
-        return self.bear_off_count == self.TOTAL_CHECKERS
+        return self.__bear_off_count__ == self.TOTAL_CHECKERS
 
     def reset(self):
         """Reset player state to initial values."""
-        self.checkers_count = self.TOTAL_CHECKERS
-        self.captured_checkers = 0
-        self.bear_off_count = 0
+        self.__checkers_count__ = self.TOTAL_CHECKERS
+        self.__captured_checkers__ = 0
+        self.__bear_off_count__ = 0
 
     def __str__(self):
         """Return string representation of the player.
@@ -101,8 +101,8 @@ class Player:
             str: String with player name, color, and checker counts.
         """
         return (
-            f"{self.name} ({self.color}) - Checkers: {self.checkers_count}, "
-            f"Captured: {self.captured_checkers}, Bear off: {self.bear_off_count}"
+            f"{self.__name__} ({self.__color__}) - Checkers: {self.__checkers_count__}, "
+            f"Captured: {self.__captured_checkers__}, Bear off: {self.__bear_off_count__}"
         )
 
     def __eq__(self, other):
@@ -116,8 +116,8 @@ class Player:
         """
         return (
             isinstance(other, Player)
-            and self.name == other.name
-            and self.color == other.color
+            and self.__name__ == other.__name__
+            and self.__color__ == other.__color__
         )
 
     def __hash__(self):
@@ -126,4 +126,4 @@ class Player:
         Returns:
             int: Hash based on name and color.
         """
-        return hash((self.name, self.color))
+        return hash((self.__name__, self.__color__))

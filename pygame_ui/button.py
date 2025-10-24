@@ -37,12 +37,12 @@ class Button:
             hover_color: Button color when hovered
             text_color: Text color
         """
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text = text
-        self.color = color
-        self.hover_color = hover_color
-        self.text_color = text_color
-        self.is_hovered = False
+        self.__rect__ = pygame.Rect(x, y, width, height)
+        self.__text__ = text
+        self.__color__ = color
+        self.__hover_color__ = hover_color
+        self.__text_color__ = text_color
+        self.__is_hovered__ = False
 
     def draw(self, surface: pygame.Surface) -> None:
         """
@@ -52,20 +52,20 @@ class Button:
             surface: Surface to draw on
         """
         # Choose color based on hover state
-        current_color = self.hover_color if self.is_hovered else self.color
+        current_color = self.__hover_color__ if self.__is_hovered__ else self.__color__
 
         # Draw button background with rounded corners
-        pygame.draw.rect(surface, current_color, self.rect, border_radius=10)
+        pygame.draw.rect(surface, current_color, self.__rect__, border_radius=10)
 
         # Draw button border
         border_color = (0, 0, 0)
-        pygame.draw.rect(surface, border_color, self.rect, 3, border_radius=10)
+        pygame.draw.rect(surface, border_color, self.__rect__, 3, border_radius=10)
 
         # Draw button text
         try:
             font = pygame.font.Font(None, 28)
-            text_surface = font.render(self.text, True, self.text_color)
-            text_rect = text_surface.get_rect(center=self.rect.center)
+            text_surface = font.render(self.__text__, True, self.__text_color__)
+            text_rect = text_surface.get_rect(center=self.__rect__.center)
             surface.blit(text_surface, text_rect)
         except pygame.error:  # pylint: disable=no-member
             pass  # If font fails, button will still be visible
@@ -81,8 +81,8 @@ class Button:
             True if button was clicked, False otherwise
         """
         if event.type == pygame.MOUSEMOTION:  # pylint: disable=no-member
-            self.is_hovered = self.rect.collidepoint(event.pos)
+            self.__is_hovered__ = self.__rect__.collidepoint(event.pos)
         elif event.type == pygame.MOUSEBUTTONDOWN:  # pylint: disable=no-member
-            if event.button == 1 and self.rect.collidepoint(event.pos):
+            if event.button == 1 and self.__rect__.collidepoint(event.pos):
                 return True
         return False

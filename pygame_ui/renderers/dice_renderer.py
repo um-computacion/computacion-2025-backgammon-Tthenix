@@ -26,9 +26,9 @@ class DiceRenderer:
             dice_size: Size of dice (width and height)
             dice_dot_radius: Radius of dice dots
         """
-        self.colors = colors
-        self.dice_size = dice_size
-        self.dice_dot_radius = dice_dot_radius
+        self.__colors__ = colors
+        self.__dice_size__ = dice_size
+        self.__dice_dot_radius__ = dice_dot_radius
 
     def draw_die_face(
         self,
@@ -51,26 +51,26 @@ class DiceRenderer:
         shadow_rect = pygame.Rect(
             x + shadow_offset,
             y + shadow_offset,
-            self.dice_size,
-            self.dice_size,
+            self.__dice_size__,
+            self.__dice_size__,
         )
         pygame.draw.rect(
-            surface, self.colors["dice_shadow"], shadow_rect, border_radius=5
+            surface, self.__colors__["dice_shadow"], shadow_rect, border_radius=5
         )
 
         # Draw main die body
-        die_rect = pygame.Rect(x, y, self.dice_size, self.dice_size)
-        pygame.draw.rect(surface, self.colors["dice_white"], die_rect, border_radius=5)
+        die_rect = pygame.Rect(x, y, self.__dice_size__, self.__dice_size__)
+        pygame.draw.rect(surface, self.__colors__["dice_white"], die_rect, border_radius=5)
 
         # Draw border
         pygame.draw.rect(
-            surface, self.colors["dice_border"], die_rect, 2, border_radius=5
+            surface, self.__colors__["dice_border"], die_rect, 2, border_radius=5
         )
 
         # Calculate dot positions
-        center_x = x + self.dice_size // 2
-        center_y = y + self.dice_size // 2
-        offset = self.dice_size // 4
+        center_x = x + self.__dice_size__ // 2
+        center_y = y + self.__dice_size__ // 2
+        offset = self.__dice_size__ // 4
 
         # Draw dots based on value
         self._draw_dots_for_value(surface, value, center_x, center_y, offset)
@@ -132,9 +132,9 @@ class DiceRenderer:
         """
         pygame.draw.circle(
             surface,
-            self.colors["dice_dot"],
+            self.__colors__["dice_dot"],
             (x, y),
-            self.dice_dot_radius,
+            self.__dice_dot_radius__,
         )
 
     def draw_dice(  # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -167,10 +167,10 @@ class DiceRenderer:
         # Dibujar dados con desplazamientos agradables
         offsets = []
         if len(values) == 2:
-            offsets = [(0, 0), (self.dice_size + 10, 15)]
+            offsets = [(0, 0), (self.__dice_size__ + 10, 15)]
         else:
             # 4 dados en fila con ligeros desplazamientos verticales
-            step = self.dice_size + 10
+            step = self.__dice_size__ + 10
             offsets = [(0, 0), (step, 15), (2 * step, 0), (3 * step, 15)]
 
         for i, val in enumerate(values):

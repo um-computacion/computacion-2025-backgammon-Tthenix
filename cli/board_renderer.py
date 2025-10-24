@@ -19,8 +19,8 @@ class BoardRenderer:
 
     def __init__(self):
         """Initialize the board renderer."""
-        self.board_width = 60
-        self.separator_char = "="
+        self.__board_width__ = 60
+        self.__separator_char__ = "="
 
     def render_board(self, game: "BackgammonGame") -> None:
         """Render the complete game board with current state.
@@ -28,8 +28,8 @@ class BoardRenderer:
         Args:
             game: The BackgammonGame instance to render
         """
-        board = game.board
-        current_player = game.current_player
+        board = game.__board__
+        current_player = game.__current_player__
 
         # Display current turn prominently
         self._render_turn_header(current_player)
@@ -46,9 +46,9 @@ class BoardRenderer:
         Args:
             current_player: The current player object
         """
-        print("\n" + self.separator_char * self.board_width)
-        print(f"  CURRENT TURN: {current_player.name} ({current_player.color})")
-        print(self.separator_char * self.board_width)
+        print("\n" + self.__separator_char__ * self.__board_width__)
+        print(f"  CURRENT TURN: {current_player.__name__} ({current_player.__color__})")
+        print(self.__separator_char__ * self.__board_width__)
 
     def _render_main_board(self, board) -> None:
         """Render the main game board.
@@ -62,8 +62,8 @@ class BoardRenderer:
 
         left_top = [self._format_point(board, i) for i in range(12, 18)]  # 13..18
         right_top = [self._format_point(board, i) for i in range(18, 24)]  # 19..24
-        bar_w = len(board.checker_bar[0])
-        bar_b = len(board.checker_bar[1])
+        bar_w = len(board.__checker_bar__[0])
+        bar_b = len(board.__checker_bar__[1])
         print(f"  {' '.join(left_top)}    W:{bar_w}|B:{bar_b}    {' '.join(right_top)}")
 
         print(" +--------------------+     +--------------------+")
@@ -80,10 +80,10 @@ class BoardRenderer:
         Args:
             board: The board object to render
         """
-        white_off = len(board.off_board[0])
-        black_off = len(board.off_board[1])
+        white_off = len(board.__off_board__[0])
+        black_off = len(board.__off_board__[1])
         print(f"\n  Bearing off - White: {white_off} | Black: {black_off}")
-        print(self.separator_char * self.board_width + "\n")
+        print(self.__separator_char__ * self.__board_width__ + "\n")
 
     def _format_point(self, board, idx: int) -> str:
         """Format a point for display.
@@ -95,7 +95,7 @@ class BoardRenderer:
         Returns:
             Formatted string representation of the point
         """
-        pieces = board.points[idx]
+        pieces = board.__points__[idx]
         if not pieces:
             return "  "
         owner = "W" if pieces[0] == 1 else "B"
@@ -108,38 +108,41 @@ class BoardRenderer:
         Args:
             game: The BackgammonGame instance to render status for
         """
-        print("\n" + self.separator_char * self.board_width)
+        print("\n" + self.__separator_char__ * self.__board_width__)
         print("  GAME STATUS")
-        print(self.separator_char * self.board_width)
+        print(self.__separator_char__ * self.__board_width__)
 
         # Show current player
-        current_player = game.current_player
-        print(f"  Current Player: {current_player.name} ({current_player.color})")
+        current_player = game.__current_player__
+        print(
+            f"  Current Player: {current_player.__name__} ({current_player.__color__})"
+        )
 
         # Show dice information
-        if game.last_roll:
-            print(f"  Last Roll: {game.last_roll[0]} and {game.last_roll[1]}")
-            print(f"  Available Moves: {game.available_moves}")
+        if game.__last_roll__:
+            print(f"  Last roll: {game.__last_roll__[0]} and {game.__last_roll__[1]}")
+            print(f"  Available moves: {game.__available_moves__}")
         else:
-            print("  No dice rolled yet")
+            print("  Last roll: None")
+            print("  Available moves: []")
 
         # Show game over status
         if game.is_game_over():
             winner = game.get_winner()
             if winner:
-                print(f"  GAME OVER - Winner: {winner.name} ({winner.color})")
+                print(f"  GAME OVER - Winner: {winner.__name__} ({winner.__color__})")
             else:
                 print("  GAME OVER - Draw")
         else:
             print("  Game in progress")
 
-        print(self.separator_char * self.board_width)
+        print(self.__separator_char__ * self.__board_width__)
 
     def render_help(self) -> None:
         """Render the help information for the board display."""
-        print("\n" + self.separator_char * self.board_width)
+        print("\n" + self.__separator_char__ * self.__board_width__)
         print("  BOARD DISPLAY HELP")
-        print(self.separator_char * self.board_width)
+        print(self.__separator_char__ * self.__board_width__)
         print("  Board Layout:")
         print("    - Points 1-24 are numbered from bottom to top")
         print("    - W = White pieces, B = Black pieces")
@@ -150,7 +153,7 @@ class BoardRenderer:
         print("    - 'board' or 'b' to display this board")
         print("    - 'status' or 's' for game status")
         print("    - 'help' or 'h' for all commands")
-        print(self.separator_char * self.board_width)
+        print(self.__separator_char__ * self.__board_width__)
 
     def set_board_width(self, width: int) -> None:
         """Set the board display width.
@@ -158,7 +161,7 @@ class BoardRenderer:
         Args:
             width: The width for board display
         """
-        self.board_width = max(40, min(120, width))  # Clamp between 40 and 120
+        self.__board_width__ = max(40, min(120, width))  # Clamp between 40 and 120
 
     def set_separator_char(self, char: str) -> None:
         """Set the separator character for board display.
@@ -166,4 +169,4 @@ class BoardRenderer:
         Args:
             char: The character to use for separators
         """
-        self.separator_char = char if char else "="
+        self.__separator_char__ = char if char else "="

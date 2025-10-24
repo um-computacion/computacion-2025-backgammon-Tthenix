@@ -23,84 +23,84 @@ class BackgammonGame:
     def __init__(self, player1=None, player2=None):
         """Initialize a new backgammon game."""
         if player1 is None:
-            self.player1 = Player("Player 1", "white")
+            self.__player1__ = Player("Player 1", "white")
         else:
-            self.player1 = player1
+            self.__player1__ = player1
 
         if player2 is None:
-            self.player2 = Player("Player 2", "black")
+            self.__player2__ = Player("Player 2", "black")
         else:
-            self.player2 = player2
+            self.__player2__ = player2
 
-        self.board = Board()
-        self.dice = Dice()
-        self.current_player = self.player1
-        self.last_roll = None
-        self.available_moves = []
-        self.move_history = []
+        self.__board__ = Board()
+        self.__dice__ = Dice()
+        self.__current_player__ = self.__player1__
+        self.__last_roll__ = None
+        self.__available_moves__ = []
+        self.__move_history__ = []
 
         # Initialize checker objects for each player
-        self.player1_checkers = [Checker("white") for _ in range(15)]
-        self.player2_checkers = [Checker("black") for _ in range(15)]
+        self.__player1_checkers__ = [Checker("white") for _ in range(15)]
+        self.__player2_checkers__ = [Checker("black") for _ in range(15)]
 
     def setup_initial_position(self):
         """Set up the initial board position using Checker objects."""
-        self.board.setup_initial_position()
+        self.__board__.setup_initial_position()
 
         # Reset all checkers
-        for checker in self.player1_checkers:
+        for checker in self.__player1_checkers__:
             checker.reset()
-        for checker in self.player2_checkers:
+        for checker in self.__player2_checkers__:
             checker.reset()
 
         # Place player 1 checkers in their initial positions
         checker_index = 0
         # Point 1 (0-indexed as 0): 2 checkers
         for _ in range(2):
-            self.player1_checkers[checker_index].place_on_point(1)
+            self.__player1_checkers__[checker_index].place_on_point(1)
             checker_index += 1
         # Point 12 (0-indexed as 11): 5 checkers
         for _i in range(5):
-            self.player1_checkers[checker_index].place_on_point(12)
+            self.__player1_checkers__[checker_index].place_on_point(12)
             checker_index += 1
         # Point 17 (0-indexed as 16): 3 checkers
         for _i in range(3):
-            self.player1_checkers[checker_index].place_on_point(17)
+            self.__player1_checkers__[checker_index].place_on_point(17)
             checker_index += 1
         # Point 19 (0-indexed as 18): 5 checkers
         for _i in range(5):
-            self.player1_checkers[checker_index].place_on_point(19)
+            self.__player1_checkers__[checker_index].place_on_point(19)
             checker_index += 1
 
         # Place player 2 checkers in their initial positions
         checker_index = 0
         # Point 24 (0-indexed as 23): 2 checkers
         for _i in range(2):
-            self.player2_checkers[checker_index].place_on_point(24)
+            self.__player2_checkers__[checker_index].place_on_point(24)
             checker_index += 1
         # Point 13 (0-indexed as 12): 5 checkers
         for _i in range(5):
-            self.player2_checkers[checker_index].place_on_point(13)
+            self.__player2_checkers__[checker_index].place_on_point(13)
             checker_index += 1
         # Point 8 (0-indexed as 7): 3 checkers
         for _i in range(3):
-            self.player2_checkers[checker_index].place_on_point(8)
+            self.__player2_checkers__[checker_index].place_on_point(8)
             checker_index += 1
         # Point 6 (0-indexed as 5): 5 checkers
         for _i in range(5):
-            self.player2_checkers[checker_index].place_on_point(6)
+            self.__player2_checkers__[checker_index].place_on_point(6)
             checker_index += 1
 
     def get_checkers_at_point(self, point, player_num):
         """Get all checker objects at a specific point for a player."""
         checkers = []
         if player_num == 1:
-            for checker in self.player1_checkers:
-                if checker.position == point + 1:  # Convert 0-based to 1-based
+            for checker in self.__player1_checkers__:
+                if checker.__position__ == point + 1:  # Convert 0-based to 1-based
                     checkers.append(checker)
         else:
-            for checker in self.player2_checkers:
-                if checker.position == point + 1:  # Convert 0-based to 1-based
+            for checker in self.__player2_checkers__:
+                if checker.__position__ == point + 1:  # Convert 0-based to 1-based
                     checkers.append(checker)
         return checkers
 
@@ -108,12 +108,12 @@ class BackgammonGame:
         """Get all checker objects on the bar for a player."""
         checkers = []
         if player_num == 1:
-            for checker in self.player1_checkers:
-                if checker.is_on_bar:
+            for checker in self.__player1_checkers__:
+                if checker.__is_on_bar__:
                     checkers.append(checker)
         else:
-            for checker in self.player2_checkers:
-                if checker.is_on_bar:
+            for checker in self.__player2_checkers__:
+                if checker.__is_on_bar__:
                     checkers.append(checker)
         return checkers
 
@@ -121,12 +121,12 @@ class BackgammonGame:
         """Get all checker objects that have been borne off for a player."""
         checkers = []
         if player_num == 1:
-            for checker in self.player1_checkers:
-                if checker.is_borne_off:
+            for checker in self.__player1_checkers__:
+                if checker.__is_borne_off__:
                     checkers.append(checker)
         else:
-            for checker in self.player2_checkers:
-                if checker.is_borne_off:
+            for checker in self.__player2_checkers__:
+                if checker.__is_borne_off__:
                     checkers.append(checker)
         return checkers
 
@@ -184,16 +184,16 @@ class BackgammonGame:
 
     def roll_dice(self):
         """Roll dice and update game state."""
-        roll = self.dice.roll()
-        self.last_roll = roll
-        self.available_moves = self.dice.get_moves(roll)
+        roll = self.__dice__.roll()
+        self.__last_roll__ = roll
+        self.__available_moves__ = self.__dice__.__get_moves__(roll)
         return roll
 
     def get_available_moves(self):
         """Get available moves based on last dice roll."""
-        if self.last_roll is None:
+        if self.__last_roll__ is None:
             return []
-        return self.dice.get_moves(self.last_roll)
+        return self.__dice__.__get_moves__(self.__last_roll__)
 
     def validate_move(self, from_point, to_point):
         """Validate if a move is legal."""
@@ -216,32 +216,32 @@ class BackgammonGame:
             return False
 
         # Delegate final validation to the board
-        return self.board.can_move(from_point, to_point, player_num)
+        return self.__board__.can_move(from_point, to_point, player_num)
 
     # ---- Internal helpers to keep validate_move simple (reduce branches/returns) ----
     def _ensure_moves_available(self):
         """Return True if there is a last roll and available moves are populated."""
-        if self.last_roll is None:
+        if self.__last_roll__ is None:
             return False
-        if len(self.available_moves) == 0:
-            self.available_moves = self.dice.get_moves(self.last_roll)
-        return len(self.available_moves) > 0
+        if len(self.__available_moves__) == 0:
+            self.__available_moves__ = self.__dice__.__get_moves__(self.__last_roll__)
+        return len(self.__available_moves__) > 0
 
     def _get_current_player_num(self):
         """Return 1 for player1, 2 for player2."""
-        return 1 if self.current_player == self.player1 else 2
+        return 1 if self.__current_player__ == self.__player1__ else 2
 
     def _has_player_piece_at(self, from_point, player_num):
         """Check bounds and that the top checker at from_point belongs to player_num."""
         if from_point < 0 or from_point >= 24:
             return False
-        if len(self.board.points[from_point]) == 0:
+        if len(self.__board__.__points__[from_point]) == 0:
             return False
-        return self.board.points[from_point][0] == player_num
+        return self.__board__.__points__[from_point][0] == player_num
 
     def _is_distance_available(self, distance):
         """Check whether the rolled distances include the given distance."""
-        for move_distance in self.available_moves:
+        for move_distance in self.__available_moves__:
             if move_distance == distance:
                 return True
         return False
@@ -259,7 +259,7 @@ class BackgammonGame:
         if not self.validate_move(from_point, to_point):
             return False
 
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
@@ -267,7 +267,7 @@ class BackgammonGame:
         distance = abs(to_point - from_point)
 
         # Save previous state for history
-        old_board = self.board.copy()
+        old_board = self.__board__.copy()
         move_info = {
             "from": from_point,
             "to": to_point,
@@ -277,21 +277,21 @@ class BackgammonGame:
         }
 
         # Check if there's a capture
-        if len(self.board.points[to_point]) > 0:
-            if len(self.board.points[to_point]) == 1:
-                if self.board.points[to_point][0] != player_num:
-                    move_info["captured"] = self.board.points[to_point][0]
+        if len(self.__board__.__points__[to_point]) > 0:
+            if len(self.__board__.__points__[to_point]) == 1:
+                if self.__board__.__points__[to_point][0] != player_num:
+                    move_info["captured"] = self.__board__.__points__[to_point][0]
 
         # Execute movement
-        success = self.board.move_piece(from_point, to_point, player_num)
+        success = self.__board__.move_piece(from_point, to_point, player_num)
 
         if success:
             # Remove used dice value - find and remove the first matching distance
-            for i, move in enumerate(self.available_moves):
+            for i, move in enumerate(self.__available_moves__):
                 if move == distance:
-                    self.available_moves.pop(i)
+                    self.__available_moves__.pop(i)
                     break
-            self.move_history.append(move_info)
+            self.__move_history__.append(move_info)
 
         return success
 
@@ -299,14 +299,14 @@ class BackgammonGame:
         """Move a checker from the bar to the board."""
         # Check if the dice value is available
         found_dice = False
-        for move in self.available_moves:
+        for move in self.__available_moves__:
             if move == dice_value:
                 found_dice = True
                 break
         if not found_dice:
             return False
 
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
             # Fichas blancas (1) capturadas están en el lado negro (index 1)
             player_bar_index = 1
@@ -318,7 +318,7 @@ class BackgammonGame:
         # Check if player has their own checkers on opponent's side
         player_pieces_on_bar = [
             piece
-            for piece in self.board.checker_bar[player_bar_index]
+            for piece in self.__board__.__checker_bar__[player_bar_index]
             if piece == player_num
         ]
         if len(player_pieces_on_bar) == 0:
@@ -338,7 +338,7 @@ class BackgammonGame:
             return False
 
         # Save move for history
-        old_board = self.board.copy()
+        old_board = self.__board__.copy()
         move_info = {
             "from": "bar",
             "to": entry_point,
@@ -348,25 +348,25 @@ class BackgammonGame:
         }
 
         # Execute movement
-        success = self.board.enter_from_bar(entry_point, player_num)
+        success = self.__board__.enter_from_bar(entry_point, player_num)
 
         if success:
             # Remove used dice value - find and remove the first matching dice value
-            for i, move in enumerate(self.available_moves):
+            for i, move in enumerate(self.__available_moves__):
                 if move == dice_value:
-                    self.available_moves.pop(i)
+                    self.__available_moves__.pop(i)
                     break
-            self.move_history.append(move_info)
+            self.__move_history__.append(move_info)
 
         return success
 
     def can_bear_off(self, player_num):
         """Check if a player can bear off checkers."""
-        return self.board.is_all_pieces_in_home(player_num)
+        return self.__board__.is_all_pieces_in_home(player_num)
 
     def bear_off_checker(self, point):
         """Bear off a checker from the board."""
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
@@ -375,18 +375,18 @@ class BackgammonGame:
             return False
 
         # Update available moves if they are empty
-        if len(self.available_moves) == 0 and self.last_roll is not None:
-            self.available_moves = self.dice.get_moves(self.last_roll)
+        if len(self.__available_moves__) == 0 and self.__last_roll__ is not None:
+            self.__available_moves__ = self.__dice__.__get_moves__(self.__last_roll__)
 
         # Check if there are valid dice values
-        if len(self.available_moves) == 0:
+        if len(self.__available_moves__) == 0:
             return False
 
         # Try each available dice value
-        for i, dice_value in enumerate(self.available_moves):
-            if self.board.can_bear_off(point, player_num, dice_value):
+        for i, dice_value in enumerate(self.__available_moves__):
+            if self.__board__.can_bear_off(point, player_num, dice_value):
                 # Save move for history
-                old_board = self.board.copy()
+                old_board = self.__board__.copy()
                 move_info = {
                     "from": point,
                     "to": "off",
@@ -395,116 +395,120 @@ class BackgammonGame:
                     "board_state": old_board,
                 }
 
-                success = self.board.bear_off_piece(point, player_num)
+                success = self.__board__.bear_off_piece(point, player_num)
                 if success:
                     # Remove the used dice value
-                    self.available_moves.pop(i)
-                    self.move_history.append(move_info)
+                    self.__available_moves__.pop(i)
+                    self.__move_history__.append(move_info)
                     return True
 
         return False
 
     def switch_current_player(self):
         """Switch to the other player."""
-        if self.current_player == self.player1:
-            self.current_player = self.player2
+        if self.__current_player__ == self.__player1__:
+            self.__current_player__ = self.__player2__
         else:
-            self.current_player = self.player1
+            self.__current_player__ = self.__player1__
 
         # Clear dice state when switching players
-        self.last_roll = None
-        self.available_moves = []
+        self.__last_roll__ = None
+        self.__available_moves__ = []
 
     def is_game_over(self):
         """Check if the game is over."""
-        return self.board.is_game_over()
+        return self.__board__.is_game_over()
 
     def get_winner(self):
         """Get the winner of the game."""
-        winner_num = self.board.get_winner()
+        winner_num = self.__board__.get_winner()
         if winner_num == 1:
-            return self.player1
+            return self.__player1__
         if winner_num == 2:
-            return self.player2
+            return self.__player2__
         return None
 
     def get_game_state(self):
         """Get the current game state."""
         state = {}
-        state["board"] = self.board.get_board_state()
-        state["current_player"] = self.current_player
-        state["last_roll"] = self.last_roll
+        state["board"] = self.__board__.get_board_state()
+        state["current_player"] = self.__current_player__
+        state["last_roll"] = self.__last_roll__
         state["available_moves"] = []
-        for move in self.available_moves:
+        for move in self.__available_moves__:
             state["available_moves"].append(move)
         state["game_over"] = self.is_game_over()
         return state
 
     def get_player_by_color(self, color):
         """Get player by color."""
-        if self.player1.color == color:
-            return self.player1
-        if self.player2.color == color:
-            return self.player2
+        if self.__player1__.__color__ == color:
+            return self.__player1__
+        if self.__player2__.__color__ == color:
+            return self.__player2__
         return None
 
     def reset_game(self):
         """Reset the game to initial state."""
-        self.board = Board()
-        self.current_player = self.player1
-        self.last_roll = None
-        self.available_moves = []
-        self.move_history = []
-        self.player1.reset()
-        self.player2.reset()
+        self.__board__ = Board()
+        self.__current_player__ = self.__player1__
+        self.__last_roll__ = None
+        self.__available_moves__ = []
+        self.__move_history__ = []
+        self.__player1__.reset()
+        self.__player2__.reset()
 
         # Reset all checker objects
-        for checker in self.player1_checkers:
+        for checker in self.__player1_checkers__:
             checker.reset()
-        for checker in self.player2_checkers:
+        for checker in self.__player2_checkers__:
             checker.reset()
 
     def copy_game_state(self):
         """Create a copy of the current game state."""
         state = {}
-        state["board"] = self.board.copy()
+        state["board"] = self.__board__.copy()
         state["players"] = {}
-        state["players"]["player1"] = Player(self.player1.name, self.player1.color)
-        state["players"]["player2"] = Player(self.player2.name, self.player2.color)
-        state["current_player"] = self.current_player
-        state["last_roll"] = self.last_roll
+        state["players"]["player1"] = Player(
+            self.__player1__.__name__, self.__player1__.__color__
+        )
+        state["players"]["player2"] = Player(
+            self.__player2__.__name__, self.__player2__.__color__
+        )
+        state["current_player"] = self.__current_player__
+        state["last_roll"] = self.__last_roll__
         state["available_moves"] = []
-        for move in self.available_moves:
+        for move in self.__available_moves__:
             state["available_moves"].append(move)
         state["move_history"] = []
-        for move in self.move_history:
+        for move in self.__move_history__:
             state["move_history"].append(move)
         return state
 
     def undo_last_move(self):
         """Undo the last move."""
-        if len(self.move_history) == 0:
+        if len(self.__move_history__) == 0:
             return False
 
-        last_move = self.move_history.pop()
-        self.board = last_move["board_state"]
+        last_move = self.__move_history__.pop()
+        self.__board__ = last_move["board_state"]
 
         # Restore available moves
-        if self.last_roll is not None:
-            self.available_moves = self.dice.get_moves(self.last_roll)
+        if self.__last_roll__ is not None:
+            self.__available_moves__ = self.__dice__.__get_moves__(self.__last_roll__)
 
         return True
 
     def get_possible_destinations(self, from_point):
         """Get possible destinations from a given point."""
         # Update available moves if they are empty
-        if len(self.available_moves) == 0 and self.last_roll is not None:
-            self.available_moves = self.dice.get_moves(self.last_roll)
+        if len(self.__available_moves__) == 0 and self.__last_roll__ is not None:
+            self.__available_moves__ = self.__dice__.__get_moves__(self.__last_roll__)
 
-        if len(self.available_moves) == 0:
+        if len(self.__available_moves__) == 0:
             return []
 
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
@@ -512,20 +516,20 @@ class BackgammonGame:
         # Check if there's a piece at the origin
         if from_point < 0 or from_point >= 24:
             return []
-        if len(self.board.points[from_point]) == 0:
+        if len(self.__board__.__points__[from_point]) == 0:
             return []
-        if self.board.points[from_point][0] != player_num:
+        if self.__board__.__points__[from_point][0] != player_num:
             return []
 
         destinations = []
-        for move_dist in self.available_moves:
+        for move_dist in self.__available_moves__:
             if player_num == 1:
                 to_point = from_point + move_dist
             else:
                 to_point = from_point - move_dist
 
             if 0 <= to_point < 24:
-                if self.board.can_move(from_point, to_point, player_num):
+                if self.__board__.can_move(from_point, to_point, player_num):
                     destinations.append(to_point)
 
         return destinations
@@ -533,13 +537,13 @@ class BackgammonGame:
     def has_valid_moves(self):
         """Check if current player has valid moves."""
         # Update available moves if they are empty
-        if len(self.available_moves) == 0 and self.last_roll is not None:
-            self.available_moves = self.dice.get_moves(self.last_roll)
+        if len(self.__available_moves__) == 0 and self.__last_roll__ is not None:
+            self.__available_moves__ = self.__dice__.__get_moves__(self.__last_roll__)
 
-        if len(self.available_moves) == 0:
+        if len(self.__available_moves__) == 0:
             return False
 
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
@@ -559,13 +563,13 @@ class BackgammonGame:
 
     def _can_enter_from_bar(self, player_num):
         """Return True if the player can legally enter from the bar with any die."""
-        for dice_value in self.available_moves:
+        for dice_value in self.__available_moves__:
             if player_num == 1:
                 entry_point = dice_value - 1  # Blancas entran en 0-5
             else:
                 entry_point = 24 - dice_value  # Negras entran en 19-24
             if 0 <= entry_point < 24:
-                point = self.board.points[entry_point]
+                point = self.__board__.__points__[entry_point]
                 if len(point) == 0:
                     return True
                 if len(point) < 2:
@@ -585,26 +589,26 @@ class BackgammonGame:
 
         for point in home_points:
             if (
-                not self.board.points[point]
-                or self.board.points[point][0] != player_num
+                not self.__board__.__points__[point]
+                or self.__board__.__points__[point][0] != player_num
             ):
                 continue
-            for dice_value in self.available_moves:
-                if self.board.can_bear_off(point, player_num, dice_value):
+            for dice_value in self.__available_moves__:
+                if self.__board__.can_bear_off(point, player_num, dice_value):
                     return True
         return False
 
     def must_enter_from_bar(self):
         """Check if current player must enter checkers from bar."""
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
-        return self.board.has_pieces_on_bar(player_num)
+        return self.__board__.has_pieces_on_bar(player_num)
 
     def get_pip_count(self, player):
         """Calculate pip count for a player."""
-        if player == self.player1:
+        if player == self.__player1__:
             player_num = 1
         else:
             player_num = 2
@@ -613,7 +617,7 @@ class BackgammonGame:
 
         # Count pips for pieces on board
         for point_idx in range(24):
-            point = self.board.points[point_idx]
+            point = self.__board__.__points__[point_idx]
             for piece in point:
                 if piece == player_num:
                     if player_num == 1:
@@ -628,14 +632,18 @@ class BackgammonGame:
             player_bar_index = 1
             # Contar solo las fichas blancas en la barra
             bar_pieces = sum(
-                1 for piece in self.board.checker_bar[player_bar_index] if piece == 1
+                1
+                for piece in self.__board__.__checker_bar__[player_bar_index]
+                if piece == 1
             )
             pip_count = pip_count + (bar_pieces * 25)
         else:
             player_bar_index = 0
             # Contar solo las fichas negras en la barra
             bar_pieces = sum(
-                1 for piece in self.board.checker_bar[player_bar_index] if piece == 2
+                1
+                for piece in self.__board__.__checker_bar__[player_bar_index]
+                if piece == 2
             )
             pip_count = pip_count + (bar_pieces * 24)
 
@@ -653,7 +661,7 @@ class BackgammonGame:
         if point < 0 or point >= 24:
             return False
 
-        pieces = self.board.points[point]
+        pieces = self.__board__.__points__[point]
         if len(pieces) >= 2 and pieces[0] != player_num:
             return True
         return False
@@ -663,7 +671,7 @@ class BackgammonGame:
         if point < 0 or point >= 24:
             return False
 
-        pieces = self.board.points[point]
+        pieces = self.__board__.__points__[point]
         if len(pieces) == 1 and pieces[0] != player_num:
             return True
         return False
@@ -675,12 +683,12 @@ class BackgammonGame:
     def validate_complete_turn(self, moves):
         """Validate a complete turn with multiple moves."""
         # Create a temporary board to test moves
-        temp_board = self.board.copy()
+        temp_board = self.__board__.copy()
         temp_moves = []
-        for move in self.available_moves:
+        for move in self.__available_moves__:
             temp_moves.append(move)
 
-        if self.current_player == self.player1:
+        if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2

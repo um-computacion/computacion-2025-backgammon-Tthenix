@@ -20,7 +20,7 @@ class BoardRenderer:
         Args:
             colors: Dictionary of color definitions
         """
-        self.colors = colors
+        self.__colors__ = colors
 
     def create_wood_texture_surface(self, width: int, height: int) -> pygame.Surface:
         """
@@ -34,7 +34,7 @@ class BoardRenderer:
             Surface with wood texture pattern
         """
         surface = pygame.Surface((width, height))
-        base_color = self.colors["wood_light"]
+        base_color = self.__colors__["wood_light"]
 
         # Fill with base wood color
         surface.fill(base_color)
@@ -121,7 +121,7 @@ class BoardRenderer:
             ]
 
         pygame.draw.polygon(surface, color, points)
-        pygame.draw.polygon(surface, self.colors["black"], points, 2)
+        pygame.draw.polygon(surface, self.__colors__["black"], points, 2)
 
     def draw_center_gap(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
@@ -144,12 +144,12 @@ class BoardRenderer:
         gap_rect = pygame.Rect(gap_x, gap_y, gap_width, gap_height)
 
         # Fill with darker brown for recessed effect
-        pygame.draw.rect(surface, self.colors["center_gap"], gap_rect)
+        pygame.draw.rect(surface, self.__colors__["center_gap"], gap_rect)
 
         # Add shadow effect on the left side
         shadow_width = 4
         shadow_rect = pygame.Rect(gap_x, gap_y, shadow_width, gap_height)
-        pygame.draw.rect(surface, self.colors["center_gap_shadow"], shadow_rect)
+        pygame.draw.rect(surface, self.__colors__["center_gap_shadow"], shadow_rect)
 
         # Add shadow effect on the right side
         shadow_rect = pygame.Rect(
@@ -158,14 +158,14 @@ class BoardRenderer:
             shadow_width,
             gap_height,
         )
-        pygame.draw.rect(surface, self.colors["center_gap_shadow"], shadow_rect)
+        pygame.draw.rect(surface, self.__colors__["center_gap_shadow"], shadow_rect)
 
         # Add wood grain texture to the gap
         for i in range(0, gap_width, 6):
             line_color = (
-                max(0, self.colors["center_gap"][0] - 10),
-                max(0, self.colors["center_gap"][1] - 10),
-                max(0, self.colors["center_gap"][2] - 10),
+                max(0, self.__colors__["center_gap"][0] - 10),
+                max(0, self.__colors__["center_gap"][1] - 10),
+                max(0, self.__colors__["center_gap"][2] - 10),
             )
             pygame.draw.line(
                 surface,
@@ -178,9 +178,9 @@ class BoardRenderer:
         # Add horizontal wood grain lines for natural texture
         for y in range(gap_y, gap_y + gap_height, 12):
             line_color = (
-                max(0, self.colors["center_gap"][0] - 15),
-                max(0, self.colors["center_gap"][1] - 15),
-                max(0, self.colors["center_gap"][2] - 15),
+                max(0, self.__colors__["center_gap"][0] - 15),
+                max(0, self.__colors__["center_gap"][1] - 15),
+                max(0, self.__colors__["center_gap"][2] - 15),
             )
             pygame.draw.line(
                 surface,
@@ -215,7 +215,7 @@ class BoardRenderer:
         white_zone_rect = pygame.Rect(
             bear_off_x, bear_off_y, bear_off_width, zone_height
         )
-        pygame.draw.rect(surface, self.colors["bear_off_bg"], white_zone_rect)
+        pygame.draw.rect(surface, self.__colors__["bear_off_bg"], white_zone_rect)
 
         # Add wood grain texture to white zone
         self._add_wood_texture(
@@ -224,7 +224,7 @@ class BoardRenderer:
             bear_off_y,
             bear_off_width,
             zone_height,
-            self.colors["bear_off_bg"],
+            self.__colors__["bear_off_bg"],
         )
 
         # Draw BLACK zone (bottom) - dark wood
@@ -233,9 +233,9 @@ class BoardRenderer:
         )
         # Use darker wood color for black zone
         dark_wood = (
-            max(0, self.colors["bear_off_bg"][0] - 40),
-            max(0, self.colors["bear_off_bg"][1] - 40),
-            max(0, self.colors["bear_off_bg"][2] - 40),
+            max(0, self.__colors__["bear_off_bg"][0] - 40),
+            max(0, self.__colors__["bear_off_bg"][1] - 40),
+            max(0, self.__colors__["bear_off_bg"][2] - 40),
         )
         pygame.draw.rect(surface, dark_wood, black_zone_rect)
 
@@ -253,13 +253,13 @@ class BoardRenderer:
         bear_off_rect = pygame.Rect(
             bear_off_x, bear_off_y, bear_off_width, bear_off_height
         )
-        pygame.draw.rect(surface, self.colors["bear_off_border"], bear_off_rect, 3)
+        pygame.draw.rect(surface, self.__colors__["bear_off_border"], bear_off_rect, 3)
 
         # Draw dividing line between zones
         middle_y = bear_off_y + bear_off_height // 2
         pygame.draw.line(
             surface,
-            self.colors["bear_off_border"],
+            self.__colors__["bear_off_border"],
             (bear_off_x, middle_y),
             (bear_off_x + bear_off_width, middle_y),
             2,
@@ -284,7 +284,7 @@ class BoardRenderer:
             font = pygame.font.Font(None, 24)
 
             # White player bear off area (top)
-            white_text = font.render("WHITE", True, self.colors["black"])
+            white_text = font.render("WHITE", True, self.__colors__["black"])
             white_rect = white_text.get_rect()
             white_rect.center = (
                 bear_off_x + bear_off_width // 2,
@@ -293,7 +293,7 @@ class BoardRenderer:
             surface.blit(white_text, white_rect)
 
             # Black player bear off area (bottom)
-            black_text = font.render("BLACK", True, self.colors["black"])
+            black_text = font.render("BLACK", True, self.__colors__["black"])
             black_rect = black_text.get_rect()
             black_rect.center = (
                 bear_off_x + bear_off_width // 2,
@@ -305,7 +305,7 @@ class BoardRenderer:
             # If font loading fails, draw simple geometric indicators
             pygame.draw.circle(
                 surface,
-                self.colors["white"],
+                self.__colors__["white"],
                 (
                     bear_off_x + bear_off_width // 2,
                     bear_off_y + bear_off_height // 4,
@@ -314,7 +314,7 @@ class BoardRenderer:
             )
             pygame.draw.circle(
                 surface,
-                self.colors["black"],
+                self.__colors__["black"],
                 (
                     bear_off_x + bear_off_width // 2,
                     bear_off_y + bear_off_height // 4,
@@ -325,7 +325,7 @@ class BoardRenderer:
 
             pygame.draw.circle(
                 surface,
-                self.colors["black"],
+                self.__colors__["black"],
                 (
                     bear_off_x + bear_off_width // 2,
                     bear_off_y + 3 * bear_off_height // 4,
@@ -365,7 +365,7 @@ class BoardRenderer:
 
             # Top points (13-18) - pointing down
             color = (
-                self.colors["point_light"] if i % 2 == 0 else self.colors["point_dark"]
+                self.__colors__["point_light"] if i % 2 == 0 else self.__colors__["point_dark"]
             )
             self.draw_triangular_point(
                 surface,
@@ -379,7 +379,7 @@ class BoardRenderer:
 
             # Bottom points (12-7) - pointing up
             color = (
-                self.colors["point_dark"] if i % 2 == 0 else self.colors["point_light"]
+                self.__colors__["point_dark"] if i % 2 == 0 else self.__colors__["point_light"]
             )
             self.draw_triangular_point(
                 surface,
@@ -398,7 +398,7 @@ class BoardRenderer:
 
             # Top points (19-24) - pointing down
             color = (
-                self.colors["point_dark"] if i % 2 == 0 else self.colors["point_light"]
+                self.__colors__["point_dark"] if i % 2 == 0 else self.__colors__["point_light"]
             )
             self.draw_triangular_point(
                 surface,
@@ -412,7 +412,7 @@ class BoardRenderer:
 
             # Bottom points (6-1) - pointing up
             color = (
-                self.colors["point_light"] if i % 2 == 0 else self.colors["point_dark"]
+                self.__colors__["point_light"] if i % 2 == 0 else self.__colors__["point_dark"]
             )
             self.draw_triangular_point(
                 surface,

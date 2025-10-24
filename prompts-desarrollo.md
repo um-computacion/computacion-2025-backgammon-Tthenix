@@ -3129,3 +3129,78 @@ cli/command_parser.py
 cli/input_validator.py
 cli/game_controller.py
 cli/user_interface.py
+
+---
+
+## Prompt 23
+
+### Claude-4-sonnet:
+
+### Prompt:
+
+Change all attributes to the attribute format (mandatory requirement).
+
+### Answer:
+
+Perfect! I have successfully completed the change of all attributes to the attribute format according to the course requirements.
+
+✅ COMPLETED – Attribute Change to attribute
+
+Summary of changes made:
+
+✅ Core Classes – All attributes updated:
+
+core/backgammon.py: player1, player2, board, dice, current_player, last_roll, available_moves, move_history, player1_checkers, player2_checkers
+
+core/player.py: name, color, checkers_count, captured_checkers, bear_off_count
+
+core/board.py: points, checker_bar, off_board
+
+core/checker.py: color, position, is_on_bar, is_born_off
+
+✅ CLI Classes – All attributes updated:
+
+cli/cli.py: game, \_running, board_renderer, command_parser, input_validator, game_controller, user_interface
+
+cli/board_renderer.py: board_width, separator_char
+
+cli/game_controller.py: game
+
+✅ Pygame UI Classes – All attributes updated:
+
+pygame_ui/backgammon_board.py: width, height, screen, colors, board_margin, border_width, center_gap_width, bear_off_width, point_width, point_height, checker_radius, dice_size, dice_dot_radius, board_renderer, checker_renderer, dice_renderer, interaction, board_state, dice_values, game, roll_button
+
+pygame_ui/board_interaction.py: selected_point, valid_destinations, game, board_state
+
+pygame_ui/button.py: rect, text, color, hover_color, text_color, is_hovered
+
+pygame_ui/renderers/: All renderer attributes updated
+
+✅ Test Files – All test files updated:
+
+Imports fixed
+
+Attribute references updated
+
+Comparison methods (eq) adjusted
+
+Current status:
+✅ All attributes converted to the attribute format
+✅ Code fully in English as required
+✅ Tests updated to use new private attribute names
+✅ Comparison methods corrected to reference private attributes
+
+The project now fully complies with the mandatory requirement to use attributes in the attribute format, according to the course specifications. All files have been systematically updated to maintain consistency across the entire codebase.
+
+### What i do with the answer?
+
+i test it all, and i used it
+
+### reference:
+
+cli/cli.py
+cli/board_renderer.py
+cli/command_parser.py
+cli/input_validator.py
+cli/game_controller.py
+cli/user_interface.py

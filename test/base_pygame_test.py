@@ -11,14 +11,17 @@ from core.backgammon import BackgammonGame
 class BasePygameTest(TestCase):
     """Clase base con lógica compartida para tests de pygame UI."""
 
-    board: "BackgammonBoard"
-    game: "BackgammonGame"
+    def __init__(self, *args, **kwargs):
+        """Initialize test with board and game attributes."""
+        super().__init__(*args, **kwargs)
+        self.__board__: "BackgammonBoard" = None
+        self.__game__: "BackgammonGame" = None
 
     def _init_board_and_game(self) -> None:
         """Crear tablero y juego inicializados y reflejarlos en el tablero."""
 
-        self.board = BackgammonBoard()
-        self.game = BackgammonGame()
-        self.game.setup_initial_position()
-        self.board.set_game(self.game)
-        self.board.update_from_game()
+        self.__board__ = BackgammonBoard()
+        self.__game__ = BackgammonGame()
+        self.__game__.setup_initial_position()
+        self.__board__.set_game(self.__game__)
+        self.__board__.update_from_game()
