@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from cli.cli import BackgammonCLI
+from cli.input_validator import InputValidator
 
 
 class TestBackgammonCLI(unittest.TestCase):
@@ -262,6 +263,408 @@ class TestBackgammonCLI(unittest.TestCase):
         # the turn display logic is called by checking board output
         output = self._run_commands(["board", "quit"])
         self.assertIn("CURRENT TURN:", output)
+
+    # ==================== INPUT VALIDATOR TESTS ====================
+
+    def test_input_validator_validate_point_valid(self):
+        """Test InputValidator.validate_point with valid points.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test valid points
+        self.assertTrue(validator.validate_point(1))
+        self.assertTrue(validator.validate_point(12))
+        self.assertTrue(validator.validate_point(24))
+
+    def test_input_validator_validate_point_invalid(self):
+        """Test InputValidator.validate_point with invalid points.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test invalid points
+        self.assertFalse(validator.validate_point(0))
+        self.assertFalse(validator.validate_point(25))
+        self.assertFalse(validator.validate_point(-1))
+        self.assertFalse(validator.validate_point(100))
+
+    def test_input_validator_validate_die_value_valid(self):
+        """Test InputValidator.validate_die_value with valid die values.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test valid die values
+        self.assertTrue(validator.validate_die_value(1))
+        self.assertTrue(validator.validate_die_value(3))
+        self.assertTrue(validator.validate_die_value(6))
+
+    def test_input_validator_validate_die_value_invalid(self):
+        """Test InputValidator.validate_die_value with invalid die values.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test invalid die values
+        self.assertFalse(validator.validate_die_value(0))
+        self.assertFalse(validator.validate_die_value(7))
+        self.assertFalse(validator.validate_die_value(-1))
+        self.assertFalse(validator.validate_die_value(10))
+
+    def test_input_validator_parse_int_input_valid(self):
+        """Test InputValidator.parse_int_input with valid integer strings.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test valid integer strings
+        self.assertEqual(validator.parse_int_input("5"), 5)
+        self.assertEqual(validator.parse_int_input("  10  "), 10)  # With whitespace
+        self.assertEqual(validator.parse_int_input("0"), 0)
+        self.assertEqual(validator.parse_int_input("-5"), -5)
+
+    def test_input_validator_parse_int_input_invalid(self):
+        """Test InputValidator.parse_int_input with invalid strings.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test invalid strings that should return None
+        self.assertIsNone(validator.parse_int_input("abc"))
+        self.assertIsNone(validator.parse_int_input("12.5"))
+        self.assertIsNone(validator.parse_int_input(""))
+        self.assertIsNone(validator.parse_int_input("   "))
+        self.assertIsNone(validator.parse_int_input("5.0"))
+        self.assertIsNone(validator.parse_int_input("hello world"))
+
+    def test_input_validator_validate_move_points_valid(self):
+        """Test InputValidator.validate_move_points with valid move points.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test valid move points
+        self.assertTrue(validator.validate_move_points(1, 2))
+        self.assertTrue(validator.validate_move_points(12, 15))
+        self.assertTrue(validator.validate_move_points(24, 23))
+
+    def test_input_validator_validate_move_points_invalid(self):
+        """Test InputValidator.validate_move_points with invalid move points.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test invalid move points
+        self.assertFalse(validator.validate_move_points(0, 2))  # Invalid from_point
+        self.assertFalse(validator.validate_move_points(1, 25))  # Invalid to_point
+        self.assertFalse(validator.validate_move_points(0, 25))  # Both invalid
+        self.assertFalse(validator.validate_move_points(-1, 2))  # Negative from_point
+        self.assertFalse(validator.validate_move_points(1, 0))  # Invalid to_point
+
+    def test_input_validator_get_validation_error_message(self):
+        """Test InputValidator.get_validation_error_message for different input types.
+
+        Returns:
+            None
+        """
+
+        validator = InputValidator()
+
+        # Test specific error messages
+        self.assertEqual(
+            validator.get_validation_error_message("point"),
+            "[ERROR] Point must be between 1 and 24.",
+        )
+        self.assertEqual(
+            validator.get_validation_error_message("die"),
+            "[ERROR] Die value must be between 1 and 6.",
+        )
+        self.assertEqual(
+            validator.get_validation_error_message("move"),
+            "[ERROR] Points must be between 1 and 24.",
+        )
+
+        # Test unknown input type (should return general message)
+        self.assertEqual(
+            validator.get_validation_error_message("unknown"),
+            "[ERROR] Invalid input. Please enter a valid number.",
+        )
+
+        # Test general fallback
+        self.assertEqual(
+            validator.get_validation_error_message("general"),
+            "[ERROR] Invalid input. Please enter a valid number.",
+        )
+
+    def test_input_validator_initialization(self):
+        """Test InputValidator initialization.
+
+        Returns:
+            None
+        """
+
+        # Test that validator can be initialized
+        validator = InputValidator()
+        self.assertIsNotNone(validator)
+
+        # Test that all methods are callable
+        self.assertTrue(callable(validator.validate_point))
+        self.assertTrue(callable(validator.validate_die_value))
+        self.assertTrue(callable(validator.parse_int_input))
+        self.assertTrue(callable(validator.validate_move_points))
+        self.assertTrue(callable(validator.get_validation_error_message))
+
+    # ==================== CLI COVERAGE TESTS ====================
+
+    def test_cli_empty_command_handling(self):
+        """Test CLI handling of empty commands.
+
+        Returns:
+            None
+        """
+        # Test empty command handling (line 113)
+        output = self._run_commands(["", "quit"])
+        self.assertIn("Thanks for playing Backgammon! Goodbye.", output)
+
+    def test_cli_status_with_last_roll(self):
+        """Test status command when last roll exists.
+
+        Returns:
+            None
+        """
+        # Test status with last roll (lines 213-216)
+        with patch("core.dice.Dice.roll", return_value=(3, 4)):
+            output = self._run_commands(["roll", "status", "quit"])
+        self.assertIn("Last roll:", output)
+        self.assertIn("Available moves:", output)
+
+    def test_cli_moves_without_roll(self):
+        """Test moves command without rolling dice first.
+
+        Returns:
+            None
+        """
+        # Test moves without roll (lines 277-278)
+        output = self._run_commands(["moves", "quit"])
+        self.assertIn("You must roll the dice first", output)
+
+    def test_cli_moves_no_valid_destinations(self):
+        """Test moves command when no valid destinations exist.
+
+        Returns:
+            None
+        """
+        # Test moves with no valid destinations (lines 316-319)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            # Clear board to ensure no valid moves
+            self.__cli__.__game_controller__.__game__.__board__.__points__ = [
+                [] for _ in range(24)
+            ]
+            output = self._run_commands(["roll", "moves", "1", "quit"])
+        self.assertIn("No pieces available to move", output)
+
+    def test_cli_move_invalid_point_validation(self):
+        """Test move command with invalid point validation.
+
+        Returns:
+            None
+        """
+        # Test move with invalid point (lines 304, 306-310)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "move", "25", "quit", "quit"])
+        self.assertIn("Invalid input. Please enter a valid number", output)
+
+    def test_cli_move_invalid_destination_validation(self):
+        """Test move command with invalid destination validation.
+
+        Returns:
+            None
+        """
+        # Test move with invalid destination (lines 334-335)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "move", "1", "25", "quit", "quit"])
+        self.assertIn("Points must be between 1 and 24", output)
+
+    def test_cli_move_successful_move(self):
+        """Test successful move execution.
+
+        Returns:
+            None
+        """
+        # Test successful move (lines 338-342)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            self._run_commands(["roll", "move", "1", "2", "quit"])
+        # Should not show error messages for valid move
+
+    def test_cli_move_illegal_move_handling(self):
+        """Test move command with illegal move.
+
+        Returns:
+            None
+        """
+        # Test illegal move (lines 351-354)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "move", "10", "11", "quit"])
+        self.assertIn("Illegal move", output)
+
+    def test_cli_move_exhausts_moves(self):
+        """Test move command when moves are exhausted.
+
+        Returns:
+            None
+        """
+        # Test move exhaustion (lines 378-379)
+        self.__cli__.__game_controller__.__game__.setup_initial_position()
+        self.__cli__.__game_controller__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game_controller__.__game__.__available_moves__ = [1]
+        output = self._run_commands(["move", "1", "2", "quit"])
+        self.assertIn("No moves remaining", output)
+
+    def test_cli_enter_invalid_die_value(self):
+        """Test enter command with invalid die value.
+
+        Returns:
+            None
+        """
+        # Test enter with invalid die (lines 391, 394-397)
+        self.__cli__.__game_controller__.__game__.__board__.__checker_bar__[1] = [1]
+        self.__cli__.__game_controller__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game_controller__.__game__.__available_moves__ = [1, 2]
+        output = self._run_commands(["enter", "7", "quit"])
+        self.assertIn("Die value must be between 1 and 6", output)
+
+    def test_cli_enter_successful_entry(self):
+        """Test successful entry from bar.
+
+        Returns:
+            None
+        """
+        # Test successful entry (lines 409)
+        self.__cli__.__game_controller__.__game__.__board__.__checker_bar__[1] = [1]
+        self.__cli__.__game_controller__.__game__.__board__.__points__[0] = []
+        self.__cli__.__game_controller__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game_controller__.__game__.__available_moves__ = [1, 2]
+        output = self._run_commands(["enter", "1", "quit"])
+        self.assertIn("Checker entered from bar", output)
+
+    def test_cli_enter_blocked_entry(self):
+        """Test enter command when entry is blocked.
+
+        Returns:
+            None
+        """
+        # Test blocked entry (lines 421-422)
+        self.__cli__.__game_controller__.__game__.__board__.__checker_bar__[1] = [1]
+        self.__cli__.__game_controller__.__game__.__board__.__points__[0] = [2, 2]
+        self.__cli__.__game_controller__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game_controller__.__game__.__available_moves__ = [1, 2]
+        output = self._run_commands(["enter", "1", "quit"])
+        self.assertIn("Cannot enter with that die value", output)
+
+    def test_cli_bearoff_invalid_point(self):
+        """Test bearoff command with invalid point.
+
+        Returns:
+            None
+        """
+        # Test bearoff with invalid point (lines 426, 429-432)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "bearoff", "25", "quit"])
+        self.assertIn("Point must be between 1 and 24", output)
+
+    def test_cli_bearoff_successful(self):
+        """Test successful bearoff.
+
+        Returns:
+            None
+        """
+        # Test successful bearoff (lines 444)
+        for i in range(24):
+            self.__cli__.__game_controller__.__game__.__board__.__points__[i] = []
+        self.__cli__.__game_controller__.__game__.__board__.__points__[23] = [1]
+        self.__cli__.__game_controller__.__game__.__last_roll__ = (1, 2)
+        self.__cli__.__game_controller__.__game__.__available_moves__ = [1, 2]
+        output = self._run_commands(["bearoff", "24", "quit"])
+        self.assertIn("Checker borne off", output)
+
+    def test_cli_bearoff_invalid_conditions(self):
+        """Test bearoff when conditions are not met.
+
+        Returns:
+            None
+        """
+        # Test bearoff with invalid conditions (lines 477, 481)
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "bearoff", "6", "quit"])
+        self.assertIn("Cannot bear off from that point", output)
+
+    def test_cli_unknown_command_handling(self):
+        """Test handling of unknown commands.
+
+        Returns:
+            None
+        """
+        # Test unknown command (line 113 - continue on empty/unknown)
+        output = self._run_commands(["unknown_command", "quit"])
+        self.assertIn("Unknown command", output)
+
+    def test_cli_game_over_detection(self):
+        """Test game over detection and handling.
+
+        Returns:
+            None
+        """
+        # Test game over detection
+        self.__cli__.__game_controller__.__game__.__board__.__off_board__[0] = [1] * 15
+        output = self._run_commands(["end", "quit"])
+        self.assertIn("GAME OVER!", output)
+
+    def test_cli_turn_switching(self):
+        """Test turn switching functionality.
+
+        Returns:
+            None
+        """
+        # Test turn switching
+        with patch("core.dice.Dice.roll", return_value=(1, 2)):
+            output = self._run_commands(["roll", "end", "board", "quit"])
+        self.assertIn("Player 2 (black)", output)
+
+    def test_cli_board_display(self):
+        """Test board display functionality.
+
+        Returns:
+            None
+        """
+        # Test board display
+        output = self._run_commands(["board", "quit"])
+        self.assertIn("CURRENT TURN:", output)
+        self.assertIn("Player 1 (white)", output)
 
 
 if __name__ == "__main__":
