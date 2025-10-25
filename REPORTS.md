@@ -11,7 +11,7 @@ cli/game_controller.py                       36      1    97%   111
 cli/input_validator.py                       17      0   100%
 cli/user_interface.py                        44      0   100%
 core/__init__.py                              2      0   100%
-core/backgammon.py                          441     23    95%   164, 219-220, 460, 508, 591, 649, 652, 692, 696, 700, 707, 782-795, 928, 945, 967
+core/backgammon.py                          441     22    95%   164, 219-220, 460, 508, 591, 649, 652, 692, 696, 707, 782-795, 928, 945, 967
 core/board.py                               195      4    98%   199-200, 239, 274
 core/checker.py                              73      3    96%   67, 94, 193
 core/dice.py                                 15      1    93%   43
@@ -26,17 +26,14 @@ pygame_ui/renderers/board_renderer.py        82      4    95%   304-326
 pygame_ui/renderers/checker_renderer.py      84      6    93%   197-198, 276-282
 pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 -----------------------------------------------------------------------
-TOTAL                                      1861    124    93%
+TOTAL                                      1861    123    93%
 
 ```
 ## Pylint Report
 ```text
-************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_main
-test/test_pygame_ui_main.py:10:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
-test/test_pygame_ui_main.py:10:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
 
------------------------------------
-Your code has been rated at 9.97/10
+------------------------------------
+Your code has been rated at 10.00/10
 
 
 ```
