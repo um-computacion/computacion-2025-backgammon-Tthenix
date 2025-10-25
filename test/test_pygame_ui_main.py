@@ -7,7 +7,9 @@ game mechanics, and UI rendering.
 
 import unittest
 from unittest.mock import patch, Mock
-from test.base_pygame_test import BasePygameTest
+from test.base_pygame_test import (  # pylint: disable=import-error,no-name-in-module
+    BasePygameTest,
+)
 import pygame  # pylint: disable=import-error
 from pygame_ui.pygame_ui import (
     _handle_event,
