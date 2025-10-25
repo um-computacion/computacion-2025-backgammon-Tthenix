@@ -1,7 +1,10 @@
-"""Test module for basic Backgammon game functionality.
+"""Core tests for BackgammonGame functionality.
 
-This module contains tests for basic game mechanics, initialization,
-and simple operations.
+This module contains tests for the core BackgammonGame class including:
+- Initialization and setup
+- Basic game mechanics
+- Move validation
+- Game state management
 """
 
 import unittest
@@ -12,8 +15,8 @@ from core.board import Board
 from core.dice import Dice
 
 
-class TestBackgammonGameBasic(unittest.TestCase):
-    """Test class for basic BackgammonGame functionality."""
+class TestBackgammonCore(unittest.TestCase):
+    """Test class for core BackgammonGame functionality."""
 
     def setUp(self):
         """Set up test fixtures before each test method.
@@ -22,6 +25,8 @@ class TestBackgammonGameBasic(unittest.TestCase):
             None
         """
         self.__game__ = BackgammonGame()
+
+    # ==================== INITIALIZATION TESTS ====================
 
     def test_game_initialization_with_default_players(self):
         """Test game initialization with default players.
@@ -85,6 +90,8 @@ class TestBackgammonGameBasic(unittest.TestCase):
         self.assertEqual(len(self.__game__.__board__.__points__[12]), 5)
         self.assertEqual(len(self.__game__.__board__.__points__[7]), 3)
         self.assertEqual(len(self.__game__.__board__.__points__[5]), 5)
+
+    # ==================== DICE TESTS ====================
 
     @patch("core.dice.Dice.roll", return_value=(3, 5))
     def test_roll_dice_returns_valid_values(self, mock_roll):
@@ -160,6 +167,8 @@ class TestBackgammonGameBasic(unittest.TestCase):
         moves = self.__game__.get_available_moves()
         self.assertEqual(moves, [])
 
+    # ==================== MOVE VALIDATION TESTS ====================
+
     def test_validate_move_valid_move(self):
         """Test validating a valid move.
 
@@ -202,6 +211,93 @@ class TestBackgammonGameBasic(unittest.TestCase):
         self.__game__.__last_roll__ = (1, 2)
         is_valid = self.__game__.validate_move(23, 22)
         self.assertFalse(is_valid)
+
+    def test_validate_move_out_of_bounds(self):
+        """Test validate_move with out of bounds positions.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = (1, 2)
+        self.__game__.__available_moves__ = [1, 2]
+
+        result = self.__game__.validate_move(-1, 1)
+        self.assertFalse(result)
+
+        result = self.__game__.validate_move(0, 25)
+        self.assertFalse(result)
+
+    def test_validate_move_no_last_roll(self):
+        """Test validate_move when no dice have been rolled.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = None
+
+        result = self.__game__.validate_move(0, 1)
+        self.assertFalse(result)
+
+    def test_validate_move_no_available_moves(self):
+        """Test validate_move when no moves are available.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        # Don't set __last_roll__ to prevent regeneration of available moves
+        self.__game__.__available_moves__ = []
+
+        result = self.__game__.validate_move(0, 1)
+        self.assertFalse(result)
+
+    def test_validate_move_wrong_player(self):
+        """Test validate_move for wrong player.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__current_player__ = self.__game__.__player2__
+        self.__game__.__last_roll__ = (1, 2)
+        self.__game__.__available_moves__ = [1, 2]
+
+        # Try to move player 1's checker when it's player 2's turn
+        result = self.__game__.validate_move(0, 1)
+        self.assertFalse(result)
+
+    def test_validate_move_distance_not_available(self):
+        """Test validate_move with distance not in available moves.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = (1, 2)
+        self.__game__.__available_moves__ = [1, 2]
+
+        # Try to move distance 3 when only 1,2 are available
+        result = self.__game__.validate_move(0, 3)
+        self.assertFalse(result)
+
+    def test_validate_move_blocked_destination_advanced(self):
+        """Test validate_move to blocked destination with advanced scenario.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = (1, 2)
+        self.__game__.__available_moves__ = [1, 2]
+
+        # Mock board to have blocked destination (2+ opponent pieces)
+        with patch.object(self.__game__.__board__, "can_move", return_value=False):
+            result = self.__game__.validate_move(0, 1)
+            self.assertFalse(result)
+
+    # ==================== MOVE EXECUTION TESTS ====================
 
     def test_make_move_valid_move(self):
         """Test making a valid move.
@@ -249,6 +345,8 @@ class TestBackgammonGameBasic(unittest.TestCase):
         self.__game__.__available_moves__ = [1, 2]
         self.__game__.make_move(0, 1)
         self.assertNotIn(1, self.__game__.__available_moves__)
+
+    # ==================== GAME STATE TESTS ====================
 
     def test_switch_current_player(self):
         """Test switching the current player.
@@ -385,3 +483,85 @@ class TestBackgammonGameBasic(unittest.TestCase):
         self.assertIsInstance(copy, dict)
         self.assertIn("board", copy)
         self.assertIn("players", copy)
+
+    # ==================== HELPER METHOD TESTS ====================
+
+    def test_has_valid_moves_no_roll(self):
+        """Test has_valid_moves when no dice have been rolled.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = None
+
+        result = self.__game__.has_valid_moves()
+        self.assertFalse(result)
+
+    def test_has_valid_moves_no_available_moves(self):
+        """Test has_valid_moves when no moves are available.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        # Don't set __last_roll__ to prevent regeneration of available moves
+        self.__game__.__available_moves__ = []
+
+        result = self.__game__.has_valid_moves()
+        self.assertFalse(result)
+
+    def test_has_valid_moves_with_moves(self):
+        """Test has_valid_moves when moves are available.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+        self.__game__.__last_roll__ = (1, 2)
+        self.__game__.__available_moves__ = [1, 2]
+
+        result = self.__game__.has_valid_moves()
+        self.assertTrue(result)
+
+    def test_is_blocked_position_out_of_bounds(self):
+        """Test is_blocked_position with out of bounds positions.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+
+        result = self.__game__.is_blocked_position(-1, 1)
+        self.assertFalse(result)
+
+        result = self.__game__.is_blocked_position(24, 1)
+        self.assertFalse(result)
+
+    def test_can_hit_opponent_out_of_bounds(self):
+        """Test can_hit_opponent with out of bounds positions.
+
+        Returns:
+            None
+        """
+        self.__game__.setup_initial_position()
+
+        result = self.__game__.can_hit_opponent(-1, 1)
+        self.assertFalse(result)
+
+        result = self.__game__.can_hit_opponent(24, 1)
+        self.assertFalse(result)
+
+    def test_get_available_moves_no_last_roll(self):
+        """Test get_available_moves when no dice have been rolled.
+
+        Returns:
+            None
+        """
+        self.__game__.__last_roll__ = None
+        moves = self.__game__.get_available_moves()
+        self.assertEqual(moves, [])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -732,7 +732,7 @@ class BackgammonGame:
 
         # Check if player must enter from bar first
         if self.must_enter_from_bar():
-            return self._can_enter_from_bar(player_num)
+            return self.can_enter_from_bar(player_num)
 
         # Check regular moves
         for point in range(24):
@@ -743,7 +743,7 @@ class BackgammonGame:
         # Finally, check bearing off possibilities
         return self._can_bear_off_any(player_num)
 
-    def _can_enter_from_bar(self, player_num):
+    def can_enter_from_bar(self, player_num):
         """Return True if the player can legally enter from the bar with any die.
 
         Args:
