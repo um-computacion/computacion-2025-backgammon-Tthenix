@@ -351,7 +351,7 @@ class BoardInteraction:
 
             # Check if entry point is valid and not blocked
             if 0 <= entry_point < 24:
-                destination_pieces = self.__game__.__board__.points[entry_point]
+                destination_pieces = self.__game__.__board__.__points__[entry_point]
                 if (
                     len(destination_pieces) == 0
                     or len(destination_pieces) < 2

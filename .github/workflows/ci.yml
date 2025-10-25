@@ -33,6 +33,7 @@ jobs:
           echo "Coverage debug info:"
           ls -la core/
           coverage report --show-missing
+          echo "Coverage report excludes test files (configured in .coveragerc)"
       - name: Run Pylint and generate report
         run: |
           pylint --rcfile=.pylintrc core/ test/ > pylint_report.txt || true
