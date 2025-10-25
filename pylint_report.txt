@@ -1,4 +1,7 @@
+************* Module computacion-2025-backgammon-Tthenix.test.test_pygame_ui_main
+test/test_pygame_ui_main.py:10:0: E0401: Unable to import 'test.base_pygame_test' (import-error)
+test/test_pygame_ui_main.py:10:0: E0611: No name 'base_pygame_test' in module 'test' (no-name-in-module)
 
-------------------------------------
-Your code has been rated at 10.00/10
+-----------------------------------
+Your code has been rated at 9.97/10
 
