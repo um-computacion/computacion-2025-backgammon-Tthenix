@@ -37,7 +37,7 @@ def _handle_event(event, game, board) -> bool:
         return _handle_keydown(event, game, board)
     if event.type == pygame.MOUSEBUTTONDOWN:  # pylint: disable=no-member
         _handle_mouse_click(event, board)
-    if board.roll_button.handle_event(event):
+    if board.__roll_button__.handle_event(event):
         _handle_roll_button_click(game, board)
     return True
 
