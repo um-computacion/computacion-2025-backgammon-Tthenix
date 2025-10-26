@@ -127,8 +127,8 @@ class TestPygameUIMain(BasePygameTest):
         self.__game__.is_game_over = Mock(return_value=False)
 
         # Mock roll button
-        self.__board__.roll_button = Mock()
-        self.__board__.roll_button.handle_event.return_value = True
+        self.__board__.__roll_button__ = Mock()
+        self.__board__.__roll_button__.handle_event.return_value = True
 
         event = Mock()
         event.type = pygame.MOUSEBUTTONDOWN  # pylint: disable=no-member
