@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  backgammon:
+    build: .
+    container_name: backgammon-game
+    environment:
+      - DISPLAY=:99
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+

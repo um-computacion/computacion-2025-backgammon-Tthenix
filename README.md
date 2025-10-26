@@ -4,11 +4,27 @@
 
 ## How to Run
 
+### Docker Setup (Recommended)
+
+First, build and start the Docker container:
+
 ```bash
-python main.py --gui
+docker compose up --build
 ```
 
-And choice the option do you want
+Then, in a new terminal, execute the game:
+
+```bash
+docker exec -it backgammon-game python main.py
+```
+
+### Alternative: Direct Python Execution
+
+```bash
+python main.py
+```
+
+And choose the option you want
 
 ### Pygame Usage
 

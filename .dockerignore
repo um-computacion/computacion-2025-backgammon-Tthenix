@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+compose.y*ml
+.dockerignore
+
+# Project specific
+coverage_report.txt
+pylint_report.txt
+cobertura.xml
+*.log
+
+# Documentation
+README.md
+CHANGELOG.md
+JUSTIFICATION.md
+prompts-*.md
+REPORTS.md
+
+# Assets that might be large
+assets/
+test/
