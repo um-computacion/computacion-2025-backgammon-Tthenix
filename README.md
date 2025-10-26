@@ -4,19 +4,33 @@
 
 ## How to Run
 
-### Docker Setup (Recommended)
+### Docker Setup with Pygame UI Support (Recommended)
 
-First, build and start the Docker container:
+**Prerequisites for Pygame UI in Docker:**
+
+1. **Download and install XMing:**
+
+   - Windows: Download [XMing](https://sourceforge.net/projects/xming/) and install it
+   - Mac: Download [XQuartz](https://www.xquartz.org/) and install it
+
+2. **Start XLaunch:**
+
+   - Windows: Run "XLaunch" from Start Menu
+   - Mac: Open XQuartz, go to Settings > Security > Check "Allow connections from network clients"
+
+3. **Build and start the Docker container:**
 
 ```bash
 docker compose up --build
 ```
 
-Then, in a new terminal, execute the game:
+4. **Execute the game:**
 
 ```bash
 docker exec -it backgammon-game python main.py
 ```
+
+**Note:** With XMing/XQuartz, both CLI (option 1) and Pygame UI (option 2) will work in Docker!
 
 ### Alternative: Direct Python Execution
 

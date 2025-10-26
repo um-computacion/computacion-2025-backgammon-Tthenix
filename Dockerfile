@@ -32,6 +32,8 @@ COPY . .
 # Set environment variables for Pygame
 ENV SDL_VIDEODRIVER=dummy
 ENV DISPLAY=:99
+ENV SDL_AUDIODRIVER=dummy
+ENV PULSE_SERVER=unix:/tmp/pulse-socket
 
 # Make main.py executable
 RUN chmod +x main.py
