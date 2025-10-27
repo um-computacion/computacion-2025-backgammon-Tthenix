@@ -592,6 +592,57 @@ class BackgammonGame:
         state["game_over"] = self.is_game_over()
         return state
 
+    def get_serializable_state(self):
+        """Get a serializable version of the game state.
+
+        Returns:
+            dict: Dictionary containing serializable game state
+        """
+        state = {
+            "board": self.__board__.get_board_state(),
+            "current_player": {
+                "name": self.__current_player__.__name__,
+                "color": self.__current_player__.__color__,
+            },
+            "player1": {
+                "name": self.__player1__.__name__,
+                "color": self.__player1__.__color__,
+            },
+            "player2": {
+                "name": self.__player2__.__name__,
+                "color": self.__player2__.__color__,
+            },
+            "last_roll": self.__last_roll__,
+            "available_moves": self.__available_moves__,
+            "move_history": self.__move_history__,
+            "game_over": self.is_game_over(),
+        }
+        return state
+
+    def restore_from_state(self, state):
+        """Restore game state from serializable data.
+
+        Args:
+            state: Dictionary containing serialized game state
+
+        Returns:
+            None
+        """
+        # Restore board state
+        self.__board__.set_board_state(state["board"])
+
+        # Restore current player
+        current_player_name = state["current_player"]["name"]
+        if current_player_name == self.__player1__.__name__:
+            self.__current_player__ = self.__player1__
+        else:
+            self.__current_player__ = self.__player2__
+
+        # Restore game state
+        self.__last_roll__ = state["last_roll"]
+        self.__available_moves__ = state["available_moves"]
+        self.__move_history__ = state["move_history"]
+
     def get_player_by_color(self, color):
         """Get player by color.
 

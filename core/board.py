@@ -447,6 +447,19 @@ class Board:
             "off_board": [off.copy() for off in self.__off_board__],
         }
 
+    def set_board_state(self, state):
+        """Set the board state from a dictionary.
+
+        Args:
+            state: Dictionary containing board state
+
+        Returns:
+            None
+        """
+        self.__points__ = [point.copy() for point in state["points"]]
+        self.__checker_bar__ = [checker_bar.copy() for checker_bar in state["bar"]]
+        self.__off_board__ = [off.copy() for off in state["off_board"]]
+
     def copy(self):
         """Create a deep copy of the board.
 
