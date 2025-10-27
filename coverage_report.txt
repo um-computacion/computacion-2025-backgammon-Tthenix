@@ -17,7 +17,7 @@ core/game_persistence.py                     64      0   100%
 core/player.py                               43      0   100%
 pygame_ui/__init__.py                         0      0   100%
 pygame_ui/backgammon_board.py               195     44    77%   218, 317, 391, 403, 422, 436-454, 475-481, 493-498, 524-525, 566-567, 588-591, 602, 638-639, 648-651, 667-669, 688-700
-pygame_ui/board_interaction.py              183     31    83%   264, 284, 287, 306, 316, 335, 401, 418, 455, 463, 492, 512-522, 535, 544-546, 549, 595-596, 628-633
+pygame_ui/board_interaction.py              183     25    86%   264, 284, 287, 306, 316, 335, 401, 418, 455, 463, 492, 518-520, 535, 544-546, 549, 595-596, 628-633
 pygame_ui/button.py                          39      0   100%
 pygame_ui/pygame_ui.py                      134     28    79%   46, 48, 153-164, 178-194, 257-258, 299
 pygame_ui/renderers/__init__.py               4      0   100%
@@ -25,4 +25,4 @@ pygame_ui/renderers/board_renderer.py        82      4    95%   304-326
 pygame_ui/renderers/checker_renderer.py      84      6    93%   199-200, 278-284
 pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 -----------------------------------------------------------------------
-TOTAL                                      2070    178    91%
+TOTAL                                      2070    172    92%
