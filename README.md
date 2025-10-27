@@ -2,14 +2,28 @@
 
 ### Alumno: Nahuel Quiroga - 64048
 
+## Prerequisites
+
+1. Install Python 3.11+
+2. Create virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 ## How to Run
 
-### Execute docker to install redis server
+### Start Redis server
 
 ```bash
 docker-compose up -d
 ```
-### In another terminal 
+
+### Run the application
 
 ```bash
 python main.py --gui
