@@ -8,11 +8,9 @@ It follows SOLID principles with clear separation of concerns.
 import json
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
-
 import redis  # pylint: disable=import-error
-
 from .backgammon import BackgammonGame
-
+from .player import Player
 
 class GamePersistenceInterface(ABC):
     """Abstract interface for game persistence operations."""
@@ -186,7 +184,6 @@ class GamePersistenceService:
         game_state = self.__persistence__.load_game(game_id)
         if game_state:
             # Create a new game instance and restore state
-            from .player import Player
 
             player1 = Player(
                 game_state["player1"]["name"], game_state["player1"]["color"]

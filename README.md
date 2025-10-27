@@ -4,6 +4,13 @@
 
 ## How to Run
 
+### Execute docker to install redis server
+
+```bash
+docker-compose up -d
+```
+### In another terminal 
+
 ```bash
 python main.py --gui
 ```

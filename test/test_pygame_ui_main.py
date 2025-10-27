@@ -34,6 +34,8 @@ class TestPygameUIMain(BasePygameTest):
         """
         with patch("pygame.display.set_mode"), patch("pygame.init"):
             self._init_board_and_game()
+            # Agregar mock para persistence_service
+            self.__persistence_service__ = Mock()
 
     def test_handle_event_quit(self):
         """Test handling quit event returns False.
@@ -44,7 +46,7 @@ class TestPygameUIMain(BasePygameTest):
         event = Mock()
         event.type = pygame.QUIT  # pylint: disable=no-member
 
-        result = _handle_event(event, self.__game__, self.__board__)
+        result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
         self.assertFalse(result)
 
     def test_handle_event_game_over_escape(self):
@@ -60,7 +62,7 @@ class TestPygameUIMain(BasePygameTest):
         event.type = pygame.KEYDOWN  # pylint: disable=no-member
         event.key = pygame.K_ESCAPE  # pylint: disable=no-member
 
-        result = _handle_event(event, self.__game__, self.__board__)
+        result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
         self.assertFalse(result)
 
     def test_handle_event_game_over_reset(self):
@@ -76,7 +78,7 @@ class TestPygameUIMain(BasePygameTest):
         event.type = pygame.KEYDOWN  # pylint: disable=no-member
         event.key = pygame.K_r  # pylint: disable=no-member
 
-        result = _handle_event(event, self.__game__, self.__board__)
+        result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
         self.assertTrue(result)
 
     def test_handle_event_keydown(self):
@@ -93,7 +95,7 @@ class TestPygameUIMain(BasePygameTest):
 
         with patch("pygame_ui.pygame_ui._handle_keydown") as mock_handle:
             mock_handle.return_value = True
-            result = _handle_event(event, self.__game__, self.__board__)
+            result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
             self.assertTrue(result)
             mock_handle.assert_called_once_with(event, self.__game__, self.__board__)
 
@@ -114,7 +116,7 @@ class TestPygameUIMain(BasePygameTest):
         event.pos = (100, 200)
 
         with patch("pygame_ui.pygame_ui._handle_mouse_click") as mock_handle:
-            result = _handle_event(event, self.__game__, self.__board__)
+            result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
             self.assertTrue(result)
             mock_handle.assert_called_once_with(event, self.__board__)
 
@@ -135,7 +137,7 @@ class TestPygameUIMain(BasePygameTest):
         event.pos = (100, 200)  # Add pos attribute
 
         with patch("pygame_ui.pygame_ui._handle_roll_button_click") as mock_handle:
-            result = _handle_event(event, self.__game__, self.__board__)
+            result = _handle_event(event, self.__game__, self.__board__, self.__persistence_service__)
             self.assertTrue(result)
             mock_handle.assert_called_once_with(self.__game__, self.__board__)
 
