@@ -11,24 +11,24 @@ cli/game_controller.py                       36      1    97%   111
 cli/input_validator.py                       17      0   100%
 cli/user_interface.py                        44      0   100%
 core/__init__.py                              2      0   100%
-core/backgammon.py                          453     33    93%   161, 216-217, 437, 485, 568, 578-597, 609-621, 677, 680, 720, 724, 728, 735, 810-823, 956, 973, 995
-core/board.py                               199      7    96%   199-200, 239, 274, 459-461
+core/backgammon.py                          453     24    95%   161, 216-217, 437, 485, 568, 616, 677, 680, 720, 724, 728, 735, 810-823, 956, 973, 995
+core/board.py                               199      4    98%   199-200, 239, 274
 core/checker.py                              73      3    96%   67, 94, 193
 core/dice.py                                 15      1    93%   43
-core/file_persistence.py                     35     23    34%   43-49, 61-68, 80-87
-core/game_persistence.py                     64     33    48%   87-93, 105-112, 124-129, 140, 171-172, 184-197, 209
+core/file_persistence.py                     35      2    94%   86-87
+core/game_persistence.py                     64      0   100%
 core/player.py                               43      0   100%
 pygame_ui/__init__.py                         0      0   100%
 pygame_ui/backgammon_board.py               195     44    77%   218, 317, 391, 403, 422, 436-454, 475-481, 493-498, 524-525, 566-567, 588-591, 602, 638-639, 648-651, 667-669, 688-700
-pygame_ui/board_interaction.py              183     28    85%   264, 284, 287, 306, 316, 335, 401, 418, 455, 463, 492, 515-521, 535, 544-546, 549, 595-596, 628-633
-pygame_ui/button.py                          39      8    79%   82-94
+pygame_ui/board_interaction.py              183     31    83%   264, 284, 287, 306, 316, 335, 401, 418, 455, 463, 492, 512-522, 535, 544-546, 549, 595-596, 628-633
+pygame_ui/button.py                          39      0   100%
 pygame_ui/pygame_ui.py                      134     28    79%   46, 48, 153-164, 178-194, 257-258, 299
 pygame_ui/renderers/__init__.py               4      0   100%
 pygame_ui/renderers/board_renderer.py        82      4    95%   304-326
 pygame_ui/renderers/checker_renderer.py      84      6    93%   199-200, 278-284
 pygame_ui/renderers/dice_renderer.py         63      1    98%   157
 -----------------------------------------------------------------------
-TOTAL                                      2070    249    88%
+TOTAL                                      2070    178    91%
 
 ```
 ## Pylint Report
