@@ -1,5 +1,4 @@
 """Backgammon game module.
-
 This module contains the main BackgammonGame class that orchestrates
 the entire Backgammon game, managing players, board, dice, and game logic.
 """
@@ -12,14 +11,12 @@ from .checker import Checker
 
 class BackgammonGame:
     """Main Backgammon game class.
-
     Note: This class holds core game state and therefore carries several
     instance attributes by design. The attribute count is justified by the
     domain model (players, board, dice, history, etc.).
     """
 
     # pylint: disable=too-many-instance-attributes
-
     def __init__(self, player1=None, player2=None):
         """Initialize a new backgammon game.
 
@@ -308,7 +305,6 @@ class BackgammonGame:
 
     def _get_current_player_num(self):
         """Return 1 for player1, 2 for player2.
-
         Returns:
             int: Player number (1 or 2)
         """
@@ -316,11 +312,9 @@ class BackgammonGame:
 
     def _has_player_piece_at(self, from_point, player_num):
         """Check bounds and that the top checker at from_point belongs to player_num.
-
         Args:
             from_point (int): Point index (0-23)
             player_num (int): Player number (1 or 2)
-
         Returns:
             bool: True if player has piece at point, False otherwise
         """
@@ -332,10 +326,8 @@ class BackgammonGame:
 
     def _is_distance_available(self, distance):
         """Check whether the rolled distances include the given distance.
-
         Args:
             distance (int): Distance to check
-
         Returns:
             bool: True if distance is available, False otherwise
         """
@@ -346,12 +338,10 @@ class BackgammonGame:
 
     def _is_correct_direction(self, from_point, to_point, player_num):
         """Validate that the move goes in the correct direction for the player.
-
         Args:
             from_point (int): Source point index (0-23)
             to_point (int): Destination point index (0-23)
             player_num (int): Player number (1 or 2)
-
         Returns:
             bool: True if direction is correct, False otherwise
         """
@@ -363,24 +353,19 @@ class BackgammonGame:
 
     def make_move(self, from_point, to_point):
         """Execute a move on the board.
-
         Args:
             from_point (int): Source point index (0-23)
             to_point (int): Destination point index (0-23)
-
         Returns:
             bool: True if the move was successful, False otherwise
         """
         if not self.validate_move(from_point, to_point):
             return False
-
         if self.__current_player__ == self.__player1__:
             player_num = 1
         else:
             player_num = 2
-
         distance = abs(to_point - from_point)
-
         # Save previous state for history
         old_board = self.__board__.copy()
         move_info = {
@@ -396,10 +381,8 @@ class BackgammonGame:
             if len(self.__board__.__points__[to_point]) == 1:
                 if self.__board__.__points__[to_point][0] != player_num:
                     move_info["captured"] = self.__board__.__points__[to_point][0]
-
         # Execute movement
         success = self.__board__.move_piece(from_point, to_point, player_num)
-
         if success:
             # Remove used dice value - find and remove the first matching distance
             for i, move in enumerate(self.__available_moves__):
@@ -412,10 +395,8 @@ class BackgammonGame:
 
     def move_from_bar(self, dice_value):
         """Move a checker from the bar to the board.
-
         Args:
             dice_value (int): Dice value to use for the move
-
         Returns:
             bool: True if the move was successful, False otherwise
         """
@@ -445,15 +426,11 @@ class BackgammonGame:
         ]
         if len(player_pieces_on_bar) == 0:
             return False
-
         # Calculate entry point
-        # REGLA BACKGAMMON: Las fichas RE-ENTRAN por la HOME del OPONENTE
-        # Blancas (1) re-entran en puntos 0-5 (home de negras)
-        # Negras (2) re-entran en puntos 19-24 (home de blancas)
         if player_num == 1:
-            entry_point = dice_value - 1  # Blancas entran en 0-5
+            entry_point = dice_value - 1
         else:
-            entry_point = 24 - dice_value  # Negras entran en 19-24
+            entry_point = 24 - dice_value
 
         # Validate entry point
         if entry_point < 0 or entry_point >= 24:
@@ -591,6 +568,57 @@ class BackgammonGame:
             state["available_moves"].append(move)
         state["game_over"] = self.is_game_over()
         return state
+
+    def get_serializable_state(self):
+        """Get a serializable version of the game state.
+
+        Returns:
+            dict: Dictionary containing serializable game state
+        """
+        state = {
+            "board": self.__board__.get_board_state(),
+            "current_player": {
+                "name": self.__current_player__.__name__,
+                "color": self.__current_player__.__color__,
+            },
+            "player1": {
+                "name": self.__player1__.__name__,
+                "color": self.__player1__.__color__,
+            },
+            "player2": {
+                "name": self.__player2__.__name__,
+                "color": self.__player2__.__color__,
+            },
+            "last_roll": self.__last_roll__,
+            "available_moves": self.__available_moves__,
+            "move_history": self.__move_history__,
+            "game_over": self.is_game_over(),
+        }
+        return state
+
+    def restore_from_state(self, state):
+        """Restore game state from serializable data.
+
+        Args:
+            state: Dictionary containing serialized game state
+
+        Returns:
+            None
+        """
+        # Restore board state
+        self.__board__.set_board_state(state["board"])
+
+        # Restore current player
+        current_player_name = state["current_player"]["name"]
+        if current_player_name == self.__player1__.__name__:
+            self.__current_player__ = self.__player1__
+        else:
+            self.__current_player__ = self.__player2__
+
+        # Restore game state
+        self.__last_roll__ = state["last_roll"]
+        self.__available_moves__ = state["available_moves"]
+        self.__move_history__ = state["move_history"]
 
     def get_player_by_color(self, color):
         """Get player by color.

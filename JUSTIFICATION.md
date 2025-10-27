@@ -5,7 +5,7 @@
 El proyecto implementa un juego de Backgammon completo en Python siguiendo principios de arquitectura limpia y separación de responsabilidades. La arquitectura se divide en tres capas principales:
 
 1. **Capa Core (`core/`)**: Contiene toda la lógica de negocio del juego, independiente de cualquier interfaz de usuario
-2. **Capa CLI (`cli/`)**: Implementa la interfaz de línea de comandos siguiendo principios SOLID
+2. **Capa CLI (`cli/`)**: Implementa la interfaz de línea de comandos
 3. **Capa Pygame UI (`pygame_ui/`)**: Implementa la interfaz gráfica usando Pygame
 
 Esta separación garantiza que la lógica del juego sea reutilizable y testeable independientemente de la interfaz, cumpliendo con el principio de inversión de dependencias.
@@ -20,8 +20,8 @@ Esta separación garantiza que la lógica del juego sea reutilizable y testeable
 
 **Interfaces duales**:
 
-- CLI obligatorio para accesibilidad en entornos sin interfaz gráfica
-- Pygame UI obligatorio para experiencia visual atractiva con interacción mouse/teclado
+- CLI
+- Pygame
 
 ## Justificación de las clases elegidas (por qué, responsabilidades)
 
@@ -52,7 +52,7 @@ Esta separación garantiza que la lógica del juego sea reutilizable y testeable
 - **Responsabilidad**: Generar tiradas aleatorias y calcular movimientos disponibles
 - **Justificación**: Encapsula la lógica de dados para reutilización
 
-### CLI Classes (Arquitectura SOLID)
+### CLI Classes
 
 **BackgammonCLI**: Coordinador principal
 
@@ -84,7 +84,7 @@ Esta separación garantiza que la lógica del juego sea reutilizable y testeable
 - **Responsabilidad**: Manejar entrada/salida del usuario
 - **Justificación**: Centraliza operaciones de I/O
 
-### Pygame UI Classes (Arquitectura SOLID)
+### Pygame UI Classes
 
 **BackgammonBoard**: Coordinador principal de la interfaz gráfica
 
@@ -237,23 +237,6 @@ Esta separación garantiza que la lógica del juego sea reutilizable y testeable
 
 ### Casos de Error Específicos del Backgammon
 
-#### 🎯 **Movimientos Inválidos**
-
-- **Casilla Bloqueada**: Cuando se intenta mover a un punto ocupado por 2+ fichas del oponente
-- **Movimiento Imposible**: Cuando no hay movimientos válidos con los dados disponibles
-- **Dirección Incorrecta**: Movimientos en dirección opuesta a la regla del juego
-
-#### 🎯 **Estados de Juego Inválidos**
-
-- **Ficha No Encontrada**: Intentar mover desde un punto sin fichas del jugador
-- **Dados No Tirados**: Intentar mover sin haber tirado los dados
-- **Turno Incorrecto**: Intentar mover cuando no es el turno del jugador
-
-#### 🎯 **Bear Off Inválido**
-
-- **No Todas en Casa**: Intentar sacar fichas cuando no todas están en el tablero de casa
-- **Movimiento Exacto**: Intentar sacar con un dado mayor al necesario cuando hay fichas más lejanas
-
 ## Estrategias de testing y cobertura (qué se probó y por qué)
 
 ### Cobertura Actual: 92% (requisito: mínimo 90%)
@@ -286,29 +269,6 @@ Esta separación garantiza que la lógica del juego sea reutilizable y testeable
 - **Dados**: Controlar tiradas para testing determinístico
 - **Entrada de usuario**: Simular interacciones
 - **Pygame**: Mock de eventos gráficos
-
-### Plan de Pruebas Detallado
-
-#### 🎯 **Testing de Lógica de Negocio (Core)**
-
-- **BackgammonGame**: 104 tests cubriendo todos los escenarios de juego
-- **Board**: Validación de movimientos, capturas, bear off
-- **Checker**: Estados de fichas, transiciones de estado
-- **Player**: Gestión de jugadores y conteo de fichas
-- **Dice**: Lógica de dados, dobles, movimientos disponibles
-
-#### 🎯 **Testing de Interfaces**
-
-- **CLI**: Comandos, validación de entrada, flujo de usuario
-- **Pygame UI**: Eventos de mouse, renderizado, interacciones
-- **Componentes UI**: Botones, renderizadores, interacciones
-
-#### 🎯 **Testing de Escenarios Complejos**
-
-- **Juego Completo**: Desde inicio hasta victoria
-- **Casos Edge**: Dados dobles, movimientos forzados, bear off exacto
-- **Estados Inválidos**: Manejo de errores y recuperación
-- **Interfaz Gráfica**: Conversión de coordenadas, selección de fichas
 
 ## Referencias a requisitos SOLID y cómo se cumplen
 

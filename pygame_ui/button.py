@@ -70,10 +70,29 @@ class Button:
         # Draw button text
         try:
             font = pygame.font.Font(None, 28)
-            text_surface = font.render(self.__text__, True, self.__text_color__)
-            text_rect = text_surface.get_rect(center=self.__rect__.center)
-            surface.blit(text_surface, text_rect)
-        except pygame.error:  # pylint: disable=no-member
+            # Handle multi-line text
+            lines = self.__text__.split("\n")
+            if len(lines) == 1:
+                # Single line text
+                text_surface = font.render(self.__text__, True, self.__text_color__)
+                text_rect = text_surface.get_rect(center=self.__rect__.center)
+                surface.blit(text_surface, text_rect)
+            else:
+                # Multi-line text
+                line_height = font.get_height()
+                total_height = len(lines) * line_height
+                start_y = self.__rect__.center[1] - total_height // 2
+
+                for i, line in enumerate(lines):
+                    if line.strip():  # Only render non-empty lines
+                        text_surface = font.render(
+                            line.strip(), True, self.__text_color__
+                        )
+                        text_rect = text_surface.get_rect(
+                            center=(self.__rect__.center[0], start_y + i * line_height)
+                        )
+                        surface.blit(text_surface, text_rect)
+        except pygame.error:  # pylint: disable=no-member,broad-exception-caught
             pass  # If font fails, button will still be visible
 
     def handle_event(self, event: pygame.event.Event) -> bool:

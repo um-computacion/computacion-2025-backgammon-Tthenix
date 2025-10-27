@@ -7,10 +7,12 @@ It coordinates the game loop and event handling.
 
 import pygame  # pylint: disable=import-error
 from core.backgammon import BackgammonGame
+from core.game_persistence import RedisGamePersistence, GamePersistenceService
+from core.file_persistence import FileGamePersistence
 from pygame_ui.backgammon_board import BackgammonBoard
 
 
-def _handle_event(event, game, board) -> bool:
+def _handle_event(event, game, board, persistence_service) -> bool:
     """
     Handle a pygame event.
 
@@ -18,6 +20,7 @@ def _handle_event(event, game, board) -> bool:
         event: Pygame event
         game: BackgammonGame instance
         board: BackgammonBoard instance
+        persistence_service: GamePersistenceService instance
 
     Returns:
         True to continue running, False to quit
@@ -39,6 +42,10 @@ def _handle_event(event, game, board) -> bool:
         _handle_mouse_click(event, board)
     if board.__roll_button__.handle_event(event):
         _handle_roll_button_click(game, board)
+    if board.handle_save_button_click(event):
+        _handle_save_button_click(game, board, persistence_service)
+    if board.handle_load_button_click(event):
+        _handle_load_button_click(game, board, persistence_service)
     return True
 
 
@@ -131,6 +138,62 @@ def _handle_roll_button_click(game, board) -> None:
         board.update_from_game()
 
 
+def _handle_save_button_click(game, board, persistence_service) -> None:
+    """Handle save button click.
+
+    Args:
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+        persistence_service: GamePersistenceService instance
+
+    Returns:
+        None
+    """
+    # Check if dice have been rolled but no moves made yet
+    if game.__last_roll__ is not None and game.__available_moves__:
+        board.show_save_message("No puedes guardar después de tirar dados")
+        return
+
+    try:
+        success = persistence_service.save_game(game)
+        if success:
+            board.show_save_message("¡Juego guardado exitosamente!")
+        else:
+            board.show_save_message("Error al guardar el juego")
+    except (OSError, IOError, ValueError) as e:
+        board.show_save_message(f"Error al guardar: {str(e)[:30]}")
+
+
+def _handle_load_button_click(game, board, persistence_service) -> None:
+    """Handle load button click.
+
+    Args:
+        game: BackgammonGame instance
+        board: BackgammonBoard instance
+        persistence_service: GamePersistenceService instance
+
+    Returns:
+        None
+    """
+    try:
+        loaded_game = persistence_service.load_game()
+        if loaded_game:
+            # Replace current game with loaded game
+            game.__board__ = loaded_game.__board__
+            game.__current_player__ = loaded_game.__current_player__
+            game.__last_roll__ = loaded_game.__last_roll__
+            game.__available_moves__ = loaded_game.__available_moves__
+            game.__move_history__ = loaded_game.__move_history__
+
+            # Update the board display
+            board.update_from_game()
+            board.show_save_message("¡Juego cargado exitosamente!")
+        else:
+            board.show_save_message("No hay juego guardado")
+    except (OSError, IOError, ValueError) as e:
+        board.show_save_message(f"Error al cargar: {str(e)[:30]}")
+
+
 def _draw_win_message(screen, game) -> None:
     """
     Draw win message when the game ends.
@@ -186,6 +249,22 @@ def main() -> None:
     game = BackgammonGame()
     game.setup_initial_position()
 
+    # Initialize persistence service
+    try:
+        redis_persistence = RedisGamePersistence()
+        # Test connection using the proper method
+        if redis_persistence.test_connection():
+            persistence_service = GamePersistenceService(redis_persistence)
+            print("Redis connection successful")
+        else:
+            raise ConnectionError("Redis connection failed")
+    except (ConnectionError, TimeoutError, OSError) as e:
+        # Fallback to file-based persistence if Redis is not available
+        print(f"Redis not available: {e}")
+        print("Using file-based persistence instead")
+        file_persistence = FileGamePersistence()
+        persistence_service = GamePersistenceService(file_persistence)
+
     # Set the game instance in the board
     board.set_game(game)
 
@@ -194,8 +273,11 @@ def main() -> None:
 
     while running:
         for event in pygame.event.get():
-            if not _handle_event(event, game, board):
+            if not _handle_event(event, game, board, persistence_service):
                 running = False
+
+        # Update save message timer
+        board.update_save_message_timer()
 
         # Clear screen with a neutral background
         board.__screen__.fill((50, 50, 50))  # Dark gray background

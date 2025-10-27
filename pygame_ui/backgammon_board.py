@@ -100,6 +100,8 @@ class BackgammonBoard:
         self.__board_state__ = None
         self.__dice_values__ = None
         self.__game__ = None
+        self.__save_message__ = None
+        self.__save_message_timer__ = 0
 
         # Create roll dice button
         button_width = 100
@@ -112,6 +114,30 @@ class BackgammonBoard:
             text="ROLL DICE",
             color=(139, 69, 19),
             hover_color=(160, 82, 45),
+            text_color=(255, 255, 255),
+        )
+
+        # Create save game button (positioned at bottom of board)
+        self.__save_button__ = Button(
+            x=self.board_x + 20,
+            y=self.board_y + self.board_height + -20,
+            width=button_width,
+            height=button_height,
+            text="SAVE",
+            color=(34, 139, 34),
+            hover_color=(0, 128, 0),
+            text_color=(255, 255, 255),
+        )
+
+        # Create load game button (positioned next to save button)
+        self.__load_button__ = Button(
+            x=self.board_x + button_width + 40,
+            y=self.board_y + self.board_height + -20,
+            width=button_width,
+            height=button_height,
+            text="LOAD",
+            color=(70, 130, 180),
+            hover_color=(100, 149, 237),
             text_color=(255, 255, 255),
         )
 
@@ -269,8 +295,17 @@ class BackgammonBoard:
         # Draw roll dice button
         self.__roll_button__.draw(self.__screen__)
 
+        # Draw save game button (with conditional styling)
+        self._draw_save_button()
+
+        # Draw load game button
+        self.__load_button__.draw(self.__screen__)
+
         # Draw current player indicator
         self._draw_current_player_indicator()
+
+        # Draw save message
+        self.draw_save_message()
 
     def draw_all_checkers(self) -> None:
         """Draw all checkers on the board based on current game state.
@@ -486,7 +521,7 @@ class BackgammonBoard:
                 color = self.__colors__["white"]
                 texto_surface = font.render(texto, True, color)
                 self.__screen__.blit(texto_surface, (self.__board_margin__, 5))
-        except pygame.error:  # pylint: disable=no-member
+        except pygame.error:  # pylint: disable=no-member,broad-exception-caught
             pass
 
     def handle_board_click(self, x: int, y: int) -> None:
@@ -565,3 +600,101 @@ class BackgammonBoard:
             None
         """
         self.__interaction__.valid_destinations = destinations
+
+    def handle_save_button_click(self, event) -> bool:
+        """
+        Handle save button click event.
+
+        Args:
+            event: Pygame event
+
+        Returns:
+            True if button was clicked, False otherwise
+        """
+        return self.__save_button__.handle_event(event)
+
+    def handle_load_button_click(self, event) -> bool:
+        """
+        Handle load button click event.
+
+        Args:
+            event: Pygame event
+
+        Returns:
+            True if button was clicked, False otherwise
+        """
+        return self.__load_button__.handle_event(event)
+
+    def show_save_message(self, message: str) -> None:
+        """
+        Show a save confirmation message.
+
+        Args:
+            message: Message to display
+
+        Returns:
+            None
+        """
+        self.__save_message__ = message
+        self.__save_message_timer__ = 180  # Show for 3 seconds at 60 FPS
+
+    def update_save_message_timer(self) -> None:
+        """
+        Update the save message timer.
+
+        Returns:
+            None
+        """
+        if self.__save_message_timer__ > 0:
+            self.__save_message_timer__ -= 1
+            if self.__save_message_timer__ == 0:
+                self.__save_message__ = None
+
+    def _draw_save_button(self) -> None:
+        """
+        Draw the save button with conditional styling based on game state.
+
+        Returns:
+            None
+        """
+        # Check if save should be disabled (dice rolled but no moves made)
+        if (
+            self.__game__
+            and self.__game__.__last_roll__ is not None
+            and self.__game__.__available_moves__
+        ):
+            # Draw disabled save button
+            self.__save_button__.__color__ = (128, 128, 128)  # Gray
+            self.__save_button__.__hover_color__ = (128, 128, 128)  # Gray
+            self.__save_button__.__text_color__ = (200, 200, 200)  # Light gray text
+        else:
+            # Draw normal save button
+            self.__save_button__.__color__ = (34, 139, 34)  # Green
+            self.__save_button__.__hover_color__ = (0, 128, 0)  # Dark green
+            self.__save_button__.__text_color__ = (255, 255, 255)  # White text
+
+        self.__save_button__.draw(self.__screen__)
+
+    def draw_save_message(self) -> None:
+        """
+        Draw the save confirmation message.
+
+        Returns:
+            None
+        """
+        if not self.__save_message__:
+            return
+
+        try:
+            font = pygame.font.Font(None, 36)
+            text_surface = font.render(self.__save_message__, True, (0, 255, 0))
+            text_rect = text_surface.get_rect(center=(self.__width__ // 2, 50))
+
+            # Draw background rectangle
+            bg_rect = text_rect.inflate(20, 10)
+            pygame.draw.rect(self.__screen__, (0, 0, 0), bg_rect)
+            pygame.draw.rect(self.__screen__, (255, 255, 255), bg_rect, 2)
+
+            self.__screen__.blit(text_surface, text_rect)
+        except pygame.error:  # pylint: disable=no-member,broad-exception-caught
+            pass
