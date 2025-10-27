@@ -150,7 +150,9 @@ class CheckerRenderer:
             spacing = self.__checker_radius__ * 2 + 2
         else:
             # Condensed spacing for many checkers
-            spacing = (point_height - self.__checker_radius__ * 2) // (checker_count - 1)
+            spacing = (point_height - self.__checker_radius__ * 2) // (
+                checker_count - 1
+            )
             spacing = max(spacing, self.__checker_radius__ + 2)
 
         for i, player in enumerate(checkers):
@@ -194,7 +196,7 @@ class CheckerRenderer:
             text = font.render(str(count), True, self.__colors__["white"])
             text_rect = text.get_rect(center=(x, y))
             surface.blit(text, text_rect)
-        except pygame.error:  # pylint: disable=no-member
+        except pygame.error:  # pylint: disable=no-member,broad-exception-caught
             pass
 
     def draw_checkers_on_bar(  # pylint: disable=too-many-arguments,too-many-positional-arguments

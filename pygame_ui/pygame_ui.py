@@ -149,6 +149,11 @@ def _handle_save_button_click(game, board, persistence_service) -> None:
     Returns:
         None
     """
+    # Check if dice have been rolled but no moves made yet
+    if game.__last_roll__ is not None and game.__available_moves__:
+        board.show_save_message("No puedes guardar después de tirar dados")
+        return
+
     try:
         success = persistence_service.save_game(game)
         if success:

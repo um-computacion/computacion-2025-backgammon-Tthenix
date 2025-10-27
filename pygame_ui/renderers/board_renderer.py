@@ -301,7 +301,7 @@ class BoardRenderer:
             )
             surface.blit(black_text, black_rect)
 
-        except pygame.error:  # pylint: disable=no-member
+        except pygame.error:  # pylint: disable=no-member,broad-exception-caught
             # If font loading fails, draw simple geometric indicators
             pygame.draw.circle(
                 surface,
@@ -365,7 +365,9 @@ class BoardRenderer:
 
             # Top points (13-18) - pointing down
             color = (
-                self.__colors__["point_light"] if i % 2 == 0 else self.__colors__["point_dark"]
+                self.__colors__["point_light"]
+                if i % 2 == 0
+                else self.__colors__["point_dark"]
             )
             self.draw_triangular_point(
                 surface,
@@ -379,7 +381,9 @@ class BoardRenderer:
 
             # Bottom points (12-7) - pointing up
             color = (
-                self.__colors__["point_dark"] if i % 2 == 0 else self.__colors__["point_light"]
+                self.__colors__["point_dark"]
+                if i % 2 == 0
+                else self.__colors__["point_light"]
             )
             self.draw_triangular_point(
                 surface,
@@ -398,7 +402,9 @@ class BoardRenderer:
 
             # Top points (19-24) - pointing down
             color = (
-                self.__colors__["point_dark"] if i % 2 == 0 else self.__colors__["point_light"]
+                self.__colors__["point_dark"]
+                if i % 2 == 0
+                else self.__colors__["point_light"]
             )
             self.draw_triangular_point(
                 surface,
@@ -412,7 +418,9 @@ class BoardRenderer:
 
             # Bottom points (6-1) - pointing up
             color = (
-                self.__colors__["point_light"] if i % 2 == 0 else self.__colors__["point_dark"]
+                self.__colors__["point_light"]
+                if i % 2 == 0
+                else self.__colors__["point_dark"]
             )
             self.draw_triangular_point(
                 surface,
