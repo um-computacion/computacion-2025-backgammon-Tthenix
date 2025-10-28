@@ -2,3 +2,4 @@
 omit =
     */venv/*
     */test/*
+    */pygame_ui/*
