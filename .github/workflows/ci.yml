@@ -28,7 +28,6 @@ jobs:
       - name: Run tests and generate coverage report
         run: |
           coverage run -m unittest discover -s test -p "test_*.py"
-          coverage xml -o cobertura.xml
           coverage report -m > coverage_report.txt
           echo "Coverage debug info:"
           ls -la core/
