@@ -1,0 +1,633 @@
+"""
+Board Interaction Module
+
+This module handles mouse interactions and coordinate conversions
+for the backgammon board.
+"""
+
+from typing import Optional, List
+
+from core.backgammon import BackgammonGame
+
+
+class BoardInteraction:
+    """Handles mouse interactions and game state management for the board."""
+
+    def __init__(self) -> None:
+        """Initialize the board interaction handler.
+
+        Returns:
+            None
+        """
+        self.__selected_point__: Optional[int] = None
+        self.__valid_destinations__: Optional[List[int]] = None
+        self.__game__: Optional[BackgammonGame] = None
+        self.__board_state__: Optional[dict] = None
+
+    def set_game(self, game: BackgammonGame) -> None:
+        """
+        Set the game instance to use for game logic.
+
+        Args:
+            game: BackgammonGame instance
+
+        Returns:
+            None
+        """
+        self.__game__ = game
+
+    def set_board_state(self, board_state: dict) -> None:
+        """
+        Set the current board state.
+
+        Args:
+            board_state: Dictionary containing board state
+
+        Returns:
+            None
+        """
+        self.__board_state__ = board_state
+
+    def get_point_from_coordinates(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_width: int,
+        play_area_height: int,
+        point_width: int,
+        half_width: int,
+        center_gap_width: int,
+        bear_off_x: int = None,
+        bear_off_y: int = None,
+        bear_off_width: int = None,
+        bear_off_height: int = None,
+    ) -> Optional[int]:
+        """
+        Convert screen coordinates to board point index.
+
+        Args:
+            x: X coordinate on screen
+            y: Y coordinate on screen
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_width: Width of play area
+            play_area_height: Height of play area
+            point_width: Width of each point
+            half_width: Width of half board
+            center_gap_width: Width of center gap
+
+        Returns:
+            Point index (0-23) or None if not on a valid point
+        """
+        # Check bear-off area first
+        bear_off_result = self._check_bear_off_area(
+            x, y, bear_off_x, bear_off_y, bear_off_width, bear_off_height
+        )
+        if bear_off_result is not None:
+            return bear_off_result
+
+        # Check if click is within play area
+        if not self._is_within_play_area(
+            x, y, play_area_x, play_area_y, play_area_width, play_area_height
+        ):
+            return None
+
+        # Calculate point from coordinates
+        return self._calculate_point_from_position(
+            x,
+            y,
+            play_area_x,
+            play_area_y,
+            play_area_height,
+            point_width,
+            half_width,
+            center_gap_width,
+        )
+
+    def _check_bear_off_area(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        bear_off_x: int,
+        bear_off_y: int,
+        bear_off_width: int,
+        bear_off_height: int,
+    ) -> Optional[str]:
+        """Check if click is in bear-off area.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+            bear_off_x: X position of bear-off area
+            bear_off_y: Y position of bear-off area
+            bear_off_width: Width of bear-off area
+            bear_off_height: Height of bear-off area
+
+        Returns:
+            "off" if in bear-off area, None otherwise
+        """
+        if (
+            bear_off_x is not None
+            and bear_off_y is not None
+            and bear_off_width is not None
+            and bear_off_height is not None
+        ):
+            if (
+                bear_off_x <= x <= bear_off_x + bear_off_width
+                and bear_off_y <= y <= bear_off_y + bear_off_height
+            ):
+                return "off"
+        return None
+
+    def _is_within_play_area(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_width: int,
+        play_area_height: int,
+    ) -> bool:
+        """Check if coordinates are within play area.
+
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_width: Width of play area
+            play_area_height: Height of play area
+
+        Returns:
+            True if coordinates are within play area, False otherwise
+        """
+        return (
+            play_area_x <= x <= play_area_x + play_area_width
+            and play_area_y <= y <= play_area_y + play_area_height
+        )
+
+    def _calculate_point_from_position(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_height: int,
+        point_width: int,
+        half_width: int,
+        center_gap_width: int,
+    ) -> Optional[int]:
+        """Calculate point index from position.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_height: Height of play area
+            point_width: Width of each point
+            half_width: Width of half board
+            center_gap_width: Width of center gap
+
+        Returns:
+            Point index (0-23) or None if not on a valid point
+        """
+        mid_y = play_area_y + play_area_height // 2
+        is_top_half = y < mid_y
+        rel_x = x - play_area_x
+
+        # Check center gap (bar area)
+        if half_width <= rel_x <= half_width + center_gap_width:
+            return "bar"
+
+        # Left side
+        if rel_x < half_width:
+            point_index = int(rel_x / point_width)
+            return 12 + point_index if is_top_half else 11 - point_index
+
+        # Right side
+        rel_x_right = rel_x - half_width - center_gap_width
+        point_index = int(rel_x_right / point_width)
+        return 18 + point_index if is_top_half else 5 - point_index
+
+    def can_select_checker(self, point) -> bool:
+        """
+        Check if a checker at the given point can be selected.
+
+        Args:
+            point: Point index to check, or "bar" for bar selection
+
+        Returns:
+            True if checker can be selected, False otherwise
+        """
+        # Early validation checks
+        if not self._can_select_checker_basic_validation():
+            return False
+
+        # Handle bar selection
+        if point == "bar":
+            return self.can_select_from_bar()
+
+        # Check if player has pieces on bar (prevents moving other pieces)
+        if self._player_has_pieces_on_bar():
+            return False
+
+        # Validate point selection
+        return self._can_select_point_checker(point)
+
+    def _can_select_checker_basic_validation(self) -> bool:
+        """Check basic validation for checker selection.
+
+        Returns:
+            True if basic validation passes, False otherwise
+        """
+        if not self.__game__ or not self.__board_state__:
+            return False
+        if not self.__game__.__last_roll__:
+            return False
+        return self.__game__.has_valid_moves()
+
+    def _player_has_pieces_on_bar(self) -> bool:
+        """Check if current player has pieces on bar.
+
+        Returns:
+            True if current player has pieces on bar, False otherwise
+        """
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+        player_bar_index = 1 if current_player_num == 1 else 0
+
+        if "bar" not in self.__board_state__:
+            return False
+
+        player_pieces_on_bar = [
+            piece
+            for piece in self.__board_state__["bar"][player_bar_index]
+            if piece == current_player_num
+        ]
+        return len(player_pieces_on_bar) > 0
+
+    def _can_select_point_checker(self, point) -> bool:
+        """Check if a point checker can be selected.
+
+        Args:
+            point: Point index to check
+
+        Returns:
+            True if checker can be selected, False otherwise
+        """
+        # Handle special cases like "off" or "bar"
+        if not isinstance(point, int):
+            return False
+
+        if point >= len(self.__board_state__["points"]):
+            return False
+
+        checkers = self.__board_state__["points"][point]
+        if not checkers:
+            return False
+
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+        return checkers[0] == current_player_num
+
+    def can_select_from_bar(self) -> bool:
+        """
+        Check if a checker can be selected from the bar.
+
+        Returns:
+            True if current player has their own pieces on opponent's side, False otherwise
+        """
+        if not self.__game__ or not self.__board_state__:
+            return False
+
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+
+        # Check if current player has THEIR pieces on opponent's side
+        # Fichas blancas (1) capturadas están en el lado negro (index 1)
+        # Fichas negras (2) capturadas están en el lado blanco (index 0)
+        if "bar" not in self.__board_state__:
+            return False
+
+        if current_player_num == 1:
+            # Jugador blanco verifica el lado negro (index 1) para sus fichas blancas
+            bar_pieces = self.__board_state__["bar"][1]
+            return any(piece == 1 for piece in bar_pieces)
+
+        # Jugador negro verifica el lado blanco (index 0) para sus fichas negras
+        bar_pieces = self.__board_state__["bar"][0]
+        return any(piece == 2 for piece in bar_pieces)
+
+    def get_valid_destinations_from_bar(self) -> List[int]:
+        """
+        Get valid destinations for checkers entering from bar.
+
+        Returns:
+            List of valid destination point indices
+        """
+        if not self.__game__:
+            return []
+
+        destinations = []
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+
+        # Check each available dice value
+
+        for dice_value in self.__game__.__available_moves__:
+            if current_player_num == 1:
+
+                entry_point = dice_value - 1
+            else:
+
+                entry_point = 24 - dice_value
+
+            # Check if entry point is valid and not blocked
+            if 0 <= entry_point < 24:
+                destination_pieces = self.__game__.__board__.__points__[entry_point]
+                if (
+                    len(destination_pieces) == 0
+                    or len(destination_pieces) < 2
+                    or destination_pieces[0] == current_player_num
+                ):
+                    destinations.append(entry_point)
+
+        return destinations
+
+    def get_valid_destinations(self, from_point) -> List:
+        """
+        Get list of valid destination points for a checker.
+
+        Args:
+            from_point: Source point index or "bar"
+
+        Returns:
+            List of valid destination point indices or "off" for bearing off
+        """
+        if not self.__game__:
+            return []
+
+        # Handle bar destinations
+        if from_point == "bar":
+            return self.get_valid_destinations_from_bar()
+
+        # Get regular destinations
+        destinations = self.__game__.get_possible_destinations(from_point)
+
+        # Check if bearing off is possible
+        if self._can_bear_off_from_point(from_point):
+            destinations.append("off")
+
+        return destinations
+
+    def _can_bear_off_from_point(self, from_point: int) -> bool:
+        """
+        Check if a checker can be borne off from a specific point.
+
+        Args:
+            from_point: Source point index
+
+        Returns:
+            True if bearing off is possible, False otherwise
+        """
+        if not self.__game__:
+            return False
+
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+
+        # Check if player can bear off at all
+        if not self.__game__.can_bear_off(current_player_num):
+            return False
+
+        # Check if the specific point can bear off with available dice
+        for dice_value in self.__game__.__available_moves__:
+            if self.__game__.__board__.can_bear_off(
+                from_point, current_player_num, dice_value
+            ):
+                return True
+
+        return False
+
+    def select_checker(self, point) -> None:
+        """
+        Select a checker at the given point.
+
+        Args:
+            point: Point index to select or "bar"
+
+        Returns:
+            None
+        """
+        if self.can_select_checker(point):
+            self.__selected_point__ = point
+            self.__valid_destinations__ = self.get_valid_destinations(point)
+
+    def deselect_checker(self) -> None:
+        """Deselect the currently selected checker.
+
+        Returns:
+            None
+        """
+        self.__selected_point__ = None
+        self.__valid_destinations__ = None
+
+    def execute_checker_move(self, from_point, to_point) -> bool:
+        """
+        Execute a checker move from one point to another.
+
+        Args:
+            from_point: Source point index or "bar"
+            to_point: Destination point index or "off" for bearing off
+
+        Returns:
+            True if move was successful, False otherwise
+        """
+        if not self.__game__:
+            return False
+
+        # Handle move from bar
+        if from_point == "bar":
+            return self.execute_move_from_bar(to_point)
+
+        # Handle bearing off
+        if to_point == "off":
+            return self.execute_bearing_off(from_point)
+
+        # Validate and execute regular move
+        if self.__game__.validate_move(from_point, to_point):
+            success = self.__game__.make_move(from_point, to_point)
+            if success:
+                # Deseleccionar ficha
+                self.deselect_checker()
+                # Si no quedan movimientos disponibles, finalizar turno automáticamente
+                if not self.__game__.__available_moves__:
+                    # Reiniciar dados y movimientos y cambiar turno
+                    self.__game__.__last_roll__ = None
+                    self.__game__.__available_moves__ = []
+                    self.__game__.switch_current_player()
+                return True
+
+        return False
+
+    def execute_move_from_bar(self, to_point: int) -> bool:
+        """
+        Execute a move from bar to a point.
+
+        Args:
+            to_point: Destination point index
+
+        Returns:
+            True if move was successful, False otherwise
+        """
+        if not self.__game__:
+            return False
+
+        current_player_num = (
+            1 if self.__game__.__current_player__ == self.__game__.__player1__ else 2
+        )
+
+        # Calculate required dice value
+
+        if current_player_num == 1:
+
+            required_dice = to_point + 1
+        else:
+
+            required_dice = 24 - to_point
+
+        # Check if we have the required dice value
+        if required_dice not in self.__game__.__available_moves__:
+            return False
+
+        # Use the game's move_from_bar method
+        success = self.__game__.move_from_bar(required_dice)
+
+        if success:
+            self.deselect_checker()
+
+            if not self.__game__.__available_moves__:
+                self.__game__.__last_roll__ = None
+                self.__game__.__available_moves__ = []
+                self.__game__.switch_current_player()
+            return True
+        return False
+
+    def execute_bearing_off(self, from_point: int) -> bool:
+        """
+        Execute bearing off a checker from the board.
+
+        Args:
+            from_point: Source point index
+
+        Returns:
+            True if bearing off was successful, False otherwise
+        """
+        if not self.__game__:
+            return False
+
+        # Execute bearing off using game logic
+        success = self.__game__.bear_off_checker(from_point)
+        if success:
+            self.deselect_checker()
+            # Si no quedan movimientos disponibles, finalizar turno automáticamente
+            if not self.__game__.__available_moves__:
+                # Reiniciar dados y movimientos y cambiar turno
+                self.__game__.__last_roll__ = None
+                self.__game__.__available_moves__ = []
+                self.__game__.switch_current_player()
+            return True
+
+        return False
+
+    def handle_board_click(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        x: int,
+        y: int,
+        play_area_x: int,
+        play_area_y: int,
+        play_area_width: int,
+        play_area_height: int,
+        point_width: int,
+        half_width: int,
+        center_gap_width: int,
+        bear_off_x: int = None,
+        bear_off_y: int = None,
+        bear_off_width: int = None,
+        bear_off_height: int = None,
+    ) -> None:
+        """
+        Handle a mouse click on the board.
+
+        Args:
+            x: X coordinate of click
+            y: Y coordinate of click
+            play_area_x: X position of play area
+            play_area_y: Y position of play area
+            play_area_width: Width of play area
+            play_area_height: Height of play area
+            point_width: Width of each point
+            half_width: Width of half board
+            center_gap_width: Width of center gap
+            bear_off_x: X position of bear-off area
+            bear_off_y: Y position of bear-off area
+            bear_off_width: Width of bear-off area
+            bear_off_height: Height of bear-off area
+
+        Returns:
+            None
+        """
+        # Verificar si el jugador tiene movimientos válidos
+        if (
+            self.__game__
+            and self.__game__.__last_roll__
+            and not self.__game__.has_valid_moves()
+        ):
+            # Si no hay movimientos válidos, cambiar turno automáticamente
+            self.__game__.switch_current_player()
+            return
+
+        point = self.get_point_from_coordinates(
+            x,
+            y,
+            play_area_x,
+            play_area_y,
+            play_area_width,
+            play_area_height,
+            point_width,
+            half_width,
+            center_gap_width,
+            bear_off_x,
+            bear_off_y,
+            bear_off_width,
+            bear_off_height,
+        )
+
+        # Handle click outside valid area
+        if point is None:
+            # Click outside valid area - deselect
+            self.deselect_checker()
+            return
+
+        # If no checker selected, try to select one
+        if self.__selected_point__ is None:
+            self.select_checker(point)
+        else:
+            # If clicked on selected point again, deselect
+            if point == self.__selected_point__:
+                self.deselect_checker()
+            # If clicked on valid destination, execute move
+            elif self.__valid_destinations__ and point in self.__valid_destinations__:
+                self.execute_checker_move(self.__selected_point__, point)
+            # Otherwise, try to select new checker
+            else:
+                self.deselect_checker()
+                self.select_checker(point)

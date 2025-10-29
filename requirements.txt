@@ -1,0 +1,4 @@
+coverage==7.10.5
+pygame==2.6.0
+pylint>=3.0.0
+redis==7.0.1

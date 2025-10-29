@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+.cursor/
+.coverage
+.github/copilot-instructions.md
+htmlcov/
+.coverage.*
