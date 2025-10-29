@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Sprint 5
 
+### [0.0.21] - 2025-10-27
+
+### Added
+
+- Better docker implementation
+
 ### [0.0.21] - 2025-10-26
 
 ### Added
