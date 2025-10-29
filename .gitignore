@@ -6,4 +6,4 @@ venv/
 htmlcov/
 coverage.xml
 .coverage.*
-.cache/
+.cache/cobertura.xml
