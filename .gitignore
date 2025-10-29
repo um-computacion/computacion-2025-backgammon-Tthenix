@@ -4,7 +4,4 @@ venv/
 .coverage
 .github/copilot-instructions.md
 htmlcov/
-coverage.xml
 .coverage.*
-.cache/cobertura.xml
-cobertura.xml
