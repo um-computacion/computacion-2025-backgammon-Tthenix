@@ -7,3 +7,4 @@ htmlcov/
 coverage.xml
 .coverage.*
 .cache/cobertura.xml
+cobertura.xml
